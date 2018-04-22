@@ -1,0 +1,14 @@
+#!/usr/bin/env aptfile
+
+#https://github.com/seatgeek/bash-aptfile
+
+# trigger an apt-get update
+update
+
+#packages
+package "git-core"
+package "dos2unix"
+package "nmap"
+
+package "mysql-server"
+package "rabbitmq"

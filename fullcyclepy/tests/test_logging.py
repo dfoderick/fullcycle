@@ -1,0 +1,8 @@
+'''test logging'''
+from backend.fcmapp import ApplicationService, ComponentName
+
+APP = ApplicationService(ComponentName.fullcycle)
+
+APP.loginfo('Unit Test Info')
+APP.logdebug('Unit Test Debug')
+APP.logerror('Unit Test Error')

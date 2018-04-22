@@ -1,0 +1,3 @@
+put this line in a file called /etc/environment
+
+PYTHONPATH=/home/pi/fullcycle/fullcyclepy

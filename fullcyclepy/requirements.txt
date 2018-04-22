@@ -1,0 +1,38 @@
+#
+####### Python Requirements for Full Cycle #######
+#
+# Install using...
+# pip3 install -r requirements.txt
+#
+###### External apps. See atpfile ######
+#sudo apt-get install dos2unix
+#For discovery
+#sudo apt-get install nmap
+#
+###### Requirements without Version Specifiers ######
+jsonpickle
+#not nmap!
+python-nmap
+paramiko
+paho-mqtt
+telethon
+mysqlclient
+#mysqldb
+#mysql-python
+sqlalchemy
+#for RabbitMQ
+pika
+#for redis
+redis
+# for camera, this one will error on windows, of course
+python3-picamera
+#opencv not working
+#opencv-python
+
+#Linux doesnt seem to need colorama
+
+#for temperature module:
+#	Adafruit_DHT
+#	git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+#	cd Adafruit_Python_DHT
+#	sudo python3 setup.py install

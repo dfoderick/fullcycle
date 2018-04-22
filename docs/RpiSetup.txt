@@ -1,0 +1,57 @@
+
+How to install Full Cycle Mining on Raspberry Pi
+Reference Hardware
+	rpi 3 b v1.2
+	power adapter
+	touchscreen 7"
+	64GB sd card (or smaller if using cloud subscription)
+	usb keyboard and mouse may be necessary
+
+Install Guide
+	https://www.raspberrypi.org/documentation/installation/installing-images/README.md
+
+1. Download rpi Raspbian Desktop
+	https://www.raspberrypi.org/downloads/raspbian/
+	Etcher
+		https://etcher.io/
+
+2. Write image to sd card
+	takes 10 minutes or so
+	create ssh file on boot partition so will work headless
+
+3. Connect power and network. (camera, keyboard optional if have touch)
+
+4. boot
+	If gui display does not show then
+	ping raspberrypi.local to find ip address
+	It didnt show gui display the first time. But after I put ssh file on boot then
+	it booted to gui next time I ran it. Go figure.
+
+5. update
+	sudo apt-get update
+	sudo apt-get dist-upgrade
+	takes a long time to upgrade
+
+6. Setup
+	calibrate screen if needed
+	sudo apt-get install matchbox-keyboard
+	then reboot
+
+6. download fcm
+	sudo apt-get install git
+	git clone https://SkyLakeMine@bitbucket.org/SkyLakeMine/skylake.git
+
+7. run setup.py
+	python -V	[ it will probably say 2.7]
+	alias python='/usr/bin/python3.5'
+	requirements.txt?
+
+8. Enable gpio
+	sudo raspi-config
+
+default ssh login
+username: pi
+password: raspberry
+
+Useful downloads:
+	gpartition

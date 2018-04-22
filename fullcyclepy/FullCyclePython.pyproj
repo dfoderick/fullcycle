@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7dfacff8-8abe-4af3-8c58-61a88ae44e0d}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>backend\fcmapp.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+    <Name>FullCyclePython</Name>
+    <IsWindowsApplication>False</IsWindowsApplication>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include=".pylintrc" />
+    <Content Include="aptfile" />
+    <Content Include="backend\config\algos.conf" />
+    <Content Include="backend\config\cloud.json">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="backend\config\emailsendto.conf" />
+    <Content Include="backend\config\emaillogin.conf" />
+    <Content Include="backend\config\ftp.conf" />
+    <Content Include="backend\config\fullcycle.conf" />
+    <Content Include="backend\config\miners.conf" />
+    <Content Include="backend\config\minertypes.conf" />
+    <Content Include="backend\config\pools.conf" />
+    <Content Include="backend\config\rules.conf" />
+    <Content Include="backend\config\rules_future.conf" />
+    <Content Include="backend\config\services.conf" />
+    <Content Include="backend\fcmstop.cmd" />
+    <Content Include="backend\Readme.txt" />
+    <Content Include="backend\servicesstart.cmd" />
+    <Content Include="backend\servicesstop.cmd" />
+    <Content Include="backend\fcmstart.cmd" />
+    <Content Include="linux\environment.txt" />
+    <Content Include="linux\redis.service">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="linux\supervisord.conf" />
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="backend\component.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\doflow_discover.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\doflow_handlemessages.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\doflow_monitor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\simplemonitor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_discovered.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_log.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_monitorminer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_online.py" />
+    <Compile Include="backend\when_alert.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\config\__init__.py" />
+    <Compile Include="backend\when_discover.py" />
+    <Compile Include="backend\fcmapp.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_monitor.py" />
+    <Compile Include="backend\when_restart.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_sensor_reading.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_offline.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_provision.py" />
+    <Compile Include="backend\when_provision_dispatch.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_runrules.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\runcommand.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\schedule.py" />
+    <Compile Include="backend\when_shutdown.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\temperature\tempsensor.py" />
+    <Compile Include="backend\when_switch.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\logging.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\loggingrepository.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\miningrules.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\sensors.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\services.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\camerahelper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\taskschedule.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\temperaturehelper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="messaging\schema.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\mining.py" />
+    <Compile Include="domain\rep.py" />
+    <Compile Include="domain\repository.py" />
+    <Compile Include="domain\__init__.py" />
+    <Compile Include="helpers\antminerhelper.py" />
+    <Compile Include="helpers\minerapi.py" />
+    <Compile Include="helpers\mydeviceshelper.py" />
+    <Compile Include="helpers\networkhelper.py" />
+    <Compile Include="helpers\queuehelper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\ssh.py" />
+    <Compile Include="helpers\telegramhelper.py" />
+    <Compile Include="helpers\__init__.py" />
+    <Compile Include="hw\wincam.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hw\winvidcam.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="messaging\messages.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="messaging\sensormessages.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="messaging\__init__.py" />
+    <Compile Include="tests\test_broadcast.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_db.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_json_message.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_logging.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_miner.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_minerapi.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_mining.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_minersummary.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_rules.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_telegram.py" />
+    <Compile Include="backend\when_email.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_temperature.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="backend\" />
+    <Folder Include="backend\config\" />
+    <Folder Include="backend\temperature\" />
+    <Folder Include="db\" />
+    <Folder Include="domain\" />
+    <Folder Include="helpers\" />
+    <Folder Include="messaging\" />
+    <Folder Include="hw\" />
+    <Folder Include="linux\" />
+    <Folder Include="docs\" />
+    <Folder Include="tests\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
