@@ -18,17 +18,17 @@ HEARTBEAT = TaskSchedule(run_on_init=True)
 HEARTBEAT.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
 HEARTBEAT.interval = 60 * APP.configuration('schedule.hearbeat.minutes')
 
-MONITOR = TaskSchedule()
+MONITOR = TaskSchedule(run_on_init=True)
 MONITOR.interval = APP.configuration('schedule.monitor.seconds')
 
-DISCOVER = TaskSchedule()
+DISCOVER = TaskSchedule(run_on_init=True)
 DISCOVER.interval = 60 * APP.configuration('schedule.discover.minutes')
 
-CAMERA = TaskSchedule(run_on_init=False)
+CAMERA = TaskSchedule(run_on_init=True)
 CAMERA.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
 CAMERA.interval = 60 * APP.configuration('schedule.camera.minutes')
 
-TEMPERATURE = TaskSchedule(run_on_init=False)
+TEMPERATURE = TaskSchedule(run_on_init=True)
 TEMPERATURE.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
 TEMPERATURE.interval = 60 * APP.configuration('schedule.temperature.minutes')
 
@@ -47,27 +47,33 @@ while True:
             DISCOVER.lastrun = datetime.datetime.now()
 
         if CAMERA.is_time_to_run():
-            print("[{0}] sending camera".format(APP.now()))
-            APP.take_picture('fullcycle_camera.png')
-            APP.sendtelegramfile('fullcycle_camera.png')
+            if APP.is_enabled_configuration('telegram') and APP.is_enabled_configuration('camera'):
+                print("[{0}] sending camera".format(APP.now()))
+                APP.take_picture('fullcycle_camera.png')
+                APP.sendtelegramfile('fullcycle_camera.png')
             CAMERA.lastrun = datetime.datetime.now()
 
         if TEMPERATURE.is_time_to_run():
-            print("[{0}] sending temperature".format(APP.now()))
-            SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
-            if SENSOR_HUMID is not None or TEMPERATURE is not None:
-                MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
-                APP.sendtelegrammessage(MESSAGE)
+            if APP.is_enabled_configuration('temperature') and APP.is_enabled_configuration('telegram'):
+                print("[{0}] sending temperature".format(APP.now()))
+                SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
+                if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
+                    MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
+                    APP.sendtelegrammessage(MESSAGE)
             TEMPERATURE.lastrun = datetime.datetime.now()
 
         if HEARTBEAT.is_time_to_run():
             print("[{0}] sending heartbeat".format(APP.now()))
+            MSG = 'At {0}'.format(APP.now())
             #get summary of known miners. name, hash or offline, pool
-            SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
-            if SENSOR_HUMID is not None and SENSOR_TEMP is not None:
-                MSG = 'At {0} Temp={1:0.1f}*  Humidity={2:0.1f}%\n{3}'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID, APP.minersummary())
+            if APP.is_enabled_configuration('temperature'):
+                SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
+                if SENSOR_HUMID is not None and SENSOR_TEMP is not None:
+                    MSG = MSG + 'Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(SENSOR_TEMP, SENSOR_HUMID)
+            MSG = MSG + '\n{0}'.format(APP.minersummary())
+            if APP.is_enabled_configuration('telegram'):
                 APP.sendtelegrammessage(MSG)
-                APP.sendqueueitem(QueueEntry(QueueName.Q_LOG, MSG, 'broadcast'))
+            APP.sendqueueitem(QueueEntry(QueueName.Q_LOG, MSG, 'broadcast'))
             HEARTBEAT.lastrun = datetime.datetime.now()
 
         time.sleep(SLEEP_SECONDS)

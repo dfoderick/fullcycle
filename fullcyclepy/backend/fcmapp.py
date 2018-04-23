@@ -215,11 +215,21 @@ class ApplicationService:
         return os.path.join(self.homedirectory, configfilename)
 
     def setup_configuration(self):
+        '''configuration is loaded once at startup'''
         raw = BaseRepository().readrawfile(self.getconfigfilename('config/fullcycle.conf'))
         self.__config = json.loads(raw)
 
     def configuration(self, key):
         return self.__config[key]
+
+    def is_enabled_configuration(self, key):
+        lookupkey = '{0}.enabled'.format(key)
+        if not lookupkey in self.__config:
+            return False
+        value = self.__config[lookupkey]
+        if isinstance(value,str):
+            return (value == 'true' or value == 'True')
+        return value
 
     def initminercache(self):
         '''put known miners into cache'''
