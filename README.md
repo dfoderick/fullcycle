@@ -21,7 +21,7 @@ FCM has been thoroughly tested on Rasbian Stretch.
 git clone https://github.com/dfoderick/fullcycle.git
 ```
 Any updated documentation and troubleshooting tips will be in /docs folder.
-Any platform specific scripts will be in /fullcyclepy/linux
+Any platform specific scripts will be in /os/linux
 
 ## Installing MySql/MariaDB
 
@@ -30,7 +30,7 @@ You may already have the database installed. Verify using the following command.
 pi@raspberrypi:~ $ mysql --version
 mysql  Ver 15.1 Distrib 10.1.23-MariaDB, for debian-linux-gnueabihf (armv7l) using readline 5.2
 ```
-If mysql is not install then follow these steps. Remember the user and password. 
+If mysql is not installed then follow these steps. Remember the user and password. 
 The following instructions assume user is `root` and password is `mining`. 
 ```
 sudo apt-get install mysql-server
