@@ -1,0 +1,2 @@
+tail -n 50 ~/fullcycle/fullcyclepy/backend/fcm.err
+#python3 ~/fullcycle/fullcyclepy/backend/when_log.py

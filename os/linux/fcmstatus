@@ -1,0 +1,3 @@
+#sudo systemctl status fcmschedule.service
+sudo supervisorctl status all
+

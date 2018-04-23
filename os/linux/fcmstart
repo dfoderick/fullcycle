@@ -1,0 +1,7 @@
+
+#this will run services as daemon. use -n to run in forground
+#configuration is in /etc/supervisord.conf
+supervisord 
+sleep 5s
+fcmstatus
+
