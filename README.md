@@ -1,5 +1,14 @@
 # Full Cycle Mining (FCM) Controller
 Monitoring and active management for your Bitcoin mining operation.
+1. Temperature and Hashrate of ASIC miners
+2. Alerts based on customizable rules
+3. Switch Pools and Reset miner commands
+4. Discovery of new miners on the network
+5. Automatically configure miners with your pool worker accounts
+6. Temperature and Humidity monitoring of your mining room
+7. Camera photos of your mining room sent to you on a schedule
+8. Configurable, Extensible architecture built on workflow components and microservices
+9. Web UI for monitoring and management
 
 ## Requirements
 
@@ -104,20 +113,21 @@ redis> get foo
 !!! IMPORTANT !!!
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
 otherwise it installs an old version of erlang and you have to uninstall both!
-Also install socat before rabbitmq. You have been warned.
+Also install socat before rabbitmq.
 
-The following command download rabbitmq and set up a users for each component.
+The following commands download rabbitmq.
 ```
 apt-get install –y erlang logrotate
-apt-get -f install
-$ wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_10/rabbitmq-server_3.6.10-1_all.deb
-$ dpkg -i rabbitmq-server_3.6.10-1_all.deb
-$ sudo rabbitmq-plugins enable rabbitmq_management
+sudo apt-get install socat
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_10/rabbitmq-server_3.6.10-1_all.deb
+dpkg -i rabbitmq-server_3.6.10-1_all.deb
+sudo rabbitmq-plugins enable rabbitmq_management
 ```
 Start the rabbitmq service.
 ```
 rabbitmq-server start
 ```
+Set up a user for each component.
 ```
 $ sudo rabbitmqctl add_user fullcycle mining
 $ sudo rabbitmqctl set_user_tags fullcycle administrator
@@ -176,12 +186,18 @@ Then make each one executable.
 ```
 sudo chmod +x ~/bin/fcm*
 ```
-Make any required changes to services. Also, configure you Telegram account
-so that you can get updates about mining operations, photos and temperature.
+Currently, a Telgram account is required to get updates about mining operations, photos and temperature.
+If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
+Make any required changes to services.config.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ``` 
+Run the following command to test your Telegram integration. It will prompt for your phone number and you will respond with the configrmation number. If successful you will get a telegram message 
+with a picture from your mining controller (assuming you have a camera on your Raspberry Pi).
+```
+python3 ~/fullcycle/fullcyclepy/backend/test/test_telegram.py
+```
 You probably want to add your own pools. Add them to this file. 
 Be very careful to make sure the file is valid json!
 ```
