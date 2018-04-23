@@ -106,7 +106,7 @@ Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
 otherwise it installs an old version of erlang and you have to uninstall both!
 Also install socat before rabbitmq.
 
-The following command download rabbitmq and set up a user for each component.
+The following commands download rabbitmq.
 ```
 apt-get install –y erlang logrotate
 sudo apt-get install socat
@@ -118,6 +118,7 @@ Start the rabbitmq service.
 ```
 rabbitmq-server start
 ```
+Set up a user for each component.
 ```
 $ sudo rabbitmqctl add_user fullcycle mining
 $ sudo rabbitmqctl set_user_tags fullcycle administrator
