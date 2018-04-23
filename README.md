@@ -1,5 +1,14 @@
 # Full Cycle Mining (FCM) Controller
 Monitoring and active management for your Bitcoin mining operation.
+1. Temperature and Hashrate of ASIC miners
+2. Alerts based on customizable rules
+3. Switch Pools and Reset miner commands
+4. Discovery of new miners on the network
+5. Automatically configure miners with your pool worker accounts
+6. Temperature and Humidity monitoring of your mining room
+7. Camera photos of your mining room sent to you on a schedule
+8. Configurable, Extensible architecture built on workflow components and microservices
+9. Web UI for monitoring and management
 
 ## Requirements
 
