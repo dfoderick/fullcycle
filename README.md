@@ -104,9 +104,9 @@ redis> get foo
 !!! IMPORTANT !!!
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
 otherwise it installs an old version of erlang and you have to uninstall both!
-Also install socat before rabbitmq. You have been warned.
+Also install socat before rabbitmq.
 
-The following command download rabbitmq and set up a users for each component.
+The following command download rabbitmq and set up a user for each component.
 ```
 apt-get install –y erlang logrotate
 sudo apt-get install socat
