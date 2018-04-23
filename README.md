@@ -16,7 +16,9 @@ Monitoring and active management for your Bitcoin mining operation.
 2. Rabbit Message Broker
 3. redis
 4. MySql (MariaDB)
+
 Optional:
+
 5. Camera for your Raspberry Pi
 6. DHT22 Temperature and Humidity Sensor
 7. Telegram Account
@@ -27,6 +29,7 @@ This installation assumes you are using a Raspberry Pi
 but should also work for most flavors of Linux. FCM will
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Rasbian Stretch.
+You should execute the installation using a ssh command line.
 
 ## Downloading Full Cycle Mining
 
@@ -36,6 +39,28 @@ git clone https://github.com/dfoderick/fullcycle.git
 Any updated documentation and troubleshooting tips will be in /docs folder.
 Any platform specific scripts will be in /os/linux
 
+Before beginning, make sure your system is up to date.
+```
+sudo apt-get update
+```
+Full Cycle Mining requires an environment setting for Python.
+```
+sudo nano /etc/environment
+```
+Add the following line to the file and save it.
+
+PYTHONPATH=/home/pi/fullcycle/fullcyclepy
+
+The setting does not take effect immediately. You have to `logout` and log back in.
+When the environment is set correctly you will be able to print it.
+```
+pi@raspberrypi:~/bin $ printenv PYTHONPATH
+/home/pi/fullcycle/fullcyclepy
+```
+Install all the Python libraries.
+```
+```
+
 ## Installing MySql/MariaDB
 
 You may already have the database installed. Verify using the following command.
@@ -43,19 +68,26 @@ You may already have the database installed. Verify using the following command.
 pi@raspberrypi:~ $ mysql --version
 mysql  Ver 15.1 Distrib 10.1.23-MariaDB, for debian-linux-gnueabihf (armv7l) using readline 5.2
 ```
-If mysql is not installed then follow these steps. Remember the user and password. 
-The following instructions assume user is `root` and password is `mining`. 
+If you get a terminal response `command not found` then mysql is not installed and you should follow these steps. 
+Remember the password that you enter for the root user. Later we will add an application specific user. 
+The following instructions assume you enter a password `mining`. 
+Please use some kind of password. Do not leave it blank. 
 ```
 sudo apt-get install mysql-server
+```
+The next step will configure sql for production. Use all the options to make your installation secure.
+```
 sudo mysql_secure_installation
 ```
-Make sure the sql service is running.
+Installation should leave sql running. 
+Check the status and start if it is not running.
 ```
+sudo service mysql status
 sudo service mysql start
 ```
 Get into the sql prompt.
 ```
-sudo mysql -u root 
+sudo mysql -u root -p
 ```
 Execute the following commands. Hit return after each command. Don't forget the semi-colon (;) at the end of each line.
 ```
@@ -65,7 +97,7 @@ use fullcycle;
 show tables;
 create table minerlog(minerlogid int NOT NULL AUTO_INCREMENT, minerid varchar(50), minername varchar(50), createdate datetime, action varchar(255), PRIMARY KEY (minerlogid));
 CREATE USER 'fullcycle'@'%' IDENTIFIED BY 'mining';
-GRANT ALL PRIVILEGES ON fullcycle.* TO 'fullcycle'@'%'
+GRANT ALL PRIVILEGES ON fullcycle.* TO 'fullcycle'@'%';
 exit
 ```
 
@@ -92,16 +124,46 @@ sudo cp src/redis-cli /usr/local/bin/
 ```
 Copy the configuration file from source and setup redis.
 ```
-cp src/redis-server /etc/redis/redis.conf
+sudo mkdir /etc/redis
+sudo mkdir /var/redis
+sudo cp utils/redis_init_script /etc/init.d/redis_6379
+sudo cp redis.conf /etc/redis/6379.conf
+sudo mkdir /var/redis/6379
+```
+Edit the config file.
+```
+sudo nano /etc/redis/6379.conf
+```
+Set daemonize yes
+
+Set the logfile to /var/log/redis_6379.log
+
+Set the dir to /var/redis/6379 (very important step!)
+```
+sudo update-rc.d redis_6379 defaults
+```
+If you get an error `insserv: warning: script 'redis_6379' missing LSB tags and overrides` then
+it means you need to do this.
+```
+sudo nano /etc/init.d/redis_6379
+```
+Add the following lines under `#!/bin/sh`
+```
+### BEGIN INIT INFO
+# Provides:             noip
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Startup Redis
+### END INIT INFO
 ```
 Add a user that the redis service and execute under.
 ```
 sudo adduser --system --group --disabled-login redis --no-create-home --shell /bin/nologin --quiet
 ```
-Run the install.
+Run redis.
 ```
-cd utils
-./install_server.sh
+sudo chmod +x /etc/init.d/redis_6379
+sudo /etc/init.d/redis_6379 start
 ```
 Test your install. If the following commands are running the redis is configured.
 ```
@@ -110,21 +172,26 @@ redis> set foo bar
 OK
 redis> get foo
 "bar"
+redis> exit
 ```
+If you have any problem installing redis then see if there are 
+updated instructions at https://redis.io/topics/quickstart especially
+the section "Installing Redis more properly"
 
 ## Install RabbitMQ
 
-!!! IMPORTANT !!!
+!!! IMPORTANT !!!  
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
 otherwise it installs an old version of erlang and you have to uninstall both!
-Also install socat before rabbitmq.
-
+Also install socat before rabbitmq.  
+  
 The following commands download rabbitmq.
 ```
-apt-get install –y erlang logrotate
+sudo apt-get install erlang logrotate
 sudo apt-get install socat
-wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_10/rabbitmq-server_3.6.10-1_all.deb
-dpkg -i rabbitmq-server_3.6.10-1_all.deb
+sudo apt-get -f install
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.4/rabbitmq-server_3.7.4-1_all.deb
+sudo dpkg -i rabbitmq-server_3.7.4-1_all.deb
 sudo rabbitmq-plugins enable rabbitmq_management
 ```
 Start the rabbitmq service.
