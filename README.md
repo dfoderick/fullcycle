@@ -177,8 +177,8 @@ Then make each one executable.
 sudo chmod +x ~/bin/fcm*
 ```
 Currently, a Telgram account is required to get updates about mining operations, photos and temperature.
-If you don't already have an account go to https://telegram.org/ to get set up and get you api key.  
-Make any required changes to services. 
+If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
+Make any required changes to services.config.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
