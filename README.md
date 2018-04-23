@@ -176,12 +176,18 @@ Then make each one executable.
 ```
 sudo chmod +x ~/bin/fcm*
 ```
-Make any required changes to services. Also, configure you Telegram account
-so that you can get updates about mining operations, photos and temperature.
+Currently, a Telgram account is required to get updates about mining operations, photos and temperature.
+If you don't already have an account go to https://telegram.org/ to get set up and get you api key.  
+Make any required changes to services. 
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ``` 
+Run the following command to test your Telegram integration. It will prompt for your phone number and you will respond with the configrmation number. If successful you will get a telegram message 
+with a picture from your mining controller (assuming you have a camera on your Raspberry Pi).
+```
+python3 ~/fullcycle/fullcyclepy/backend/test/test_telegram.py
+```
 You probably want to add your own pools. Add them to this file. 
 Be very careful to make sure the file is valid json!
 ```
