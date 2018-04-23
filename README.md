@@ -16,6 +16,10 @@ Monitoring and active management for your Bitcoin mining operation.
 2. Rabbit Message Broker
 3. redis
 4. MySql (MariaDB)
+Optional:
+5. Camera for your Raspberry Pi
+6. DHT22 Temperature and Humidity Sensor
+7. Telegram Account
 
 ## Installation Overview
 
@@ -186,7 +190,7 @@ Then make each one executable.
 ```
 sudo chmod +x ~/bin/fcm*
 ```
-Currently, a Telgram account is required to get updates about mining operations, photos and temperature.
+A Telgram account is recommended to get updates about mining operations, photos and temperature.
 If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
 Make any required changes to services.config.
 Be very careful to make sure the file is valid json!
@@ -202,6 +206,11 @@ You probably want to add your own pools. Add them to this file.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/pools.conf
+``` 
+Review the application configuration settings to enable/disable hardware options and set
+monitoring intervals.
+```
+sudo nano ~/fullcycle/fullcyclepy/backend/config/fullcycle.conf
 ``` 
 Finally, start up Full Cycle Mining.
 ```
