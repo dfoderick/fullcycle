@@ -109,10 +109,10 @@ Also install socat before rabbitmq. You have been warned.
 The following command download rabbitmq and set up a users for each component.
 ```
 apt-get install –y erlang logrotate
-apt-get -f install
-$ wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_10/rabbitmq-server_3.6.10-1_all.deb
-$ dpkg -i rabbitmq-server_3.6.10-1_all.deb
-$ sudo rabbitmq-plugins enable rabbitmq_management
+sudo apt-get install socat
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_10/rabbitmq-server_3.6.10-1_all.deb
+dpkg -i rabbitmq-server_3.6.10-1_all.deb
+sudo rabbitmq-plugins enable rabbitmq_management
 ```
 Start the rabbitmq service.
 ```
