@@ -1,0 +1,3 @@
+cd ~/
+rm -r -f fullcycle
+git clone https://github.com/dfoderick/fullcycle.git

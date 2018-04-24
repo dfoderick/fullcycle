@@ -1,0 +1,2 @@
+cp -av ~/fullcycleconfig/*.conf ~/fullcycle/fullcyclepy/backend/config/.
+cp -av ~/fullcycleconfig/session_name.session ~/fullcycle/fullcyclepy/backend/.

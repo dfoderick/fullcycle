@@ -1,0 +1,10 @@
+cd ~/
+fcmstop
+fcmgit
+pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
+redis-cli -a mining flushall
+echo Waiting 5 seconds for updates ...
+fcmrestore
+sleep 5s
+fcmstart
+
