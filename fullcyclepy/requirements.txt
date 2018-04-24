@@ -11,13 +11,16 @@
 #
 ###### Requirements without Version Specifiers ######
 jsonpickle
+marshmallow
 #not nmap!
 python-nmap
 paramiko
 paho-mqtt
 telethon
-mysqlclient
+#sudo apt-get install python-mysqldb
 #mysqldb
+#mysql-client
+#mysqlclient
 #mysql-python
 sqlalchemy
 #for RabbitMQ

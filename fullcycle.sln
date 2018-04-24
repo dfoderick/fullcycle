@@ -4,13 +4,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4370790B-B16C-433C-8A28-9D3032EEE924}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "FullCyclePython", "fullcyclepy\FullCyclePython.pyproj", "{7DFACFF8-8ABE-4AF3-8C58-61A88AE44E0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{40B84771-52B4-487E-AC4E-30C7960D34EE}"
 	ProjectSection(SolutionItems) = preProject
+		docs\RaspberryPiSetup.md = docs\RaspberryPiSetup.md
 		docs\ReadMe.txt = docs\ReadMe.txt
 		docs\RpiSetup.txt = docs\RpiSetup.txt
+		docs\Troubleshooting.md = docs\Troubleshooting.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{0CF414F2-2531-4C92-965B-664968EC859B}"
+	ProjectSection(SolutionItems) = preProject
+		images\Full Cycle Mining Logo.png = images\Full Cycle Mining Logo.png
+		images\FullCycle_Controller.png = images\FullCycle_Controller.png
+		images\FullCycleReact.png = images\FullCycleReact.png
+		images\logo.jpg = images\logo.jpg
+		images\logo.png = images\logo.png
 	EndProjectSection
 EndProject
 Global
