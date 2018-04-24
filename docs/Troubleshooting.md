@@ -32,7 +32,3 @@ about the error.
 
 Go to your RabbitMQ site and see if  the queues are operating correctly.
 http://raspberrypi.local:15672/
-
-Run the following commands to see if there are any errrors.
-```
-```

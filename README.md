@@ -13,6 +13,11 @@ Monitoring and active management for your Bitcoin mining operation.
 ![Bitcoin Mining Controller Hardware](/images/FullCycle_Controller.png?raw=true "Bitcoin Mining Controller Hardware")
 ![Bitcoin Mining Controller UI](/images/FullCycleReact.png?raw=true "Bitcoin Mining Controller Web Site")
 
+## Contents
+[Requirements](#requirements)  
+[Installation Overview](#installation-overview)  
+[Troubleshooting](docs/Troubleshooting.md)  
+
 ## Requirements
 
 1. Python version 3.5 (or newer)
@@ -22,7 +27,7 @@ Monitoring and active management for your Bitcoin mining operation.
 
 Note: Currently supported on Rasbian Stretch.
 
-Optional:
+Optional:  
 
 5. Camera for your Raspberry Pi
 6. DHT22 Temperature and Humidity Sensor
@@ -64,6 +69,7 @@ pi@raspberrypi:~/bin $ printenv PYTHONPATH
 ```
 Install all the Python libraries.
 ```
+pip3 install -r requirements.txt
 ```
 Install supervisor.
 ```
@@ -149,9 +155,10 @@ Set `requirepass mining`
 
 Set the logfile to `/var/log/redis_6379.log`
 
-Set the dir to `/var/redis/6379` (very important step!)
+Set the dir to `/var/redis/6379` (very important step!)  
+The next command makes redis automatically start when system is reset.
 ```
-sudo update-rc.d redis_6379 defaults
+sudo update-rc.d redis_6379 start 80 2 3 4 5 . stop 20 0 1 6 .
 ```
 !!! Not needed for latest Rasbian Stretch
 If you get an error `insserv: warning: script 'redis_6379' missing LSB tags and overrides` then
@@ -174,11 +181,11 @@ Add a user that the redis service and execute under.
 sudo adduser --system --group --disabled-login redis --no-create-home --shell /bin/nologin --quiet
 sudo chmod +x /etc/init.d/redis_6379
 ```
-Run redis.
+Start redis.
 ```
 sudo /etc/init.d/redis_6379 start
 ```
-Test your install. If the following commands are running the redis is configured.
+Test your install. If the following commands are run then redis is configured.
 ```
 $ redis-cli
 redis> set foo bar
@@ -186,6 +193,10 @@ OK
 redis> get foo
 "bar"
 redis> exit
+```
+redis can also play ping pong.
+```
+redis-cli -a mining ping
 ```
 If you have any problem installing redis then see if there are 
 updated instructions at https://redis.io/topics/quickstart especially
@@ -204,7 +215,6 @@ The following commands download rabbitmq.
 ```
 wget https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
 sudo dpkg -i esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
-
 wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.4/rabbitmq-server_3.7.4-1_all.deb
 sudo dpkg -i rabbitmq-server_3.7.4-1_all.deb
 sudo rabbitmq-plugins enable rabbitmq_management
@@ -272,14 +282,17 @@ Then make each one executable.
 ```
 sudo chmod +x ~/bin/fcm*
 ```
-A Telgram account is recommended to get updates about mining operations, photos and temperature.
+A Telgram account is highly recommended to get updates from your controller 
+about mining operations, photos and temperature. It is the primary
+console that allows you to see what is happening to your miners.  
 If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
 Make any required changes to services.config.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ``` 
-Run the following command to test your Telegram integration. It will prompt for your phone number and you will respond with the configrmation number. If successful you will get a telegram message 
+Run the following command to test your Telegram integration. 
+It will prompt for your phone number and you will respond with the configrmation number. If successful you will get a telegram message 
 with a picture from your mining controller (assuming you have a camera on your Raspberry Pi).
 ```
 python3 ~/fullcycle/fullcyclepy/backend/test/test_telegram.py
