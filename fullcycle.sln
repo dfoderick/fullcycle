@@ -21,6 +21,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{0CF414F2-2531-4C92-965B-664968EC859B}"
 	ProjectSection(SolutionItems) = preProject
 		images\Full Cycle Mining Logo.png = images\Full Cycle Mining Logo.png
+		images\FullCycle_Controller.png = images\FullCycle_Controller.png
+		images\FullCycleReact.png = images\FullCycleReact.png
 		images\logo.jpg = images\logo.jpg
 		images\logo.png = images\logo.png
 	EndProjectSection
