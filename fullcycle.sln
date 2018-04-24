@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{40B84771-5
 		docs\RaspberryPiSetup.md = docs\RaspberryPiSetup.md
 		docs\ReadMe.txt = docs\ReadMe.txt
 		docs\RpiSetup.txt = docs\RpiSetup.txt
+		docs\Troubleshooting.md = docs\Troubleshooting.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{0CF414F2-2531-4C92-965B-664968EC859B}"

@@ -17,6 +17,8 @@ Monitoring and active management for your Bitcoin mining operation.
 3. redis
 4. MySql (MariaDB)
 
+Note: Currently supported on Rasbian Stretch.
+
 Optional:
 
 5. Camera for your Raspberry Pi
@@ -60,6 +62,10 @@ pi@raspberrypi:~/bin $ printenv PYTHONPATH
 Install all the Python libraries.
 ```
 ```
+Install supervisor.
+```
+sudo easy_install supervisor
+```
 
 ## Installing MySql/MariaDB
 
@@ -73,7 +79,7 @@ Remember the password that you enter for the root user. Later we will add an app
 The following instructions assume you enter a password `mining`. 
 Please use some kind of password. Do not leave it blank. 
 ```
-sudo apt-get install mysql-server
+sudo apt-get install mariadb-server
 ```
 The next step will configure sql for production. Use all the options to make your installation secure.
 ```
@@ -108,9 +114,9 @@ The database should now be set up.
 redis is the in-memory cache. Install it using the following commands. 
 
 ```
-$ wget http://download.redis.io/releases/redis-4.0.8.tar.gz
-$ tar xzf redis-4.0.8.tar.gz
-$ cd redis-4.0.8
+$ wget http://download.redis.io/releases/redis-4.0.9.tar.gz
+$ tar xzf redis-4.0.9.tar.gz
+$ cd redis-4.0.9
 $ make
 ```
 Use the following command to copy the executables.
@@ -134,14 +140,17 @@ Edit the config file.
 ```
 sudo nano /etc/redis/6379.conf
 ```
-Set daemonize yes
+Set `daemonize yes`
 
-Set the logfile to /var/log/redis_6379.log
+Set `requirepass mining`
 
-Set the dir to /var/redis/6379 (very important step!)
+Set the logfile to `/var/log/redis_6379.log`
+
+Set the dir to `/var/redis/6379` (very important step!)
 ```
 sudo update-rc.d redis_6379 defaults
 ```
+!!! Not needed for latest Rasbian Stretch
 If you get an error `insserv: warning: script 'redis_6379' missing LSB tags and overrides` then
 it means you need to do this.
 ```
@@ -156,13 +165,14 @@ Add the following lines under `#!/bin/sh`
 # Short-Description:    Startup Redis
 ### END INIT INFO
 ```
+!!! Not needed for latest Rasbian Stretch
 Add a user that the redis service and execute under.
 ```
 sudo adduser --system --group --disabled-login redis --no-create-home --shell /bin/nologin --quiet
+sudo chmod +x /etc/init.d/redis_6379
 ```
 Run redis.
 ```
-sudo chmod +x /etc/init.d/redis_6379
 sudo /etc/init.d/redis_6379 start
 ```
 Test your install. If the following commands are running the redis is configured.
@@ -184,55 +194,57 @@ the section "Installing Redis more properly"
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
 otherwise it installs an old version of erlang and you have to uninstall both!
 Also install socat before rabbitmq.  
+
+Find latest download for Raspberry Pi at https://packages.erlang-solutions.com/erlang/#tabs-debian
   
 The following commands download rabbitmq.
 ```
-sudo apt-get install erlang logrotate
-sudo apt-get install socat
-sudo apt-get -f install
+wget https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
+sudo dpkg -i esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
+
 wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.4/rabbitmq-server_3.7.4-1_all.deb
 sudo dpkg -i rabbitmq-server_3.7.4-1_all.deb
 sudo rabbitmq-plugins enable rabbitmq_management
 ```
 Start the rabbitmq service.
 ```
-rabbitmq-server start
+sudo rabbitmq-server start
 ```
 Set up a user for each component.
 ```
-$ sudo rabbitmqctl add_user fullcycle mining
-$ sudo rabbitmqctl set_user_tags fullcycle administrator
-$ sudo rabbitmqctl set_permissions -p / fullcycle ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user action mining
-$ sudo rabbitmqctl set_permissions -p / action ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user alert mining
-$ sudo rabbitmqctl set_permissions -p / alert ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user component mining
-$ sudo rabbitmqctl set_permissions -p / component ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user discover mining
-$ sudo rabbitmqctl set_permissions -p / discover ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user email mining
-$ sudo rabbitmqctl set_permissions -p / email ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user log mining
-$ sudo rabbitmqctl set_permissions -p / log ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user monitor mining
-$ sudo rabbitmqctl set_permissions -p / monitor ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user monitorminer mining
-$ sudo rabbitmqctl set_permissions -p / monitorminer ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user offline mining
-$ sudo rabbitmqctl set_permissions -p / offline ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user online mining
-$ sudo rabbitmqctl set_permissions -p / online ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user provision mining
-$ sudo rabbitmqctl set_permissions -p / provision ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user rules mining
-$ sudo rabbitmqctl set_permissions -p / rules ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user schedule mining
-$ sudo rabbitmqctl set_permissions -p / schedule ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user statisticsupdated mining
-$ sudo rabbitmqctl set_permissions -p / statisticsupdated ".*" ".*" ".*"
-$ sudo rabbitmqctl add_user test mining
-$ sudo rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
+sudo rabbitmqctl add_user fullcycle mining
+sudo rabbitmqctl set_user_tags fullcycle administrator
+sudo rabbitmqctl set_permissions -p / fullcycle ".*" ".*" ".*"
+sudo rabbitmqctl add_user action mining
+sudo rabbitmqctl set_permissions -p / action ".*" ".*" ".*"
+sudo rabbitmqctl add_user alert mining
+sudo rabbitmqctl set_permissions -p / alert ".*" ".*" ".*"
+sudo rabbitmqctl add_user component mining
+sudo rabbitmqctl set_permissions -p / component ".*" ".*" ".*"
+sudo rabbitmqctl add_user discover mining
+sudo rabbitmqctl set_permissions -p / discover ".*" ".*" ".*"
+sudo rabbitmqctl add_user email mining
+sudo rabbitmqctl set_permissions -p / email ".*" ".*" ".*"
+sudo rabbitmqctl add_user log mining
+sudo rabbitmqctl set_permissions -p / log ".*" ".*" ".*"
+sudo rabbitmqctl add_user monitor mining
+sudo rabbitmqctl set_permissions -p / monitor ".*" ".*" ".*"
+sudo rabbitmqctl add_user monitorminer mining
+sudo rabbitmqctl set_permissions -p / monitorminer ".*" ".*" ".*"
+sudo rabbitmqctl add_user offline mining
+sudo rabbitmqctl set_permissions -p / offline ".*" ".*" ".*"
+sudo rabbitmqctl add_user online mining
+sudo rabbitmqctl set_permissions -p / online ".*" ".*" ".*"
+sudo rabbitmqctl add_user provision mining
+sudo rabbitmqctl set_permissions -p / provision ".*" ".*" ".*"
+sudo rabbitmqctl add_user rules mining
+sudo rabbitmqctl set_permissions -p / rules ".*" ".*" ".*"
+sudo rabbitmqctl add_user schedule mining
+sudo rabbitmqctl set_permissions -p / schedule ".*" ".*" ".*"
+sudo rabbitmqctl add_user statisticsupdated mining
+sudo rabbitmqctl set_permissions -p / statisticsupdated ".*" ".*" ".*"
+sudo rabbitmqctl add_user test mining
+sudo rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
 ```
 If everything went as expected then you can browse to the rabbitmq management site.
 http://raspberrypi.local:15672/
@@ -251,7 +263,7 @@ sudo cp ~/fullcycle/os/linux/supervisord.conf /etc/supervisord.conf
 Included in this repository are some scripts to make managing the application easier.
 Copy these to your /bin directory.
 ```
-sudo cp ~/fullcycle/os/linux/. ~/bin/.
+sudo cp -av ~/fullcycle/os/linux/. ~/bin/
 ```
 Then make each one executable.
 ```

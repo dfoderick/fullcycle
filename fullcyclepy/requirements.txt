@@ -11,6 +11,7 @@
 #
 ###### Requirements without Version Specifiers ######
 jsonpickle
+marshmallow
 #not nmap!
 python-nmap
 paramiko
