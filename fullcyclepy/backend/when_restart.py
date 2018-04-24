@@ -45,7 +45,7 @@ def when_restart(channel, method, properties, body):
 
 def dorestart(miner, command: MinerCommand):
     if command.command:
-        showmsg = Fore.YELLOW + "{0}({1}) {2}".format(miner.name, '{}:{}'.format(miner.ipaddress, miner.port), command.command)
+        showmsg = Fore.YELLOW + "{0}({1}) {2} {3}".format(miner.name, '{}:{}'.format(miner.ipaddress, miner.port), command.command, command.parameter)
         COMPONENTACTION.app.sendlog(showmsg)
         #access = COMPONENTACTION.app.antminer.getaccesslevel(miner)
         #if access == MinerAccessLevel.Restricted:
@@ -54,7 +54,11 @@ def dorestart(miner, command: MinerCommand):
             #access = COMPONENTACTION.app.antminer.setminertoprivileged(miner)
             #if access == MinerAccessLevel.Restricted:
             #    raise Exception('Could not set miner {0} to priviledged'.format(miner.name))
-        antminerhelper.restart(miner)
+        if command.parameter and command.parameter == 'reboot':
+            miner.set_ftp_port(COMPONENTACTION.app.configuration('discover.sshport'))
+            antminerhelper.reboot(miner, COMPONENTACTION.app.sshlogin())
+        else:
+            antminerhelper.restart(miner)
         log = MinerLog()
         log.createdate = datetime.datetime.utcnow()
         log.minerid = miner.key()
