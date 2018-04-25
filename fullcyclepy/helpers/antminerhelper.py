@@ -163,10 +163,16 @@ def restart(miner: Miner):
     return apiresponse
 
 def print_connection_data(connection):
-    print(connection.strdata)    # print the last line of received data
-    print('==========================')
-    print(connection.alldata)   # This contains the complete data received.
-    print('==========================')
+    if connection.strdata:
+        print(connection.strdata)    # print the last line of received data
+        print('==========================')
+    if connection.alldata:
+        print(connection.alldata)   # This contains the complete data received.
+        print('==========================')
+
+def print_response(response):
+    for line in response:
+        print(line)
 
 def getportfromminer(miner: Miner):
     if isinstance(miner.ftpport, int): return miner.ftpport
@@ -175,12 +181,19 @@ def getportfromminer(miner: Miner):
         if tryport > 0: return tryport
     return 22
 
+def getminerconfig(miner: Miner, login):
+    '''ger the miner config file'''
+    connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
+    config = connection.exec_command('cat /config/{0}.conf'.format(getminerfilename(miner)))
+    connection.close_connection()
+    return config
+
 def restartminer(miner: Miner, login):
     '''restart miner through ssh'''
     connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
     connection.open_shell()
     connection.send_shell('/etc/init.d/{0}.sh restart'.format(getminerfilename(miner)))
-    time.sleep(5)
+    time.sleep(15)
     print_connection_data(connection)
     connection.close_connection()
 
@@ -200,8 +213,7 @@ def reboot(miner: Miner, login):
     """ reboot the miner through ftp """
     connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
     connection.open_shell()
-    connection.send_shell('/sbin/reboot')
-    time.sleep(5)
+    response = connection.exec_command('/sbin/reboot')
     print_connection_data(connection)
     connection.close_connection()
 
