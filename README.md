@@ -3,11 +3,11 @@ Monitoring and active management for your Bitcoin mining operation.
 1. Temperature and Hashrate of ASIC miners
 2. Alerts based on customizable rules
 3. Switch Pools and Reset miner commands
-4. Discovery of new miners on the network
+4. Discover new miners on the network
 5. Automatically configure miners with your pool worker accounts
 6. Temperature and Humidity monitoring of your mining room
 7. Photos of your mining room sent to you on a schedule
-8. Configurable, Extensible architecture built on workflow components and microservices
+8. Configurable, extensible architecture built on workflow components and microservices
 9. Web UI for monitoring and management (https://github.com/dfoderick/fullcyclereact)
 
 ![Bitcoin Mining Controller Hardware](/images/FullCycle_Controller.png?raw=true "Bitcoin Mining Controller Hardware")
@@ -23,12 +23,12 @@ https://github.com/dfoderick/fullcyclereact
 
 ## Requirements
 
+Full Cycle Mining has been tested on Antminer S9, A3 and D3.  
+
 1. Python version 3.5 (or newer)
 2. Rabbit Message Broker
 3. redis
 4. MySql (MariaDB)
-
-Note: Currently supported on Rasbian Stretch.
 
 Optional:  
 
@@ -38,21 +38,27 @@ Optional:
 
 ## Installation Overview
 
-This installation assumes you are using a Raspberry Pi 
-but should also work for most flavors of Linux. FCM will
+This installation assumes you are using a newly flashed Raspberry Pi 
+but should also work for most flavors of Linux. FCM can
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Rasbian Stretch.
-You should execute the installation using a ssh terminal window.
+
+The current version of Rasbian Stretch is April 2018.  
+https://www.raspberrypi.org/downloads/raspbian/
+Instructions on getting set up are here  
+![Raspberry Pi Setup](/docs/RaspberryPiSetup.md?raw=true "Raspberry Pi Setup")  
+
+You should run the FCM installation steps using a terminal window.  
 
 ## Downloading Full Cycle Mining
-
+Clone the repository.
 ```
 git clone https://github.com/dfoderick/fullcycle.git
 ```
 Any updated documentation and troubleshooting tips will be in /docs folder.
 Any platform specific scripts will be in /os/linux  
 
-Before beginning the full install, run a few preliminary steps.  
+Before beginning the full install run a few preliminary steps.  
 Make sure your system is up to date.
 ```
 sudo apt-get update
