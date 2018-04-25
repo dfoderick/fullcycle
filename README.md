@@ -148,6 +148,12 @@ If everything went as expected then you can browse to the rabbitmq management si
 http://raspberrypi.local:15672/
 The user set from above is `fullcycle` and the password is `mining`.
 
+If there were errors installing then you can try unintall and re-running the script.
+```
+sudo dpkg -r rabbitmq-server
+sudo dpkg -r esl-erlang
+```
+
 If you have any issues with the setup then please consult this online guide.
 
 https://www.iotshaman.com/blog/content/how-to-install-rabbitmq-on-a-raspberry-pi
