@@ -307,6 +307,10 @@ monitoring intervals.
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/fullcycle.conf
 ``` 
+For discovering new miners on the network you need nmap.
+```
+sudo apt-get install nmap
+```
 Finally, start up Full Cycle Mining.
 ```
 fcmstart
