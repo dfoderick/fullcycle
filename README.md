@@ -11,7 +11,9 @@ Monitoring and active management for your Bitcoin mining operation.
 9. Web UI for monitoring and management (https://github.com/dfoderick/fullcyclereact)
 
 ![Bitcoin Mining Controller Hardware](/images/FullCycle_Controller.png?raw=true "Bitcoin Mining Controller Hardware")
+https://github.com/dfoderick/fullcycle/wiki/Hardware-Reference
 ![Bitcoin Mining Controller UI](/images/FullCycleReact.png?raw=true "Bitcoin Mining Controller Web Site")
+https://github.com/dfoderick/fullcyclereact
 
 ## Contents
 [Requirements](#requirements)  
@@ -47,9 +49,10 @@ You should execute the installation using a ssh terminal window.
 git clone https://github.com/dfoderick/fullcycle.git
 ```
 Any updated documentation and troubleshooting tips will be in /docs folder.
-Any platform specific scripts will be in /os/linux
+Any platform specific scripts will be in /os/linux  
 
-Before beginning, make sure your system is up to date.
+Before beginning the full install, run a few preliminary steps.  
+Make sure your system is up to date.
 ```
 sudo apt-get update
 ```
@@ -59,7 +62,7 @@ sudo nano /etc/environment
 ```
 Add the following line to the file and save it.
 
-PYTHONPATH=/home/pi/fullcycle/fullcyclepy
+PYTHONPATH=/home/pi/fullcycle/fullcyclepy  
 
 The setting does not take effect immediately. You have to `logout` and log back in.
 When the environment is set correctly you will be able to print it.
@@ -67,11 +70,13 @@ When the environment is set correctly you will be able to print it.
 pi@raspberrypi:~/bin $ printenv PYTHONPATH
 /home/pi/fullcycle/fullcyclepy
 ```
-Install all the Python libraries.
+Install all the Python libraries that the application will need. 
+Sometimes installing these can be problematic. See the troubleshooting
+section if you have any problems.
 ```
-pip3 install -r requirements.txt
+pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
 ```
-Install supervisor.
+Install supervisor now since it will be used in the next steps.
 ```
 sudo easy_install supervisor
 ```
@@ -142,53 +147,51 @@ https://www.iotshaman.com/blog/content/how-to-install-rabbitmq-on-a-raspberry-pi
 
 ## Configuring Full Cycle Mining
 
-Copy the supervisord.conf file to its location. Make any required changes to it.
+Run the installation for FCM
 ```
-sudo cp ~/fullcycle/os/linux/supervisord.conf /etc/supervisord.conf
-```
-Included in this repository are some scripts to make managing the application easier.
-Copy these to your /bin directory.
-```
-sudo cp -av ~/fullcycle/os/linux/. ~/bin/
-```
-Then make each one executable.
-```
-sudo chmod +x ~/bin/fcm*
+bash ~/fullcycle/os/linux/setup_fullcycle.sh
 ```
 A Telgram account is highly recommended to get updates from your controller 
 about mining operations, photos and temperature. It is the primary
 console that allows you to see what is happening to your miners.  
 If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
-Make any required changes to services.config.
+Change the telegram configuraton in services.config to match your settings.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ``` 
-Run the following command to test your Telegram integration. 
-It will prompt for your phone number and you will respond with the configrmation number. If successful you will get a telegram message 
-with a picture from your mining controller (assuming you have a camera on your Raspberry Pi).
+Run the following command to test your Telegram integration.  
+It will prompt for your phone number and you will respond with the configrmation number. 
+If successful you will get a telegram message 
+with a picture from your mining controller 
+(assuming you have a camera on your Raspberry Pi).
 ```
 python3 ~/fullcycle/fullcyclepy/backend/test/test_telegram.py
 ```
-You probably want to add your own pools. Add them to this file. 
+You probably want to add your own pools. Add them to the following file.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/pools.conf
 ``` 
+Normally, FCM should simply discover any miners on your local subnet.
+If for any reason it cannot discover them 
+then you would add your miners to the following file.
+```
+sudo nano ~/fullcycle/fullcyclepy/backend/config/miners.conf
+```
 Review the application configuration settings to enable/disable hardware options and set
 monitoring intervals.
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/fullcycle.conf
 ``` 
-For discovering new miners on the network you need nmap.
-```
-sudo apt-get install nmap
-```
-Finally, start up Full Cycle Mining.
+There are several helpful scripts that were installed in your ~/bin directory
+to make using Full Cycle Mining easier. Let's use a couple of them now.  
+Start up Full Cycle Mining.
 ```
 fcmstart
 ```
-To see the status of the processes run `fcmstatus`.
+To see the status of the processes run `fcmstatus`. You can run this any time
+to check on the health of the application components.
 ```
 fcmstatus
 ```
