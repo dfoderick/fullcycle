@@ -1,9 +1,10 @@
 
-# install sql server
-sudo apt-get install mariadb-server
-#setup for production
-sudo mysql_secure_installation
-#start service
-sudo service mysql start
-#run sql script to create database
-sudo mysql -u root -p < ~/fullcycle/os/linux/fullcycle.sql
+# install full cycle
+#copy the supervisor file
+sudo cp ~/fullcycle/os/linux/supervisord.conf /etc/supervisord.conf
+#copy bin files
+mkdir ~/bin
+sudo cp -av ~/fullcycle/os/linux/fcm* ~/bin/
+sudo chmod +x ~/bin/fcm*
+#install nmap for network discovery
+sudo apt-get install nmap
