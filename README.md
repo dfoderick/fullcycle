@@ -152,8 +152,12 @@ If there were errors installing then you can try unintall and re-running the scr
 ```
 sudo dpkg -r rabbitmq-server
 sudo dpkg -r esl-erlang
+bash ~/fullcycle/os/linux/setup_rabbit.sh
 ```
-
+Once rabbitmq is running then you can add the users.
+```
+bash ~/fullcycle/os/linux/setup_rabbit_users.sh
+```
 If you have any issues with the setup then please consult this online guide.
 
 https://www.iotshaman.com/blog/content/how-to-install-rabbitmq-on-a-raspberry-pi
