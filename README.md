@@ -19,6 +19,7 @@ https://github.com/dfoderick/fullcyclereact
 [Requirements](#requirements)  
 [Installation Overview](#installation-overview)  
 [Troubleshooting](docs/Troubleshooting.md)  
+[Next Steps](#now-what)  
 
 ## Requirements
 
@@ -190,11 +191,14 @@ Start up Full Cycle Mining.
 ```
 fcmstart
 ```
-To see the status of the processes run `fcmstatus`. You can run this any time
-to check on the health of the application components.
-```
-fcmstatus
-```
+To see the status of the Full Cycle components use the Supervisor web site.  
+The url is the ipaddress of your controller with 9009 as the default port number.  
+![Full Cycle Supervisor](/images/fullcycle_supervisor.png?raw=true "Full Cycle Supervisor")
+You can start and stop individual components and spy on their inner workings.  
+![Full Cycle Supervisor Tail](/images/fullcycle_supervisor_tail.png?raw=true "Full Cycle Supervisor Tail")
+ 
+
+
 ## Now What?
 Congratuations on making it this far!
 If everything was successful then your Full Cycle Controller
