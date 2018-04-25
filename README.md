@@ -231,3 +231,17 @@ To see the status of the processes run `fcmstatus`.
 ```
 fcmstatus
 ```
+## Now What?
+Congratuations on making it this far!
+If everything was successful then your Full Cycle Controller
+will be hard at work discovering and monitoring your miners.
+
+But how do you see what it is doing?  
+If you set up Telegram and the correct intervals in the configuration
+file then you will be getting statuses sent to your Telegram account.
+
+Your next step is to install the web site on your controller.
+Hop over this project to download and install it now.  
+I promise its easier to set up the web site than the back end.
+https://github.com/dfoderick/fullcyclereact
+
