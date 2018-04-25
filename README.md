@@ -79,8 +79,8 @@ sudo easy_install supervisor
 ## Installing MySql/MariaDB
 
 The following instructions assume you are using the default password `mining`. 
-Please use some kind of password. Do not leave it blank.
-Read and answer all prompts.
+Please use some kind of password. Do not leave the password blank.
+Run the following script. Read and answer all prompts.
 ```
 bash ~/fullcycle/os/linux/setup_sql.sh
 ```
@@ -88,72 +88,16 @@ The database should now be set up.
 
 ## Install redis
 
-redis is the in-memory cache. Install it using the following commands. 
-
+redis is the in-memory cache. Install it using the following script. 
+The script uses `mining` as the default password.
 ```
-$ wget http://download.redis.io/releases/redis-4.0.9.tar.gz
-$ tar xzf redis-4.0.9.tar.gz
-$ cd redis-4.0.9
-$ make
-```
-Use the following command to copy the executables.
-```
-sudo make install
-```
-If for any reason it does not install correctly then run the following commands.
-```
-sudo cp src/redis-server /usr/local/bin/
-sudo cp src/redis-cli /usr/local/bin/
-```
-Copy the configuration file from source and setup redis.
-```
-sudo mkdir /etc/redis
-sudo mkdir /var/redis
-sudo cp utils/redis_init_script /etc/init.d/redis_6379
-sudo cp redis.conf /etc/redis/6379.conf
-sudo mkdir /var/redis/6379
-```
-Edit the config file.
-```
-sudo nano /etc/redis/6379.conf
-```
-Set `daemonize yes`
-
-Set `requirepass mining`
-
-Set the logfile to `/var/log/redis_6379.log`
-
-Set the dir to `/var/redis/6379` (very important step!)  
-The next command makes redis automatically start when system is reset.
-```
-sudo update-rc.d redis_6379 start 80 2 3 4 5 . stop 20 0 1 6 .
-```
-!!! Not needed for latest Rasbian Stretch
-If you get an error `insserv: warning: script 'redis_6379' missing LSB tags and overrides` then
-it means you need to do this.
-```
-sudo nano /etc/init.d/redis_6379
-```
-Add the following lines under `#!/bin/sh`
-```
-### BEGIN INIT INFO
-# Provides:             noip
-# Default-Start:        2 3 4 5
-# Default-Stop:         0 1 6
-# Short-Description:    Startup Redis
-### END INIT INFO
-```
-!!! Not needed for latest Rasbian Stretch
-Add a user that the redis service and execute under.
-```
-sudo adduser --system --group --disabled-login redis --no-create-home --shell /bin/nologin --quiet
-sudo chmod +x /etc/init.d/redis_6379
+bash ~/fullcycle/os/linux/setup_redis.sh
 ```
 Start redis.
 ```
 sudo /etc/init.d/redis_6379 start
 ```
-Test your install. If the following commands are run then redis is configured.
+Test your install. If the following commands can be run without error then redis is configured.
 ```
 $ redis-cli
 redis> set foo bar
