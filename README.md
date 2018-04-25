@@ -78,44 +78,12 @@ sudo easy_install supervisor
 
 ## Installing MySql/MariaDB
 
-You may already have the database installed. Verify using the following command.
+The following instructions assume you are using the default password `mining`. 
+Please use some kind of password. Do not leave it blank.
+Read and answer all prompts.
 ```
-pi@raspberrypi:~ $ mysql --version
-mysql  Ver 15.1 Distrib 10.1.23-MariaDB, for debian-linux-gnueabihf (armv7l) using readline 5.2
+bash ~/fullcycle/os/linux/setup_sql.sh
 ```
-If you get a terminal response `command not found` then mysql is not installed and you should follow these steps. 
-Remember the password that you enter for the root user. Later we will add an application specific user. 
-The following instructions assume you enter a password `mining`. 
-Please use some kind of password. Do not leave it blank. 
-```
-sudo apt-get install mariadb-server
-```
-The next step will configure sql for production. Use all the options to make your installation secure.
-```
-sudo mysql_secure_installation
-```
-Installation should leave sql running. 
-Check the status and start if it is not running.
-```
-sudo service mysql status
-sudo service mysql start
-```
-Get into the sql prompt.
-```
-sudo mysql -u root -p
-```
-Execute the following commands. Hit return after each command. Don't forget the semi-colon (;) at the end of each line.
-```
-create database fullcycle;
-show databases;
-use fullcycle;
-show tables;
-create table minerlog(minerlogid int NOT NULL AUTO_INCREMENT, minerid varchar(50), minername varchar(50), createdate datetime, action varchar(255), PRIMARY KEY (minerlogid));
-CREATE USER 'fullcycle'@'%' IDENTIFIED BY 'mining';
-GRANT ALL PRIVILEGES ON fullcycle.* TO 'fullcycle'@'%';
-exit
-```
-
 The database should now be set up.
 
 ## Install redis
