@@ -39,7 +39,7 @@ This installation assumes you are using a Raspberry Pi
 but should also work for most flavors of Linux. FCM will
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Rasbian Stretch.
-You should execute the installation using a ssh command line.
+You should execute the installation using a ssh terminal window.
 
 ## Downloading Full Cycle Mining
 
@@ -117,65 +117,26 @@ the section "Installing Redis more properly"
 ## Install RabbitMQ
 
 !!! IMPORTANT !!!  
+The script you are about to run should download and install the correct versions
+that you need. However, if you need to install it yourself then here are some 
+tips to follow.  
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
-otherwise it installs an old version of erlang and you have to uninstall both!
-Also install socat before rabbitmq.  
+otherwise it installs an old version of erlang and you have to uninstall both 
+rabbitmq and erlang before you can re-install!
+Also install socat before rabbitmq. It should be installed from MariaDB already.  
 
 Find latest download for Raspberry Pi at https://packages.erlang-solutions.com/erlang/#tabs-debian
   
-The following commands download rabbitmq.
+The following script downloads and installs rabbitmq and should be all you need for
+installing it on a Raspberry Pi.
 ```
-wget https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
-sudo dpkg -i esl-erlang_20.1.7-1~raspbian~stretch_armhf.deb
-wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.4/rabbitmq-server_3.7.4-1_all.deb
-sudo dpkg -i rabbitmq-server_3.7.4-1_all.deb
-sudo rabbitmq-plugins enable rabbitmq_management
-```
-Start the rabbitmq service.
-```
-sudo rabbitmq-server start
-```
-Set up a user for each component.
-```
-sudo rabbitmqctl add_user fullcycle mining
-sudo rabbitmqctl set_user_tags fullcycle administrator
-sudo rabbitmqctl set_permissions -p / fullcycle ".*" ".*" ".*"
-sudo rabbitmqctl add_user action mining
-sudo rabbitmqctl set_permissions -p / action ".*" ".*" ".*"
-sudo rabbitmqctl add_user alert mining
-sudo rabbitmqctl set_permissions -p / alert ".*" ".*" ".*"
-sudo rabbitmqctl add_user component mining
-sudo rabbitmqctl set_permissions -p / component ".*" ".*" ".*"
-sudo rabbitmqctl add_user discover mining
-sudo rabbitmqctl set_permissions -p / discover ".*" ".*" ".*"
-sudo rabbitmqctl add_user email mining
-sudo rabbitmqctl set_permissions -p / email ".*" ".*" ".*"
-sudo rabbitmqctl add_user log mining
-sudo rabbitmqctl set_permissions -p / log ".*" ".*" ".*"
-sudo rabbitmqctl add_user monitor mining
-sudo rabbitmqctl set_permissions -p / monitor ".*" ".*" ".*"
-sudo rabbitmqctl add_user monitorminer mining
-sudo rabbitmqctl set_permissions -p / monitorminer ".*" ".*" ".*"
-sudo rabbitmqctl add_user offline mining
-sudo rabbitmqctl set_permissions -p / offline ".*" ".*" ".*"
-sudo rabbitmqctl add_user online mining
-sudo rabbitmqctl set_permissions -p / online ".*" ".*" ".*"
-sudo rabbitmqctl add_user provision mining
-sudo rabbitmqctl set_permissions -p / provision ".*" ".*" ".*"
-sudo rabbitmqctl add_user rules mining
-sudo rabbitmqctl set_permissions -p / rules ".*" ".*" ".*"
-sudo rabbitmqctl add_user schedule mining
-sudo rabbitmqctl set_permissions -p / schedule ".*" ".*" ".*"
-sudo rabbitmqctl add_user statisticsupdated mining
-sudo rabbitmqctl set_permissions -p / statisticsupdated ".*" ".*" ".*"
-sudo rabbitmqctl add_user test mining
-sudo rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
+bash ~/fullcycle/os/linux/setup_rabbit.sh
 ```
 If everything went as expected then you can browse to the rabbitmq management site.
 http://raspberrypi.local:15672/
-The user set from above is `fullcycle` and the password is `mining`
+The user set from above is `fullcycle` and the password is `mining`.
 
-If you have any issues with the setup then please consult this online quide.
+If you have any issues with the setup then please consult this online guide.
 
 https://www.iotshaman.com/blog/content/how-to-install-rabbitmq-on-a-raspberry-pi
 
