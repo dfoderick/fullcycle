@@ -160,7 +160,7 @@ class ApplicationService:
     __logger_error = None
     antminer = None
 
-    def __init__(self, component=ComponentName.fullcycle, option=None):
+    def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself = False):
         self.component = component
         self.initargs(option)
         self.startupstuff()
@@ -172,7 +172,8 @@ class ApplicationService:
         #this is slow. should be option to opt out of cache?
         self.initcache()
         self.init_application()
-        self.sendqueueitem(QueueEntry(QueueName.Q_LOG, '{0} Started {1}'.format(self.now(), self.component), QueueType.broadcast))
+        if announceyourself:
+            self.sendqueueitem(QueueEntry(QueueName.Q_LOG, '{0} Started {1}'.format(self.now(), self.component), QueueType.broadcast))
 
     def initargs(self, option):
         '''process command line arguments'''
