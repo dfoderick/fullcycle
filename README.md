@@ -62,6 +62,7 @@ Before beginning the full install run a few preliminary steps.
 Make sure your system is up to date.
 ```
 sudo apt-get update
+sudo apt-get upgrade
 ```
 Full Cycle Mining requires an environment setting for Python.
 ```
@@ -71,7 +72,7 @@ Add the following line to the file and save it.
 
 PYTHONPATH=/home/pi/fullcycle/fullcyclepy  
 
-The setting does not take effect immediately. You have to `logout` and log back in.
+The setting does not take effect immediately. You have to `sudo reboot` and log back in.
 When the environment is set correctly you will be able to print it.
 ```
 pi@raspberrypi:~/bin $ printenv PYTHONPATH
@@ -143,6 +144,18 @@ The following script downloads and installs rabbitmq and should be all you need 
 installing it on a Raspberry Pi.
 ```
 bash ~/fullcycle/os/linux/setup_rabbit.sh
+```
+Restart the controller at this point.
+```
+sudo reboot
+```
+When you can log back in again then make sure rabbitmq is running.
+```
+sudo service rabbitmq-server start
+```
+You can check the status of the rabbitmq service.
+```
+sudo service rabbitmq-server status
 ```
 If everything went as expected then you can browse to the rabbitmq management site.
 http://raspberrypi.local:15672/
