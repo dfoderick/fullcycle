@@ -10,5 +10,5 @@ package "git-core"
 package "dos2unix"
 package "nmap"
 
-package "mysql-server"
+package "mariadb-server"
 package "rabbitmq"

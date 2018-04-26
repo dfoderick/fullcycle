@@ -38,7 +38,7 @@ Optional:
 
 ## Installation Overview
 
-This installation assumes you are using a newly flashed Raspberry Pi 
+This installation assumes you are using a newly flashed Raspberry Pi
 but should also work for most flavors of Linux. FCM can
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Rasbian Stretch.
@@ -85,7 +85,6 @@ sudo easy_install supervisor
 
 ## Installing MySql/MariaDB
 
-The following instructions assume you are using the default password `mining`. 
 Please use some kind of password. Do not leave the password blank.
 Run the following script. Read and answer all prompts.
 ```
@@ -95,7 +94,7 @@ The database should now be set up.
 
 ## Install redis
 
-redis is the in-memory cache. Install it using the following script. 
+redis is the in-memory cache. Install it using the following script.
 The script uses `mining` as the default password.
 ```
 bash ~/fullcycle/os/linux/setup_redis.sh
@@ -117,7 +116,7 @@ redis can also play ping pong.
 ```
 redis-cli -a mining ping
 ```
-If you have any problem installing redis then see if there are 
+If you have any problem installing redis then see if there are
 updated instructions at https://redis.io/topics/quickstart especially
 the section "Installing Redis more properly"
 
@@ -125,15 +124,15 @@ the section "Installing Redis more properly"
 
 !!! IMPORTANT !!!  
 The script you are about to run should download and install the correct versions
-that you need. However, if you need to install it yourself then here are some 
+that you need. However, if you need to install it yourself then here are some
 tips to follow.  
 Install latest erlang for Raspbian (20.1.7 or above) BEFORE installing rabbitmq;
-otherwise it installs an old version of erlang and you have to uninstall both 
+otherwise it installs an old version of erlang and you have to uninstall both
 rabbitmq and erlang before you can re-install!
 Also install socat before rabbitmq. It should be installed from MariaDB already.  
 
 Find latest download for Raspberry Pi at https://packages.erlang-solutions.com/erlang/#tabs-debian
-  
+
 The following script downloads and installs rabbitmq and should be all you need for
 installing it on a Raspberry Pi.
 ```
@@ -174,45 +173,45 @@ Run the installation for FCM
 ```
 bash ~/fullcycle/os/linux/setup_fullcycle.sh
 ```
-Install all the Python libraries that the application will need. 
+Install all the Python libraries that the application will need.
 Sometimes installing these can be problematic. See the troubleshooting
 section if you have any problems.
 ```
 pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
 ```
-You can complete the installation without a Telegram account, however 
-Telgram is highly recommended for you to get updates from your controller 
+You can complete the installation without a Telegram account, however
+Telgram is highly recommended for you to get updates from your controller
 about mining operations, photos and temperature. It is the primary
 'push notification' that allows you to see what is happening to your miners.  
-If you don't already have an account go to https://telegram.org/ 
+If you don't already have an account go to https://telegram.org/
 to get set up and get your api key.  
-Change the telegram configuraton in services.config to match your 
+Change the telegram configuraton in services.config to match your
 settings for name and api key.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
-``` 
+```
 Run the following command to test your Telegram integration.  
 It will prompt for your phone number (use international format beginning with '1' if you
-are in the USA) 
-and you will respond with the configrmation number that gets sent to you in Telegram. 
+are in the USA)
+and you will respond with the configrmation number that gets sent to you in Telegram.
 If successful you will get a telegram message ('Full Cycle Mining Test ...')
-with a picture from your mining controller 
+with a picture from your mining controller
 (assuming you have a camera on your Raspberry Pi).
 ```
 python3 ~/fullcycle/fullcyclepy/tests/test_telegram.py
 ```
-If you get any errors running the test - don't worry. Either you do not have a 
-camera installed on your Pi or else you are missing an installation step. 
+If you get any errors running the test - don't worry. Either you do not have a
+camera installed on your Pi or else you are missing an installation step.
 We'll get to them in the next section.
 
 You probably want to add your own pools. Add them to the following file.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/pools.conf
-``` 
+```
 Normally, FCM should simply discover any miners on your local subnet.
-If for any reason it cannot discover them 
+If for any reason it cannot discover them
 then you would add your miners to the following file.
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/miners.conf
@@ -221,7 +220,7 @@ Review the application configuration settings to enable/disable hardware options
 monitoring intervals.
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/fullcycle.conf
-``` 
+```
 There are several helpful scripts that were installed in your ~/bin directory
 to make using Full Cycle Mining easier. Let's use a couple of them now.  
 Start up Full Cycle Mining. (You may have to `logout` and log back in to make these work.)
@@ -258,4 +257,3 @@ Your next step is to install the web site on your controller.
 Hop over this project to download and install it now.  
 I promise its easier to set up the web site than the back end.
 https://github.com/dfoderick/fullcyclereact
-
