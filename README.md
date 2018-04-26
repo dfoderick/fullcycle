@@ -46,7 +46,7 @@ FCM has been thoroughly tested on Rasbian Stretch.
 The current version of Rasbian Stretch is April 2018.  
 https://www.raspberrypi.org/downloads/raspbian/
 Instructions on getting set up are here  
-![Raspberry Pi Setup](/docs/RaspberryPiSetup.md?raw=true "Raspberry Pi Setup")  
+![Raspberry Pi Setup](/docs/RaspberryPiSetup.md "Raspberry Pi Setup")  
 
 You should run the FCM installation steps using a terminal window.  
 
@@ -85,6 +85,7 @@ sudo easy_install supervisor
 
 ## Installing MySql/MariaDB
 
+The following instructions assume you are using the default password `mining`.
 Please use some kind of password. Do not leave the password blank.
 Run the following script. Read and answer all prompts.
 ```
