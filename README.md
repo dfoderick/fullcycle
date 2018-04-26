@@ -216,7 +216,12 @@ sudo nano ~/fullcycle/fullcyclepy/backend/config/fullcycle.conf
 ``` 
 There are several helpful scripts that were installed in your ~/bin directory
 to make using Full Cycle Mining easier. Let's use a couple of them now.  
-Start up Full Cycle Mining.
+Start up Full Cycle Mining. (You may have to `logout` and log back in to make these work.)
+```
+fcmtest
+```
+If there are any errors listed then (missing imports) then fix them.
+Make sure all services are started.
 ```
 fcmstart
 ```
