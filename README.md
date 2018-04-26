@@ -78,12 +78,6 @@ When the environment is set correctly you will be able to print it.
 pi@raspberrypi:~/bin $ printenv PYTHONPATH
 /home/pi/fullcycle/fullcyclepy
 ```
-Install all the Python libraries that the application will need. 
-Sometimes installing these can be problematic. See the troubleshooting
-section if you have any problems.
-```
-pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
-```
 Install supervisor now since it will be used in the next steps.
 ```
 sudo easy_install supervisor
@@ -157,10 +151,6 @@ You can check the status of the rabbitmq service.
 ```
 sudo service rabbitmq-server status
 ```
-If everything went as expected then you can browse to the rabbitmq management site.
-http://raspberrypi.local:15672/
-The user set from above is `fullcycle` and the password is `mining`.
-
 If there were errors installing then you can try unintall and re-running the script.
 ```
 sudo dpkg -r rabbitmq-server
@@ -171,33 +161,51 @@ Once rabbitmq is running then you can add the users.
 ```
 bash ~/fullcycle/os/linux/setup_rabbit_users.sh
 ```
+If everything went as expected then you can browse to the rabbitmq management site.
+http://raspberrypi.local:15672/
+The user set from above is `fullcycle` and the password is `mining`.  
+
 If you have any issues with the setup then please consult this online guide.
 
 https://www.iotshaman.com/blog/content/how-to-install-rabbitmq-on-a-raspberry-pi
 
 ## Configuring Full Cycle Mining
-
 Run the installation for FCM
 ```
 bash ~/fullcycle/os/linux/setup_fullcycle.sh
 ```
-A Telgram account is highly recommended to get updates from your controller 
+Install all the Python libraries that the application will need. 
+Sometimes installing these can be problematic. See the troubleshooting
+section if you have any problems.
+```
+pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
+```
+You can complete the installation without a Telegram account, however 
+Telgram is highly recommended for you to get updates from your controller 
 about mining operations, photos and temperature. It is the primary
-console that allows you to see what is happening to your miners.  
-If you don't already have an account go to https://telegram.org/ to get set up and get your api key.  
-Change the telegram configuraton in services.config to match your settings.
+'push notification' that allows you to see what is happening to your miners.  
+If you don't already have an account go to https://telegram.org/ 
+to get set up and get your api key.  
+Change the telegram configuraton in services.config to match your 
+settings for name and api key.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ``` 
 Run the following command to test your Telegram integration.  
-It will prompt for your phone number and you will respond with the configrmation number. 
-If successful you will get a telegram message 
+It will prompt for your phone number (use international format beginning with '1' if you
+are in the USA) 
+and you will respond with the configrmation number that gets sent to you in Telegram. 
+If successful you will get a telegram message ('Full Cycle Mining Test ...')
 with a picture from your mining controller 
 (assuming you have a camera on your Raspberry Pi).
 ```
-python3 ~/fullcycle/fullcyclepy/backend/test/test_telegram.py
+python3 ~/fullcycle/fullcyclepy/tests/test_telegram.py
 ```
+If you get any errors running the test - don't worry. Either you do not have a 
+camera installed on your Pi or else you are missing an installation step. 
+We'll get to them in the next section.
+
 You probably want to add your own pools. Add them to the following file.
 Be very careful to make sure the file is valid json!
 ```
@@ -221,17 +229,21 @@ Start up Full Cycle Mining. (You may have to `logout` and log back in to make th
 fcmtest
 ```
 If there are any errors listed then (missing imports) then fix them.
-Make sure all services are started.
+Make sure all services are started. If needed, run `sudo /etc/init.d/redis_6379 start` to start redis or `rabbitstart`
+to run rabbitmq.
+
+If the test is successfull it will get statistics on any miners you have set up in miners.conf.
+
+Now its time to run Full Cycle Mining!
 ```
 fcmstart
 ```
+This will start all processes and display a status of each one.
 To see the status of the Full Cycle components use the Supervisor web site.  
 The url is the ipaddress of your controller with 9009 as the default port number.  
 ![Full Cycle Supervisor](/images/fullcycle_supervisor.png?raw=true "Full Cycle Supervisor")
 You can start and stop individual components and spy on their inner workings.  
 ![Full Cycle Supervisor Tail](/images/fullcycle_supervisor_tail.png?raw=true "Full Cycle Supervisor Tail")
- 
-
 
 ## Now What?
 Congratuations on making it this far!

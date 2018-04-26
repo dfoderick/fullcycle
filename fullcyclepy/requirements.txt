@@ -28,7 +28,7 @@ pika
 #for redis
 redis
 # for camera, this one will error on windows, of course
-python3-picamera
+#python3-picamera
 #opencv not working
 #opencv-python
 
