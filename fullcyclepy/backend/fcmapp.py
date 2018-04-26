@@ -325,10 +325,10 @@ class ApplicationService:
         knownminers = self.miners()
         return knownminers
 
-    def minersummary(self):
+    def minersummary(self, maxNumber = 10):
         '''show a summary of known miners
         '''
-        return '\n'.join([m.summary() for m in self.knownminers()])
+        return '\n'.join([m.summary() for m in self.knownminers()[:maxNumber]])
 
     def addknownminer(self, miner):
         '''add miner to known miners list'''
