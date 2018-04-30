@@ -42,9 +42,9 @@ The following are Optional but recommended.
 This installation assumes you are using a newly flashed Raspberry Pi
 but should also work for most flavors of Linux. FCM can
 run on Windows but some of the installation steps will be different.
-FCM has been thoroughly tested on Rasbian Stretch.
+FCM has been thoroughly tested on Raspbian Stretch.
 
-The current version of Rasbian Stretch is April 2018.  
+The current version of Raspbian Stretch is April 2018.  
 https://www.raspberrypi.org/downloads/raspbian/
 Instructions on getting set up are here  
 ![Raspberry Pi Setup](/docs/RaspberryPiSetup.md "Raspberry Pi Setup")  
