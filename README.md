@@ -136,7 +136,7 @@ Rabbitmq is the message bus that the Full Cycle components use to talk to each o
 ### Install Rabbitmq using Docker (Recommended)
 Download and install a preconfigured Docker image for Raspberry Pi.
 ```
-docker run -d --hostname fcm-rabbit --name fullcycle-rabbit -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=fullcycle -e RABBITMQ_DEFAULT_PASS=mining -e RABBITMQ_ERLANG_COOKIE='fullcyclemining' arm32v7/rabbitmq:3-management
+docker run -d --hostname fcm-rabbit --name fullcycle-rabbit -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=fullcycle -e RABBITMQ_DEFAULT_PASS=mining -e RABBITMQ_ERLANG_COOKIE='fullcyclemining' --restart unless-stopped arm32v7/rabbitmq:3-management
 ```
 Then add the required account for each component.
 ```
@@ -159,7 +159,7 @@ Run the installation for FCM
 bash ~/fullcycle/os/linux/setup_fullcycle.sh
 ```
 Install all the Python libraries that the application will need.
-Sometimes installing these can be problematic. See the ![Troubleshooting](docs/Troubleshooting)
+Sometimes installing these can be problematic. See the ![Troubleshooting](docs/Troubleshooting.md)
 section if you have any problems.
 ```
 pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
@@ -221,7 +221,12 @@ Make sure all services are started. If needed, run `sudo /etc/init.d/redis_6379 
 to run rabbitmq.
 
 If the test is successfull it will get statistics on any miners you have set up in miners.conf.
-
+If you just keep the default test miner in miners.conf then the output will look like this.
+```
+pi@raspberrypi:~ $ fcmtest
+S9000   ?
+Shutting down fcm app...
+```
 Now its time to run Full Cycle Mining!
 ```
 fcmstart
