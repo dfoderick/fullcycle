@@ -19,4 +19,4 @@ sudo chmod +x /etc/init.d/redis_6379
 sudo /etc/init.d/redis_6379 start
 cd ~/
 #should respond with PONG
-redis-cli -a mining ping
+redis-cli ping

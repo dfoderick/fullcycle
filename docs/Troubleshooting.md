@@ -6,7 +6,7 @@ python3 -V
 ```
 It needs to be version 3.5 or higher.
 
-Run `fcmstatus` to see what is the status of the application. 
+Run `fcmstatus` to see what is the status of the application.
 It should show the status as RUNNING. If you see anything else then
 the application is encountering an error.
 ```
@@ -32,3 +32,23 @@ about the error.
 
 Go to your RabbitMQ site and see if  the queues are operating correctly.
 http://raspberrypi.local:15672/
+
+# Troublehsooting redis
+Use the following command when testing redis installed Natively.
+These commands will not work when using the Docker install of redis.
+If the following commands can be run without error then redis is configured.
+```
+$ redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+redis> exit
+```
+redis can also play ping pong.
+```
+redis-cli -a mining ping
+```
+If you have any problem installing redis then see if there are
+updated instructions at https://redis.io/topics/quickstart especially
+the section "Installing Redis more properly"

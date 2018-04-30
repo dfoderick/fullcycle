@@ -9,6 +9,6 @@ sudo chmod +x ~/bin/fcm*
 sudo cp -av ~/fullcycle/os/linux/rabbit* ~/bin/
 sudo chmod +x ~/bin/rabbit*
 #install nmap for network discovery
-sudo apt-get install nmap
-sudo apt-get install python3-picamera
+sudo apt-get -y install nmap
+sudo apt-get -y install python3-picamera
 pip3 install redis pika sqlalchemy marshmallow paramiko telethon python-nmap
