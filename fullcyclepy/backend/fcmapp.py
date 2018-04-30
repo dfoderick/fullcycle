@@ -21,7 +21,7 @@ from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSe
 from helpers.camerahelper import take_picture
 from helpers.antminerhelper import MinerMonitorException, setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
 from helpers.temperaturehelper import readtemperature
-from helpers.telegramhelper import sendalert, sendfile
+from helpers.telegramhelper import sendalert, sendphoto
 
 class ComponentName:
     '''names of components, corresponds to queue login names'''
@@ -737,9 +737,9 @@ class ApplicationService:
     def sendtelegrammessage(self, message):
         sendalert(message, self.getservice('telegram'))
 
-    def sendtelegramfile(self, file_name):
+    def sendtelegramphoto(self, file_name):
         if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
-            sendfile(file_name, self.getservice('telegram'))
+            sendphoto(file_name, self.getservice('telegram'))
 
     def getsession(self):
         service = self.getservice(ServiceName.database)

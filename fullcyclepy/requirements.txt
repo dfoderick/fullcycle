@@ -16,7 +16,9 @@ marshmallow
 python-nmap
 paramiko
 paho-mqtt
-telethon
+#telethon
+#telegram
+python-telegram-bot
 #sudo apt-get install python-mysqldb
 #mysqldb
 #mysql-client

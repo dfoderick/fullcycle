@@ -1,23 +1,21 @@
 '''telegram api'''
 import datetime
-from telethon import TelegramClient
+from telegram import Bot
+
+def echo(bot, update):
+    """Echo the user message."""
+    update.message.reply_text(update.message.text)
 
 def sendalert(message, service):
     '''send the message'''
     print("telegramhelper.py:{0}{1}".format(str(datetime.datetime.now()), message))
-    api_id = service.user
-    api_hash = service.password
-    client = TelegramClient('session_name', api_id, api_hash)
-    client.start()
-    client.send_message(service.connection, message)
-    client.disconnect()
+    chat_id = service.user
+    bot = Bot(token=service.password)
+    bot.send_message(chat_id=chat_id, text=message)
 
-def sendfile(file, service):
-    '''send the message'''
+def sendphoto(file, service):
+    '''send the photo'''
     print("telegramhelper.py:{0}{1}".format(str(datetime.datetime.now()), file))
-    api_id = service.user
-    api_hash = service.password
-    client = TelegramClient('session_name', api_id, api_hash)
-    client.start()
-    client.send_file(service.connection, file)
-    client.disconnect()
+    chat_id = service.user
+    bot = Bot(token=service.password)
+    bot.send_photo(chat_id, file)
