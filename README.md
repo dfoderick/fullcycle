@@ -1,6 +1,6 @@
 # Full Cycle Bitcoin Mining Controller
 Monitoring and active management for your Bitcoin mining operation.
-1. Temperature and Hashrate of ASIC miners
+1. Temperature and Hash rate of ASIC miners
 2. Alerts based on customizable rules
 3. Switch Pools and Reset miner commands
 4. Discover new miners on the network
@@ -44,7 +44,7 @@ but should also work for most flavors of Linux. FCM can
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Rasbian Stretch.
 
-The current version of Rasbian Stretch is April 2018.  
+The current version of Raspbian Stretch is April 2018.  
 https://www.raspberrypi.org/downloads/raspbian/
 Instructions on getting set up are here  
 ![Raspberry Pi Setup](/docs/RaspberryPiSetup.md "Raspberry Pi Setup")  
@@ -165,21 +165,18 @@ section if you have any problems.
 pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
 ```
 You can complete the installation without a Telegram account, however
-Telgram is highly recommended for you to get updates from your controller
+Telegram is highly recommended for you to get updates from your controller
 about mining operations, photos and temperature. It is the primary
 'push notification' that allows you to see what is happening to your miners.  
 If you don't already have an account go to https://telegram.org/
-to get set up and get your api key.  
-Change the telegram configuraton in services.config to match your
-settings for name and api key.
+to get set up. Create a bot for yourself using BotFather https://core.telegram.org/bots#6-botfather    
+Change the telegram configuration in services.config to match your
+settings. Put the BotFather token in password and chat_id in user.
 Be very careful to make sure the file is valid json!
 ```
 sudo nano ~/fullcycle/fullcyclepy/backend/config/services.conf
 ```
 Run the following command to test your Telegram integration.  
-It will prompt for your phone number (use international format beginning with '1' if you
-are in the USA)
-and you will respond with the configrmation number that gets sent to you in Telegram.
 If successful you will get a telegram message ('Full Cycle Mining Test ...')
 with a picture from your mining controller
 (assuming you have a camera on your Raspberry Pi).
@@ -220,7 +217,7 @@ then edit services.conf and remove the redis password
 Make sure all services are started. If needed, run `sudo /etc/init.d/redis_6379 start` to start redis or `rabbitstart`
 to run rabbitmq.
 
-If the test is successfull it will get statistics on any miners you have set up in miners.conf.
+If the test is successful it will display statistics on any miners you have set up in miners.conf.
 If you just keep the default test miner in miners.conf then the output will look like this.
 ```
 pi@raspberrypi:~ $ fcmtest
@@ -233,7 +230,7 @@ fcmstart
 ```
 This will start all processes and display a status of each running component.
 To see the status of the Full Cycle components use the Supervisor web site.  
-The url is the ipaddress of your controller with 9009 as the default port number.  
+The URL is the ip address of your controller with 9009 as the default port number.  
 ![Full Cycle Supervisor](/images/fullcycle_supervisor.png?raw=true "Full Cycle Supervisor")
 You can start and stop individual components and spy on their inner workings to see if there are any errors.  
 ![Full Cycle Supervisor Tail](/images/fullcycle_supervisor_tail.png?raw=true "Full Cycle Supervisor Tail")

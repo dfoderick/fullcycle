@@ -7,6 +7,6 @@ MESSAGE = 'Full Cycle Mining test {}'.format(APP.now())
 APP.sendtelegrammessage(MESSAGE)
 
 FILEOUT = APP.take_picture('fullcycle_camera.png')
-APP.sendtelegramfile(FILEOUT)
+APP.sendtelegramphoto(FILEOUT)
 
 APP.shutdown()
