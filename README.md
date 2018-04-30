@@ -57,6 +57,22 @@ Many of the dependencies (redis and rabbitmq) can be run from Docker.
 It is highly recommended to use the Docker installation option to make it
 easier, quicker and safer to manage the application.
 
+# Docker install on Raspberry Pi
+If you do not have Docker installed on your Raspberry Pi then follow these
+instructions.
+```
+sudo apt-get install -y apt-transport-https
+sudo curl -sSL https://get.docker.com | sudo sh
+sudo systemctl enable docker
+sudo usermod -aG docker pi
+```
+You will need to `logout` and log back in for permission to take effect. When you
+log back in then check your Docker installation.
+
+```
+docker info
+```
+If you get information about your Docker program then you are ready to go.
 ## Downloading Full Cycle Mining
 Clone the repository.
 ```
@@ -69,10 +85,11 @@ Before beginning the full install run a few preliminary steps.
 Make sure your system is up to date.
 ```
 sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get -y upgrade
 ```
-Full Cycle Mining requires an environment setting for Python.
+Full Cycle Mining requires an environment setting for Python. And a bin directory will be needed.
 ```
+mkdir ~/bin
 sudo nano /etc/environment
 ```
 Add the following line to the file and save it.
@@ -89,9 +106,9 @@ Install supervisor now since it will be used in the next steps.
 ```
 sudo easy_install supervisor
 ```
-
 ## Installing MySql/MariaDB
-
+A database is used for logging and will be used for future
+reporting features.
 The following instructions assume you are using the default password `mining`.
 Please use some kind of password. Do not leave the password blank.
 Run the following script. Read and answer all prompts.
@@ -109,6 +126,8 @@ Install redis from DockerHub.
 ```
 docker run --name fullcycle-redis -d --network=host --restart unless-stopped arm32v7/redis
 ```
+It will tell you it can't find a local image so it
+will download one from DockerHub.
 If you have to install directly on the OS then Instructions
 are found here [redis](docs/redis.md)
 ## Install RabbitMQ
@@ -127,7 +146,7 @@ docker exec -it fullcycle-rabbit /bin/bash
 You should now be at a `#` prompt inside the container. Run the setup script that creates
 the accounts.
 ```
-sudo bash ./setup_rabbit_users.sh
+bash ./setup_rabbit_users.sh
 exit
 ```
 Rabbitmq is now set up.
