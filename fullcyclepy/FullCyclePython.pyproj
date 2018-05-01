@@ -37,16 +37,7 @@
     <Content Include="backend\config\rules.conf" />
     <Content Include="backend\config\rules_future.conf" />
     <Content Include="backend\config\services.conf" />
-    <Content Include="backend\fcmstop.cmd" />
     <Content Include="backend\Readme.txt" />
-    <Content Include="backend\servicesstart.cmd" />
-    <Content Include="backend\servicesstop.cmd" />
-    <Content Include="backend\fcmstart.cmd" />
-    <Content Include="linux\environment.txt" />
-    <Content Include="linux\redis.service">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="linux\supervisord.conf" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -219,7 +210,6 @@
     <Folder Include="helpers\" />
     <Folder Include="messaging\" />
     <Folder Include="hw\" />
-    <Folder Include="linux\" />
     <Folder Include="docs\" />
     <Folder Include="tests\" />
   </ItemGroup>
