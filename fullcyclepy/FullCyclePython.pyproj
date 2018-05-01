@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7dfacff8-8abe-4af3-8c58-61a88ae44e0d}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>backend\fcmapp.py</StartupFile>
+    <StartupFile>backend\diagnostics.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -51,6 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="backend\component.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\diagnostics.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="backend\doflow_discover.py">

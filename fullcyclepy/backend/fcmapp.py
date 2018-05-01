@@ -695,13 +695,14 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        self.send(QueueName.Q_ALERT, message)
+        return self.send(QueueName.Q_ALERT, message)
 
     def send(self, q_name, message):
         '''send message to queue'''
         thequeue = self.makequeue(q_name, self.component)
-        self.trypublish(thequeue, message)
+        success = self.trypublish(thequeue, message)
         self.closequeue(thequeue)
+        return success
 
     def enqueue(self, queuelist):
         '''send a list of queue messages'''
@@ -752,8 +753,10 @@ class ApplicationService:
             session = self.getsession()
             session.add(minerlog)
             session.commit()
+            return True
         except BaseException as ex:
             self.logexception(ex)
+        return False
 
 def main():
     full_cycle = ApplicationService()
