@@ -7,10 +7,10 @@
 '''
 import unittest
 import datetime
-#from marshmallow import pprint
 from domain.mining import Miner, MinerInfo, MinerCurrentPool, MinerStatistics
-#from domain.sensors import SensorValue
+from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema
+from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 
 class TestSerialization(unittest.TestCase):
     def test_minerserialization(self):
@@ -28,6 +28,18 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(isinstance(reminer.minerpool, MinerCurrentPool))
         self.assertTrue(reminer.minerpool.poolname == 'unittest')
         self.assertTrue(isinstance(reminer.minerstats, MinerStatistics))
+
+    def test_sensorvalue_serialization(self):
+        sch = SensorValueSchema()
+        sensorvalue = SensorValue('testid','99.9','temperature')
+        sensorvalue.sensor = Sensor('testid','temperature','controller')
+        jsensor = sch.dumps(sensorvalue).data
+
+        #rehydrate sensor
+        resensor = SensorValueSchema().loads(jsensor).data
+        self.assertTrue(isinstance(resensor, SensorValue))
+        self.assertTrue(isinstance(resensor.sensor, Sensor))
+        self.assertTrue(resensor.sensorid == resensor.sensor.sensorid)
 
 if __name__ == '__main__':
     unittest.main()

@@ -25,19 +25,16 @@ class SensorSchema(Schema):
     @post_load
     def make_sensor(self, data):
         '''reconstitute sensor'''
-        entity = Sensor(sensorid=data['sensorid'], sensortype=data['sensortype'],
-                        location=data['location'])
-        return entity
+        return Sensor(**data)
 
 class SensorValueSchema(Schema):
     '''serialized version of sensor value'''
     sensorid = fields.Str()
     value = fields.Str()
     valuetype = fields.Str()
+    sensor = fields.Nested(SensorSchema, allow_none=True)
 
     @post_load
     def make_sensorvalue(self, data):
         '''reconstitute sensorvalue'''
-        entity = SensorValue(sensorid=data['sensorid'], value=data['value'],
-                             valuetype=data['valuetype'])
-        return entity
+        return SensorValue(**data)

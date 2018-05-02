@@ -7,6 +7,7 @@ import datetime
 import time
 from helpers.queuehelper import QueueName, QueueEntry
 from helpers.taskschedule import TaskSchedule
+from domain.sensors import SensorValue
 from fcmapp import ApplicationService
 
 #one-time schedule provision when app starts up

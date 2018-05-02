@@ -8,9 +8,12 @@ class Sensor(object):
         self.sensorid = sensorid
         self.location = location
 
+
 class SensorValue(object):
     """A Sesnor Reading"""
-    def __init__(self, sensorid='', value='', valuetype=''):
+
+    def __init__(self, sensorid='', value='', valuetype='', sensor = None):
         self.sensorid = sensorid
         self.valuetype = valuetype
         self.value = value
+        self.sensor = sensor
