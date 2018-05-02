@@ -1,0 +1,5 @@
+docker stop fullcycleweb
+docker rm fullcycleweb
+docker pull fullcycle/web
+docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
+
