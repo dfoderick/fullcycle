@@ -17,7 +17,7 @@ from domain.rep import MinerRepository, PoolRepository, LoginRepository, RulePar
 #from domain.miningrules import RuleParameters
 from messaging.messages import Message, MessageSchema, MinerMessageSchema
 from domain.sensors import Sensor, SensorValue
-from messaging.sensormessages import SensorValueMessage
+from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
@@ -340,7 +340,7 @@ class ApplicationService:
         return None
 
     def addknownsensor(self, sensorvalue):
-        val = self.serialize(sensorvalue, SensorValueSchema())
+        val = self.jsonserialize(SensorValueSchema(), sensorvalue)
         self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
 
     def updateknownsensor(self, sensorvalue):
@@ -506,7 +506,7 @@ class ApplicationService:
         self.listen(thebroadcast)
         return thebroadcast
 
-    def trypublish(self, thequeue, msg):
+    def trypublish(self, thequeue, msg: str):
         '''publish a message to the queue'''
         try:
             thequeue.publish(msg)
@@ -648,8 +648,8 @@ class ApplicationService:
         message_envelope = self.deserializemessageenvelope(self.safestring(body))
         schema = SensorValueSchema()
         #minermessage_dict = schema.load(message_envelope.bodyjson()).data
-        entity = schema.load(mmessage_envelope.bodyjson()).data
-        return entity
+        entity = schema.load(message_envelope.bodyjson()).data
+        return message_envelope, entity
 
 
     def createmessageenvelope(self):
@@ -764,7 +764,7 @@ class ApplicationService:
     def readtemperature(self):
         try:
             sensor_humid, sensor_temp = readtemperature()
-            if sensor_temp is None:
+            if sensor_temp is not None:
                 reading = SensorValue('fullcycletemp', sensor_temp, 'temperature')
                 reading.sensor = self.sensor
                 self.sendsensor(reading)
@@ -779,9 +779,9 @@ class ApplicationService:
 
     def sendsensor(self, reading):
         message = self.createmessageenvelope()
-        body = SensorValueMessage(sensor.sensorid, sensor.value)
-        sensorjson = message.jsonserialize(SensorValueSchema(), body)
-        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, message.make_any('sensorvalue', sensorjson)))
+        #body = SensorValueMessage(reading.sensorid, reading.value)
+        sensorjson = message.jsonserialize(SensorValueSchema(), reading)
+        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson))))
 
     def sendtelegrammessage(self, message):
         sendalert(message, self.getservice('telegram'))
