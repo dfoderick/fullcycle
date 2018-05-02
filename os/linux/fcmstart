@@ -1,7 +1,9 @@
 
 #this will run services as daemon. use -n to run in forground
+#todo: needs to be run on startup
+#supervisord
 #configuration is in /etc/supervisord.conf
-supervisord 
+sudo supervisorctl start fullcycle:* 
 sleep 5s
 fcmstatus
 

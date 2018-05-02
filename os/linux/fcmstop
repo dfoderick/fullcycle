@@ -1,4 +1,4 @@
 #should just stop fcm apps
-sudo supervisorctl stop all
+sudo supervisorctl stop fullcycle:*
 #this is temp workaround. otherwise error around port in use when try to restart
 #sudo unlink /tmp/supervisor.sock
