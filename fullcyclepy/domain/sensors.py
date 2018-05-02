@@ -11,9 +11,9 @@ class Sensor(object):
 
 class SensorValue(object):
     """A Sesnor Reading"""
-    sensor = None
 
-    def __init__(self, sensorid='', value='', valuetype=''):
+    def __init__(self, sensorid='', value='', valuetype='', sensor = None):
         self.sensorid = sensorid
         self.valuetype = valuetype
         self.value = value
+        self.sensor = sensor
