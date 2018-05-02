@@ -16,6 +16,8 @@ from domain.mining import Miner, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from messaging.messages import Message, MessageSchema, MinerMessageSchema
+from domain.sensors import Sensor, SensorValue
+from messaging.sensormessages import SensorValueMessage
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
@@ -111,6 +113,7 @@ class Cache:
 class CacheKeys:
     '''all keys stored in cache'''
     knownminers = 'knownminers'
+    knownsensors = 'knownsensors'
     pools = 'pools'
     miners = 'miners'
 
@@ -172,6 +175,7 @@ class ApplicationService:
         #this is slow. should be option to opt out of cache?
         self.initcache()
         self.init_application()
+        self.init_sensors()
         if announceyourself:
             self.sendqueueitem(QueueEntry(QueueName.Q_LOG, '{0} Started {1}'.format(self.now(), self.component), QueueType.broadcast))
 
@@ -207,6 +211,9 @@ class ApplicationService:
         except Exception as ex:
             #cache is offline. try to run in degraded mode
             self.logexception(ex)
+
+    def init_sensors(self):
+        self.sensor = Sensor('controller', 'DHT22', 'controller')
 
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
@@ -254,6 +261,7 @@ class ApplicationService:
         for miner in self.miners():
             self.__cache.delete(miner.name)
         self.__cache.delete(CacheKeys.knownminers)
+        self.__cache.delete(CacheKeys.knownsensors)
 
     def initlogger(self):
         '''set up logging application info'''
@@ -324,6 +332,22 @@ class ApplicationService:
             return self.deserializelistofstrings(list(dknownminers.values()))
         knownminers = self.miners()
         return knownminers
+
+    def knownsensors(self):
+        dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
+        if dknownsensors is not None and dknownsensors:
+            return self.deserializelistofstrings(list(dknownsensors.values()))
+        return None
+
+    def addknownsensor(self, sensorvalue):
+        val = self.serialize(sensorvalue, SensorValueSchema())
+        self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
+
+    def updateknownsensor(self, sensorvalue):
+#        ssensor = self.__cache.getfromhashset(CacheKeys.knownsensors, sensorvalue.sensorid)
+#        memsensor = self.deserialize(SensorValueSchema(), self.safestring(ssensor))
+        val = self.serialize(memminer)
+        self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
 
     def minersummary(self, maxNumber = 10):
         '''show a summary of known miners
@@ -619,6 +643,15 @@ class ApplicationService:
         minermessage_entity = schema.make_minermessage(minermessage_dict)
         return minermessage_entity
 
+    def messagedecodesensor(self, body):
+        '''deserialize sensor value '''
+        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        schema = SensorValueSchema()
+        #minermessage_dict = schema.load(message_envelope.bodyjson()).data
+        entity = schema.load(mmessage_envelope.bodyjson()).data
+        return entity
+
+
     def createmessageenvelope(self):
         '''create message envelope'''
         return Message(timestamp=datetime.datetime.utcnow(), sender=self.component)
@@ -730,10 +763,25 @@ class ApplicationService:
 
     def readtemperature(self):
         try:
-            return readtemperature()
+            sensor_humid, sensor_temp = readtemperature()
+            if sensor_temp is None:
+                reading = SensorValue('fullcycletemp', sensor_temp, 'temperature')
+                reading.sensor = self.sensor
+                self.sendsensor(reading)
+            if sensor_humid is not None:
+                reading = SensorValue('fullcyclehumid', sensor_humid, 'humidity')
+                reading.sensor = self.sensor
+                self.sendsensor(reading)
+            return sensor_humid, sensor_temp
         except BaseException as ex:
             self.logexception(ex)
         return None, None
+
+    def sendsensor(self, reading):
+        message = self.createmessageenvelope()
+        body = SensorValueMessage(sensor.sensorid, sensor.value)
+        sensorjson = message.jsonserialize(SensorValueSchema(), body)
+        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, message.make_any('sensorvalue', sensorjson)))
 
     def sendtelegrammessage(self, message):
         sendalert(message, self.getservice('telegram'))

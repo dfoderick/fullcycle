@@ -25,6 +25,7 @@ class QueueName:
     Q_POOLCONFIGURATIONCHANGED = 'poolconfigurationchanged'
     Q_CLOUDPULL = 'cloudpull'
     Q_EMAIL = 'email'
+    Q_SENSOR = 'sensor'
 
     def isvalidqname(self, queue_name):
         #pylint: disable=too-many-return-statements
@@ -59,6 +60,8 @@ class QueueName:
         if queue_name == self.Q_CLOUDPULL:
             return True
         if queue_name == self.Q_EMAIL:
+            return True
+        if queue_name == self.Q_SENSOR:
             return True
         return False
 
