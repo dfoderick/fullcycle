@@ -6,6 +6,7 @@ import os
 import datetime
 import logging
 import json
+import base64
 from colorama import init
 from colorama import Fore
 import redis
@@ -116,6 +117,7 @@ class CacheKeys:
     knownsensors = 'knownsensors'
     pools = 'pools'
     miners = 'miners'
+    camera = 'camera'
 
 class Antminer():
     def __init__(self, config, login):
@@ -759,7 +761,19 @@ class ApplicationService:
             self.send(entry.queuename, entry.message)
 
     def take_picture(self, file_name):
-        return take_picture(file_name)
+        pic = take_picture(file_name)
+        return pic
+
+    def store_picture_cache(self, file_name):
+        if os.path.isfile(file_name):
+            with open(file_name, 'rb') as photofile:
+                picdata = photofile.read()
+            reading = SensorValue('fullcyclecamera', base64.b64encode(picdata), 'camera')
+            #reading.sensor = self.sensor
+            #self.sendsensor(reading)
+            message = self.createmessageenvelope()
+            sensorjson = message.jsonserialize(SensorValueSchema(), reading)
+            self.tryputcache(CacheKeys.camera, sensorjson)
 
     def readtemperature(self):
         try:
@@ -779,7 +793,6 @@ class ApplicationService:
 
     def sendsensor(self, reading):
         message = self.createmessageenvelope()
-        #body = SensorValueMessage(reading.sensorid, reading.value)
         sensorjson = message.jsonserialize(SensorValueSchema(), reading)
         self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson))))
 
