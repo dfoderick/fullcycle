@@ -6,6 +6,7 @@ import os
 import datetime
 import logging
 import json
+import base64
 from colorama import init
 from colorama import Fore
 import redis
@@ -16,6 +17,8 @@ from domain.mining import Miner, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from messaging.messages import Message, MessageSchema, MinerMessageSchema
+from domain.sensors import Sensor, SensorValue
+from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
@@ -111,8 +114,10 @@ class Cache:
 class CacheKeys:
     '''all keys stored in cache'''
     knownminers = 'knownminers'
+    knownsensors = 'knownsensors'
     pools = 'pools'
     miners = 'miners'
+    camera = 'camera'
 
 class Antminer():
     def __init__(self, config, login):
@@ -172,6 +177,7 @@ class ApplicationService:
         #this is slow. should be option to opt out of cache?
         self.initcache()
         self.init_application()
+        self.init_sensors()
         if announceyourself:
             self.sendqueueitem(QueueEntry(QueueName.Q_LOG, '{0} Started {1}'.format(self.now(), self.component), QueueType.broadcast))
 
@@ -207,6 +213,9 @@ class ApplicationService:
         except Exception as ex:
             #cache is offline. try to run in degraded mode
             self.logexception(ex)
+
+    def init_sensors(self):
+        self.sensor = Sensor('controller', 'DHT22', 'controller')
 
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
@@ -254,6 +263,7 @@ class ApplicationService:
         for miner in self.miners():
             self.__cache.delete(miner.name)
         self.__cache.delete(CacheKeys.knownminers)
+        self.__cache.delete(CacheKeys.knownsensors)
 
     def initlogger(self):
         '''set up logging application info'''
@@ -324,6 +334,22 @@ class ApplicationService:
             return self.deserializelistofstrings(list(dknownminers.values()))
         knownminers = self.miners()
         return knownminers
+
+    def knownsensors(self):
+        dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
+        if dknownsensors is not None and dknownsensors:
+            return self.deserializelistofstrings(list(dknownsensors.values()))
+        return None
+
+    def addknownsensor(self, sensorvalue):
+        val = self.jsonserialize(SensorValueSchema(), sensorvalue)
+        self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
+
+    def updateknownsensor(self, sensorvalue):
+#        ssensor = self.__cache.getfromhashset(CacheKeys.knownsensors, sensorvalue.sensorid)
+#        memsensor = self.deserialize(SensorValueSchema(), self.safestring(ssensor))
+        val = self.serialize(memminer)
+        self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
 
     def minersummary(self, maxNumber = 10):
         '''show a summary of known miners
@@ -482,7 +508,7 @@ class ApplicationService:
         self.listen(thebroadcast)
         return thebroadcast
 
-    def trypublish(self, thequeue, msg):
+    def trypublish(self, thequeue, msg: str):
         '''publish a message to the queue'''
         try:
             thequeue.publish(msg)
@@ -619,6 +645,15 @@ class ApplicationService:
         minermessage_entity = schema.make_minermessage(minermessage_dict)
         return minermessage_entity
 
+    def messagedecodesensor(self, body):
+        '''deserialize sensor value '''
+        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        schema = SensorValueSchema()
+        #minermessage_dict = schema.load(message_envelope.bodyjson()).data
+        entity = schema.load(message_envelope.bodyjson()).data
+        return message_envelope, entity
+
+
     def createmessageenvelope(self):
         '''create message envelope'''
         return Message(timestamp=datetime.datetime.utcnow(), sender=self.component)
@@ -726,14 +761,40 @@ class ApplicationService:
             self.send(entry.queuename, entry.message)
 
     def take_picture(self, file_name):
-        return take_picture(file_name)
+        pic = take_picture(file_name)
+        return pic
+
+    def store_picture_cache(self, file_name):
+        if os.path.isfile(file_name):
+            with open(file_name, 'rb') as photofile:
+                picdata = photofile.read()
+            reading = SensorValue('fullcyclecamera', base64.b64encode(picdata), 'camera')
+            #reading.sensor = self.sensor
+            #self.sendsensor(reading)
+            message = self.createmessageenvelope()
+            sensorjson = message.jsonserialize(SensorValueSchema(), reading)
+            self.tryputcache(CacheKeys.camera, sensorjson)
 
     def readtemperature(self):
         try:
-            return readtemperature()
+            sensor_humid, sensor_temp = readtemperature()
+            if sensor_temp is not None:
+                reading = SensorValue('fullcycletemp', sensor_temp, 'temperature')
+                reading.sensor = self.sensor
+                self.sendsensor(reading)
+            if sensor_humid is not None:
+                reading = SensorValue('fullcyclehumid', sensor_humid, 'humidity')
+                reading.sensor = self.sensor
+                self.sendsensor(reading)
+            return sensor_humid, sensor_temp
         except BaseException as ex:
             self.logexception(ex)
         return None, None
+
+    def sendsensor(self, reading):
+        message = self.createmessageenvelope()
+        sensorjson = message.jsonserialize(SensorValueSchema(), reading)
+        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson))))
 
     def sendtelegrammessage(self, message):
         sendalert(message, self.getservice('telegram'))

@@ -81,6 +81,9 @@
     <Compile Include="backend\when_restart.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\when_sensor.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\when_sensor_reading.py">
       <SubType>Code</SubType>
     </Compile>
