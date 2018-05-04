@@ -113,7 +113,7 @@ func main() {
 			lastcommit = lastfound
 		}
 
-		time.Sleep(1 * 20 * 1000 * time.Millisecond)
+		time.Sleep(60 * 60 * 1000 * time.Millisecond)
 	}
 }
 
