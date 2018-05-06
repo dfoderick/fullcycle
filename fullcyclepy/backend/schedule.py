@@ -83,9 +83,9 @@ while True:
 
         if UPDATEWEB.is_time_to_run():
             print("[{0}] check for web update".format(APP.now()))
-            print('Pushing update web  command to {0}.'.format(QueueName.Q_MONITOR))
-            APP.send(QueueName.Q_MONITOR, 'monitor')
-            MONITOR.lastrun = datetime.datetime.now()
+            print('Pushing update web  command to {0}.'.format(QueueName.Q_UPDATEWEB))
+            APP.send(QueueName.Q_UPDATEWEB, 'updateweb')
+            UPDATEWEB.lastrun = datetime.datetime.now()
 
 
         time.sleep(SLEEP_SECONDS)
