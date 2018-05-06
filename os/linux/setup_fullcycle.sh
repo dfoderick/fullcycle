@@ -1,6 +1,7 @@
 
 # install full cycle
 #copy the supervisor file
+sudo service supervisord stop
 sudo cp ~/fullcycle/os/linux/supervisord.conf /etc/supervisord.conf
 sudo cp ~/fullcycle/os/linux/supervisor /etc/init.d/supervisord
 sudo chmod +x /etc/init.d/supervisord
