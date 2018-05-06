@@ -1,0 +1,12 @@
+# build docker image and push to docker hub
+docker stop fullcycleweb
+docker rm fullcycleweb
+docker login
+cd ~/
+rm -r -f ~/fullcyclereact
+git clone http://github.com/dfoderick/fullcyclereact.git
+cd ~/fullcyclereact
+docker build -t fullcycle/web .
+docker push fullcycle/web:latest
+docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
+
