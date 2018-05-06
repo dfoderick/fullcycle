@@ -203,6 +203,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\__init__.py" />
+    <Compile Include="backend\when_updateweb.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="backend\" />

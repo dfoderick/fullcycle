@@ -33,6 +33,9 @@ TEMPERATURE = TaskSchedule(run_on_init=True)
 TEMPERATURE.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
 TEMPERATURE.interval = 60 * APP.configuration('schedule.temperature.minutes')
 
+UPDATEWEB = TaskSchedule(run_on_init=False)
+UPDATEWEB.interval = APP.configuration('update.fullcycleweb.interval.minutes')
+
 while True:
     try:
         if MONITOR.is_time_to_run():
@@ -77,6 +80,13 @@ while True:
                 APP.sendtelegrammessage(MSG)
             APP.sendqueueitem(QueueEntry(QueueName.Q_LOG, MSG, 'broadcast'))
             HEARTBEAT.lastrun = datetime.datetime.now()
+
+        if UPDATEWEB.is_time_to_run():
+            print("[{0}] check for web update".format(APP.now()))
+            print('Pushing update web  command to {0}.'.format(QueueName.Q_MONITOR))
+            APP.send(QueueName.Q_MONITOR, 'monitor')
+            MONITOR.lastrun = datetime.datetime.now()
+
 
         time.sleep(SLEEP_SECONDS)
 
