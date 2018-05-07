@@ -30,7 +30,7 @@ def doupdateweb(msg):
     createdHubTime = datetime.datetime.strptime(createdHub[:createdHub.find('.')], "%Y-%m-%dT%H:%M:%S")
     print('Remote Repository', createdHubTime)
     if createdLocalTime < createdHubTime:
-       print('Web application needs update')
+       COMPONENTUPDATE.app.alert('Web application needs update')
        #docker stop
        cli.stop(containerName)
        #docker rm
@@ -40,6 +40,7 @@ def doupdateweb(msg):
        #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
        client = docker.from_env()
        client.containers.run(repositoryName, name=containerName, detach=True, network_mode='host', restart_policy={"Name": "always"} )
+       COMPONENTUPDATE.app.alert('Web application updated')
     else:
        print('Web application is up to date')
 
@@ -48,7 +49,7 @@ def main():
         doupdateweb('updateweb')
         COMPONENTUPDATE.app.shutdown()
     else:
-        COMPONENTUPDATE.listeningqueue = COMPONENTUPDATE.app.listen_to_broadcast(QueueName.Q_UPDATEWEB, when_updateweb)
+        COMPONENTUPDATE.listeningqueue = COMPONENTUPDATE.app.subscribe_and_listen(QueueName.Q_UPDATEWEB, when_updateweb)
 
 if __name__ == "__main__":
     main()

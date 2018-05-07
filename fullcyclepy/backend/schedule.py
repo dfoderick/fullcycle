@@ -34,7 +34,7 @@ TEMPERATURE.start = datetime.datetime.now().replace(microsecond=0, second=0, min
 TEMPERATURE.interval = 60 * APP.configuration('schedule.temperature.minutes')
 
 UPDATEWEB = TaskSchedule(run_on_init=False)
-UPDATEWEB.interval = APP.configuration('update.fullcycleweb.interval.minutes')
+UPDATEWEB.interval = 60 * APP.configuration('update.fullcycleweb.interval.minutes')
 
 while True:
     try:
