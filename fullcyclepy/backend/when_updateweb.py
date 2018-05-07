@@ -1,5 +1,7 @@
 '''checks for web update'''
 import datetime
+import subprocess
+import json
 import docker
 from helpers.queuehelper import QueueName
 from fcmapp import Component
@@ -16,20 +18,19 @@ def when_updateweb(channel, method, properties, body):
 
 def doupdateweb(msg):
     '''check if web app should be updated'''
-    print(msg)
-    cli = docker.client.APIClient()
-    containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
-    configLocal = cli.inspect_container(containerName)
-    containerid = configLocal['Id']
-    createdLocal = configLocal['Created']
-    createdLocalTime = datetime.datetime.strptime(createdLocal[:createdLocal.find('.')], "%Y-%m-%dT%H:%M:%S")
-    print('Local Container', containerid, createdLocalTime)
+    doupdate = False
     repositoryName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.repository')
-    configHub = cli.inspect_container(containerid)
-    createdHub = configHub['Created']
-    createdHubTime = datetime.datetime.strptime(createdHub[:createdHub.find('.')], "%Y-%m-%dT%H:%M:%S")
-    print('Remote Repository', createdHubTime)
-    if createdLocalTime < createdHubTime:
+    cli = docker.client.APIClient()
+
+    webstatus = client.pull(repositoryName)
+    print(webstatus)
+    for line in webstatus.splitlines():
+        jline = json.loads(line)
+        if 'status' in jline and jline['status'].startswith('Status'):
+            print(jline['status'])
+            doupdate = jline['status'].find('is up to date') == 0
+
+    if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
        #docker stop
        cli.stop(containerName)
@@ -41,8 +42,6 @@ def doupdateweb(msg):
        client = docker.from_env()
        client.containers.run(repositoryName, name=containerName, detach=True, network_mode='host', restart_policy={"Name": "always"} )
        COMPONENTUPDATE.app.alert('Web application updated')
-    else:
-       print('Web application is up to date')
 
 def main():
     if COMPONENTUPDATE.app.isrunnow:
