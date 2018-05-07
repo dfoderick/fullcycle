@@ -20,7 +20,7 @@ def doupdateweb(msg):
     '''check if web app should be updated'''
     doupdate = False
     repositoryName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.repository')
-    cli = docker.client.APIClient()
+    client = docker.client.APIClient()
 
     webstatus = client.pull(repositoryName)
     print(webstatus)
@@ -33,11 +33,11 @@ def doupdateweb(msg):
     if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
        #docker stop
-       cli.stop(containerName)
+       client.stop(containerName)
        #docker rm
-       cli.remove_container(containerName)
+       client.remove_container(containerName)
        #docker pull
-       cli.pull(repositoryName)
+       client.pull(repositoryName)
        #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
        client = docker.from_env()
        client.containers.run(repositoryName, name=containerName, detach=True, network_mode='host', restart_policy={"Name": "always"} )
