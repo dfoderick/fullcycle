@@ -51,7 +51,7 @@ while True:
             DISCOVER.lastrun = datetime.datetime.now()
 
         if CAMERA.is_time_to_run():
-            if APP.is_enabled_configuration('telegram') and APP.is_enabled_configuration('camera'):
+            if APP.is_enabled_configuration('telegram') and APP.configuration('camera.size') is not None:
                 print("[{0}] sending camera".format(APP.now()))
                 photo_name = APP.take_picture()
                 APP.store_picture_cache(photo_name)
