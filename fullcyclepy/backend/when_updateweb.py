@@ -28,7 +28,7 @@ def doupdateweb(msg):
         jline = json.loads(line)
         if 'status' in jline and jline['status'].startswith('Status'):
             print(jline['status'])
-            doupdate = jline['status'].find('is up to date') == 0
+            doupdate = jline['status'].find('is up to date') < 0
 
     if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
