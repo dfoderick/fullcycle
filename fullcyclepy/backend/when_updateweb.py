@@ -33,10 +33,13 @@ def doupdateweb(msg):
     if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
        containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
-       #docker stop
-       client.stop(containerName)
-       #docker rm
-       client.remove_container(containerName)
+       try:
+           #docker stop
+           client.stop(containerName)
+           #docker rm
+           client.remove_container(containerName)
+       except BaseException as ex:
+           pass
        #docker pull
        client.pull(repositoryName)
        #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
