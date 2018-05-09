@@ -53,7 +53,7 @@ while True:
         if CAMERA.is_time_to_run():
             if APP.is_enabled_configuration('telegram') and APP.is_enabled_configuration('camera'):
                 print("[{0}] sending camera".format(APP.now()))
-                photo_name = APP.take_picture('fullcycle_camera.png')
+                photo_name = APP.take_picture()
                 APP.store_picture_cache(photo_name)
                 APP.sendtelegramphoto(photo_name)
             CAMERA.lastrun = datetime.datetime.now()
