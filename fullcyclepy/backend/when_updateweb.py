@@ -32,6 +32,7 @@ def doupdateweb(msg):
 
     if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
+       containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
        #docker stop
        client.stop(containerName)
        #docker rm
