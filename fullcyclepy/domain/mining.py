@@ -200,7 +200,12 @@ class Miner(object):
         self.status = MinerStatus.Offline
         self.offlinecount += 1
 
+    def online_now(self):
+        self.status = MinerStatus.Online
+        self.offlinecount = 0
+
     def is_send_offline_alert(self):
+        #todo: make configurable
         if self.offlinecount <= 3:
             return True
         return False
