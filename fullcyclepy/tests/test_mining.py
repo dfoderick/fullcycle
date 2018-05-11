@@ -70,6 +70,18 @@ class TestMiner(unittest.TestCase):
             miner.status = 'you can be anyting' 
         self.assertRaises(ValueError, setStatusTest)
         
+    def test_miner_reset_offline_count(self):
+        miner = Miner('test')
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        self.assertFalse(miner.is_send_offline_alert())
+        miner.online_now()
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
 
 
 if __name__ == '__main__':
