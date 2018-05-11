@@ -1,4 +1,5 @@
 '''Sensor entities'''
+import datetime
 
 class Sensor(object):
     """A Sesnor"""
@@ -12,8 +13,9 @@ class Sensor(object):
 class SensorValue(object):
     """A Sesnor Reading"""
 
-    def __init__(self, sensorid='', value='', valuetype='', sensor = None):
+    def __init__(self, sensorid='', value='', valuetype='', sensor = None, sensortime = datetime.datetime.utcnow()):
         self.sensorid = sensorid
         self.valuetype = valuetype
         self.value = value
         self.sensor = sensor
+        self.sensortime = sensortime

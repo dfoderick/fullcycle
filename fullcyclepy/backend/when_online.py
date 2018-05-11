@@ -24,7 +24,7 @@ def doonline(miner):
     if savedminer is None:
         savedminer = miner
     #update status
-    savedminer.status = mining.MinerStatus.Online
+    savedminer.online_now()
     #sending message will also save it
     #just provision the miner and start to monitor
     entries.add(QueueName.Q_PROVISION, ONLINE.app.messageencode(savedminer))

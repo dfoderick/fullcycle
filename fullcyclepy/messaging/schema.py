@@ -50,6 +50,7 @@ class MinerSchema(Schema):
     '''schema for a miner'''
     name = fields.Str()
     status = fields.Str()
+    laststatuschanged = fields.DateTime(allow_none=True)
     miner_type = fields.Str()
     ipaddress = fields.Str()
     port = fields.Str()
