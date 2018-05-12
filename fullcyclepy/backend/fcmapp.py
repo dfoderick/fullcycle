@@ -535,8 +535,9 @@ class ApplicationService:
 
     def putminer(self, miner: Miner):
         '''put miner in cache'''
-        valu = self.serialize(miner)
-        self.tryputcache('miner.{0}'.format(miner.key()), valu)
+        if miner:
+            valu = self.serialize(miner)
+            self.tryputcache('miner.{0}'.format(miner.key()), valu)
 
     def getminer(self, miner: Miner):
         '''strategies for getting miner from cache

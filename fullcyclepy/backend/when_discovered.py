@@ -25,7 +25,7 @@ def dodiscovered(miner):
     #knownminer should be None
     if cachedminer is not None:
         cachedminer.updatefrom(miner)
-    COMPONENTDISCOVERED.app.putminer(cachedminer)
+        COMPONENTDISCOVERED.app.putminer(cachedminer)
     knownminer = COMPONENTDISCOVERED.app.getknownminer(miner)
     if knownminer is None:
         COMPONENTDISCOVERED.app.addknownminer(miner)
