@@ -124,7 +124,7 @@ def domonitorminer(miner):
 
 def main():
     '''main'''
-    if True: #APPMONITOR.app.isrunnow:
+    if APPMONITOR.app.isrunnow:
         test_miner = APPMONITOR.app.getknownminerbyname('192.168.1.177')
         if not test_miner:
             test_miner = APPMONITOR.app.getknownminerbyname('#S9000')
