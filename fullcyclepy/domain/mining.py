@@ -212,7 +212,7 @@ class Miner(object):
         if info is not None:
             self.minerinfo = info
             if not self.miner_type:
-                self.miner_type = info.type
+                self.miner_type = info.miner_type
             if not self.minerid:
                 self.minerid = info.minerid
 

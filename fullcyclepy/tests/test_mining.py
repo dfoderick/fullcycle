@@ -1,7 +1,7 @@
 '''test mining domain'''
 import unittest
 import datetime
-from domain.mining import Miner
+from domain.mining import Miner, MinerInfo
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -58,6 +58,11 @@ class TestMiner(unittest.TestCase):
         miner.set_ftp_port('22')
         self.assertTrue(miner.ftpport == '22')
 
+    def test_miner_setminerinfo(self):
+        miner = Miner('test')
+        minerinfo = MinerInfo('testminertype', miner.minerid)
+        miner.setminerinfo(minerinfo)
+        self.assertTrue(miner.miner_type == minerinfo.miner_type)
 
 if __name__ == '__main__':
     unittest.main()
