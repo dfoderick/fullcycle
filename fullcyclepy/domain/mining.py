@@ -230,8 +230,10 @@ class Miner(object):
                 self.minerid = info.minerid
 
     def updatefrom(self, updatedminer):
-        if self.name != updatedminer.name:
+        if self.minerid != updatedminer.minerid and self.name != updatedminer.name:
             return
+        if self.minerid == updatedminer.minerid and self.name != updatedminer.name:
+            self.name = updatedminer.name
         self.setminerinfo(updatedminer.minerinfo)
         if updatedminer.lastmonitor:
             self.lastmonitor = updatedminer.lastmonitor
@@ -243,11 +245,13 @@ class Miner(object):
         self.password = updatedminer.password
         self.clientid = updatedminer.clientid
         self.networkid = updatedminer.networkid
-        self.minerid = updatedminer.minerid
+        #self.minerid = updatedminer.minerid
         self.offlinecount = updatedminer.offlinecount
         self.defaultpool = updatedminer.defaultpool
         if updatedminer.minerpool is not None:
             self.minerpool = updatedminer.minerpool
+        if updatedminer.minerstats is not None:
+            self.minerstats = updatedminer.minerstats
 
 class Pool(object):
     """A configured Pool.

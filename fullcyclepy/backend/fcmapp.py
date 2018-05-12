@@ -569,7 +569,8 @@ class ApplicationService:
 
     def getknownminerbyname(self, minername):
         '''this could be slow if there are lots of miners'''
-        for miner in self.knownminers():
+        known = self.knownminers()
+        for miner in known:
             if miner.name == minername:
                 return miner
         return None
