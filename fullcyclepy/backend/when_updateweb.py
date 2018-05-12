@@ -28,14 +28,18 @@ def doupdateweb(msg):
         jline = json.loads(line)
         if 'status' in jline and jline['status'].startswith('Status'):
             print(jline['status'])
-            doupdate = jline['status'].find('is up to date') == 0
+            doupdate = jline['status'].find('is up to date') < 0
 
     if doupdate:
        COMPONENTUPDATE.app.alert('Web application needs update')
-       #docker stop
-       client.stop(containerName)
-       #docker rm
-       client.remove_container(containerName)
+       containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
+       try:
+           #docker stop
+           client.stop(containerName)
+           #docker rm
+           client.remove_container(containerName)
+       except BaseException as ex:
+           pass
        #docker pull
        client.pull(repositoryName)
        #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web

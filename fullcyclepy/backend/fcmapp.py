@@ -760,8 +760,12 @@ class ApplicationService:
         else:
             self.send(entry.queuename, entry.message)
 
-    def take_picture(self, file_name):
-        pic = take_picture(file_name)
+    def take_picture(self, file_name='fullcycle_camera.png'):
+        pic = take_picture(file_name, 
+                           self.configuration('camera.size'),
+                           self.configuration('camera.quality'),
+                           self.configuration('camera.brightness'),
+                           self.configuration('camera.contrast'))
         return pic
 
     def store_picture_cache(self, file_name):

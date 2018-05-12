@@ -40,7 +40,7 @@ class Miner(object):
     #friendly name for your miner. keep it unique and non obscene for demos!
     name = ''
     #saved or derived from monitoring? status of the miner. online, offline,disabled etc
-    status = ''
+    laststatuschanged = None
     #saved or derived from monitoring? type of miner. Antminer S9, Antminer D3, etc.
     miner_type = ''
     #ip address, usuall will be local ip address. example: 192.168.x.y
@@ -74,9 +74,9 @@ class Miner(object):
     minerstats = None
 
     def __init__(self, name, status='', miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
-                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None):
+                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged = None):
         self.name = name
-        self.status = status
+        self._status = status
         self.miner_type = miner_type
         self.ipaddress = ipaddress
         self.port = port
@@ -92,6 +92,19 @@ class Miner(object):
         self.minerinfo = minerinfo
         self.minerpool = minerpool
         self.minerstats = minerstats
+        self.laststatuschanged = laststatuschanged
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, value):
+        if value != MinerStatus.Online and value != MinerStatus.Offline and value != MinerStatus.Disabled:
+            raise ValueError('Invalid miner status {0}'.format(value))
+        if self._status != value:
+            self.laststatuschanged = datetime.utcnow()
+        self._status = value
 
     def key(self):
         '''cache key for this entity'''
@@ -187,7 +200,12 @@ class Miner(object):
         self.status = MinerStatus.Offline
         self.offlinecount += 1
 
+    def online_now(self):
+        self.status = MinerStatus.Online
+        self.offlinecount = 0
+
     def is_send_offline_alert(self):
+        #todo: make configurable
         if self.offlinecount <= 3:
             return True
         return False

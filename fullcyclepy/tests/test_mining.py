@@ -1,7 +1,7 @@
 '''test mining domain'''
 import unittest
 import datetime
-from domain.mining import Miner, MinerInfo
+from domain.mining import Miner, MinerStatus, MinerInfo
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -57,6 +57,31 @@ class TestMiner(unittest.TestCase):
         miner.ftpport = ''
         miner.set_ftp_port('22')
         self.assertTrue(miner.ftpport == '22')
+
+    def test_miner_status_set_lastupdate(self):
+        miner = Miner('test')
+        self.assertTrue(not miner.laststatuschanged)
+        miner.status = MinerStatus.Online
+        self.assertTrue(miner.laststatuschanged)
+
+    def test_miner_status_no_you_cant(self):
+        miner = Miner('test')
+        def setStatusTest():
+            miner.status = 'you can be anyting' 
+        self.assertRaises(ValueError, setStatusTest)
+        
+    def test_miner_reset_offline_count(self):
+        miner = Miner('test')
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        self.assertFalse(miner.is_send_offline_alert())
+        miner.online_now()
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
 
     def test_miner_setminerinfo(self):
         miner = Miner('test')

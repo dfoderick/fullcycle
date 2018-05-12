@@ -33,6 +33,7 @@ class SensorValueSchema(Schema):
     value = fields.Str()
     valuetype = fields.Str()
     sensor = fields.Nested(SensorSchema, allow_none=True)
+    sensortime = fields.DateTime()
 
     @post_load
     def make_sensorvalue(self, data):

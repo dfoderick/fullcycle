@@ -11,7 +11,6 @@ class QueueName:
     Q_LOG = 'log'
     Q_PROVISION = 'provision'
     Q_SWITCH = 'switch'
-    Q_RESET = 'reset'
     Q_RESTART = 'restart'
     Q_ALERT = 'alert'
     Q_DISCOVER = 'discover'
@@ -37,8 +36,6 @@ class QueueName:
         if queue_name == self.Q_PROVISION:
             return True
         if queue_name == self.Q_SWITCH:
-            return True
-        if queue_name == self.Q_RESET:
             return True
         if queue_name == self.Q_RESTART:
             return True

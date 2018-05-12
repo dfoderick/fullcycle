@@ -38,7 +38,6 @@ def rules(miner, minerstats, minerpool):
             broken += rule.brokenrules
 
     if broken:
-        RULES.app.alert('\n'.join([b.parameter for b in broken]))
         #TODO: could raise broken rule event???
         for rule in broken:
             log = MinerLog()
