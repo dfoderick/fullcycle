@@ -89,5 +89,10 @@ class TestMiner(unittest.TestCase):
         miner.setminerinfo(minerinfo)
         self.assertTrue(miner.miner_type == minerinfo.miner_type)
 
+    def test_miner_shouldmonitor(self):
+        miner = Miner('test')
+        miner.lastmonitor = ""
+        self.assertTrue(miner.should_monitor())
+
 if __name__ == '__main__':
     unittest.main()

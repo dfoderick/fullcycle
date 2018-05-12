@@ -553,19 +553,26 @@ class ApplicationService:
 
     def getknownminer(self, miner: Miner):
         '''get a known miner'''
-        return self.getknownminerbyname(miner.key())
+        return self.getknownminerbykey(miner.key())
 
     def getminerbyname(self, minername):
         filtered = [x for x in self.miners() if x.name == minername]
         if filtered: return filtered[0]
         return None
 
-    def getknownminerbyname(self, minername):
+    def getknownminerbykey(self, minername):
         '''todo: rename to bykey'''
         str_miner = self.__cache.getfromhashset(CacheKeys.knownminers, minername)
         if str_miner is None:
             return None
         return self.deserialize(MinerSchema(), self.safestring(str_miner))
+
+    def getknownminerbyname(self, minername):
+        '''this could be slow if there are lots of miners'''
+        for miner in self.knownminers():
+            if miner.name == minername:
+                return miner
+        return None
 
     def tryputcache(self, key, value):
         '''put value in cache key'''

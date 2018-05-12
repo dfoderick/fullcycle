@@ -100,7 +100,7 @@ class Miner(object):
 
     @status.setter
     def status(self, value):
-        if value != MinerStatus.Online and value != MinerStatus.Offline and value != MinerStatus.Disabled:
+        if value != '' and value != MinerStatus.Online and value != MinerStatus.Offline and value != MinerStatus.Disabled:
             raise ValueError('Invalid miner status {0}'.format(value))
         if self._status != value:
             self.laststatuschanged = datetime.utcnow()
@@ -156,11 +156,6 @@ class Miner(object):
         hours, minutes = divmod(minutes, 60)
         days, hours = divmod(hours, 24)
         return "%dd%dh%02dm" % (days, hours, minutes)
-
-    #def updatefrom(self, otherminer):
-    #    self.status = otherminer.status
-    #    self.miner_type = otherminer.miner_type
-    #    self.lastmonitor = otherminer.lastmonitor
 
     def is_disabled(self):
         if self.is_manually_disabled() or self.status == MinerStatus.Disabled:
@@ -238,8 +233,10 @@ class Miner(object):
         if self.name != updatedminer.name:
             return
         self.setminerinfo(updatedminer.minerinfo)
-        self.lastmonitor = updatedminer.lastmonitor
-        self.status = updatedminer.status
+        if updatedminer.lastmonitor:
+            self.lastmonitor = updatedminer.lastmonitor
+        if updatedminer.status:
+            self.status = updatedminer.status
         self.ipaddress = updatedminer.ipaddress
         self.port = updatedminer.port
         self.username = updatedminer.username
