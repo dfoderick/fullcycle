@@ -51,11 +51,12 @@ while True:
             DISCOVER.lastrun = datetime.datetime.now()
 
         if CAMERA.is_time_to_run():
-            if APP.is_enabled_configuration('telegram') and APP.configuration('camera.size') is not None:
+            if APP.configuration('camera.size') is not None:
                 print("[{0}] sending camera".format(APP.now()))
                 photo_name = APP.take_picture()
                 APP.store_picture_cache(photo_name)
-                APP.sendtelegramphoto(photo_name)
+                if APP.is_enabled_configuration('telegram'):
+                    APP.sendtelegramphoto(photo_name)
             CAMERA.lastrun = datetime.datetime.now()
 
         if TEMPERATURE.is_time_to_run():
