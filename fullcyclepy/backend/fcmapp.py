@@ -104,9 +104,17 @@ class Cache:
     def set(self, key, value):
         '''save value to cache key'''
         self.__redis.set(key, value)
+
     def delete(self, key):
         '''remove key'''
         self.__redis.delete(key)
+
+    def purge(self):
+        allkeys = self.__redis.scan_iter()
+        for key in allkeys:
+            self.delete(key)
+            print("deleted key: {}".format(key))
+
     def close(self):
         '''close the cache'''
         self.__redis = None
@@ -260,10 +268,7 @@ class ApplicationService:
 
     def cacheclear(self):
         '''clear the cache'''
-        for miner in self.miners():
-            self.__cache.delete(miner.name)
-        self.__cache.delete(CacheKeys.knownminers)
-        self.__cache.delete(CacheKeys.knownsensors)
+        self.__cache.purge()
 
     def initlogger(self):
         '''set up logging application info'''

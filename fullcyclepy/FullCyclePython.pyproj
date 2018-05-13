@@ -56,6 +56,9 @@
     <Compile Include="backend\doflow_monitor.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\purge.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\simplemonitor.py">
       <SubType>Code</SubType>
     </Compile>
