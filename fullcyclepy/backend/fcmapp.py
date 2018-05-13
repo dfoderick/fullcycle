@@ -535,7 +535,7 @@ class ApplicationService:
 
     def putminer(self, miner: Miner):
         '''put miner in cache'''
-        if miner:
+        if miner and miner.key():
             valu = self.serialize(miner)
             self.tryputcache('miner.{0}'.format(miner.key()), valu)
 
@@ -548,6 +548,9 @@ class ApplicationService:
         if valu is None:
             return None
         minerfromstore = self.deserialize(MinerSchema(), self.safestring(valu))
+        if not minerfromstore.key():
+            #do not allow entry with no key
+            return None
         minerfromstore.store = 'mem'
         return minerfromstore
 
