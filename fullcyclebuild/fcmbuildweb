@@ -7,6 +7,8 @@ rm -r -f ~/fullcyclereact
 git clone http://github.com/dfoderick/fullcyclereact.git
 cd ~/fullcyclereact
 docker build -t fullcycle/web .
-docker push fullcycle/web:latest
+docker tag fullcycle/web:latest fullcycle/web:v0.1
+docker commit -m "New Build" -a "Dave" fullcycle/web fullcycle/web:v0.1
+docker push fullcycle/web
 docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
 
