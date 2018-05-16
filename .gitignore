@@ -260,6 +260,9 @@ paket-files/
 __pycache__/
 *.pyc
 
+# mypy
+.mypy_cache/
+
 fcmapp.log
 fcm.log
 fcm.err
