@@ -1,6 +1,6 @@
 '''#discovered something that responds to cgminer api'''
 from helpers.queuehelper import QueueName, QueueEntries
-from domain.mining import Miner, MinerPool
+from domain.mining import Miner
 from fcmapp import Component
 
 COMPONENTDISCOVERED = Component(componentname='discover', option='')
@@ -31,21 +31,6 @@ def dodiscovered(miner):
         COMPONENTDISCOVERED.app.addknownminer(miner)
     else:
         COMPONENTDISCOVERED.app.updateknownminer(miner)
-
-    namedpools = COMPONENTDISCOVERED.app.pools()
-    #process the pools found on the miner
-    for pool in miner.pools_available:
-        #check if pools is a named pool...
-        foundnamed = None
-        for namedpool in namedpools:
-            if namedpool.is_same_as(pool):
-                foundnamed = namedpool
-                break
-        if foundnamed:
-            #pool should take on the cononical attributes of the named pool
-            pool.named_pool = foundnamed
-            pool.user = foundnamed.user
-        COMPONENTDISCOVERED.app.add_pool(MinerPool(miner, pool.priority,pool))
 
     entries.add(QueueName.Q_ALERT, 'discovered miner {0}'.format(miner.name))
     print("Discovered {0}".format(miner.name))

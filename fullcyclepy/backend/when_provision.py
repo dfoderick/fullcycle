@@ -8,7 +8,7 @@ from colorama import Fore
 from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import services
-from domain.mining import MinerAccessLevel
+from domain.mining import MinerAccessLevel, MinerPool
 from fcmapp import Component
 
 PROVISION = Component('provision', option='')
@@ -101,6 +101,22 @@ def doprovision(miner):
             #foundpriority = next((p for p in poollist if p.priority == 0), None)
             if filtered:
                 switchtopool(miner, filtered[0])
+
+        namedpools = PROVISION.app.pools()
+        #process the pools found on the miner. This will pick up any pools added manually
+        for pool in miner.pools_available:
+            #check if pools is a named pool...
+            foundnamed = None
+            for namedpool in namedpools:
+                if namedpool.is_same_as(pool):
+                    foundnamed = namedpool
+                    break
+            if foundnamed:
+                #pool should take on the cononical attributes of the named pool
+                pool.named_pool = foundnamed
+                pool.user = foundnamed.user
+            PROVISION.app.add_pool(MinerPool(miner, pool.priority,pool))
+
         entries.add(QueueName.Q_MONITORMINER, PROVISION.app.messageencode(miner))
     return entries
 
@@ -115,7 +131,6 @@ def switchtopool(miner, pooltoswitch):
             print(Fore.YELLOW + PROVISION.app.now(), miner.name, 'switched to {0}({1})'.format(pooltoswitch.name, pooltoswitch.url))
 
 def main():
-    '''main'''
     if PROVISION.app.isrunnow:
         for miner in PROVISION.app.knownminers():
             try:
