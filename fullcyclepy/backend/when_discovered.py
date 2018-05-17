@@ -1,6 +1,6 @@
 '''#discovered something that responds to cgminer api'''
 from helpers.queuehelper import QueueName, QueueEntries
-from domain.mining import Miner
+from domain.mining import Miner, MinerPool
 from fcmapp import Component
 
 COMPONENTDISCOVERED = Component(componentname='discover', option='')
@@ -25,12 +25,28 @@ def dodiscovered(miner):
     #knownminer should be None
     if cachedminer is not None:
         cachedminer.updatefrom(miner)
-        COMPONENTDISCOVERED.app.putminer(cachedminer)
+    COMPONENTDISCOVERED.app.putminer(cachedminer)
     knownminer = COMPONENTDISCOVERED.app.getknownminer(miner)
     if knownminer is None:
         COMPONENTDISCOVERED.app.addknownminer(miner)
     else:
         COMPONENTDISCOVERED.app.updateknownminer(miner)
+
+    namedpools = COMPONENTDISCOVERED.app.pools()
+    #process the pools found on the miner
+    for pool in miner.pools_available:
+        #check if pools is a named pool...
+        foundnamed = None
+        for namedpool in namedpools:
+            if namedpool.is_same_as(pool):
+                foundnamed = namedpool
+                break
+        if foundnamed:
+            #pool should take on the cononical attributes of the named pool
+            pool.named_pool = foundnamed
+            pool.user = foundnamed.user
+        COMPONENTDISCOVERED.app.add_pool(MinerPool(miner, pool.priority,pool))
+
     entries.add(QueueName.Q_ALERT, 'discovered miner {0}'.format(miner.name))
     print("Discovered {0}".format(miner.name))
     return entries
@@ -38,7 +54,7 @@ def dodiscovered(miner):
 def main():
     '''main'''
     if COMPONENTDISCOVERED.app.isrunnow:
-        miner = Miner('192.168.1.117')
+        miner = COMPONENTDISCOVERED.app.getknownminerbyname('S9102')
         dodiscovered(miner)
         COMPONENTDISCOVERED.app.shutdown()
     else:

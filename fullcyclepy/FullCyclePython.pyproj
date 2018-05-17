@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7dfacff8-8abe-4af3-8c58-61a88ae44e0d}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>backend\diagnostics.py</StartupFile>
+    <StartupFile>tests\test_pools.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -190,6 +190,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\test_minersummary.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_pools.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\test_rules.py">

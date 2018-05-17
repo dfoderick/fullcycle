@@ -106,6 +106,16 @@ class Miner(object):
             self.laststatuschanged = datetime.utcnow()
         self._status = value
 
+    @property
+    def pools_available(self):
+        if self.minerpool is None: return None
+        available = []
+        if 'POOLS' in self.minerpool.allpools:
+            jpools = self.minerpool.allpools['POOLS']
+            for jpool in jpools:
+                available.append(AvailablePool(pool_type=self.miner_type, named_pool=None, url=jpool['URL'], user=jpool['User'], priority=jpool['Priority']))
+        return available
+
     def key(self):
         '''cache key for this entity'''
         if self.minerid is not None and self.minerid and self.minerid != 'unknown': return self.minerid
@@ -253,15 +263,63 @@ class Miner(object):
         if updatedminer.minerstats is not None:
             self.minerstats = updatedminer.minerstats
 
+          #"Pool Stale%": 0,
+          #"Discarded": 86497,
+          #"Diff": "65.5K",
+          #"Rejected": 15,
+          #"Proxy Type": "",
+          #"Getworks": 3311,
+          #"Last Share Time": "0:00:20",
+          #"Pool Rejected%": 0.1838,
+          #"Accepted": 8148,
+          #"Last Share Difficulty": 65536,
+          #"Difficulty Accepted": 533987328,
+          #"Has Stratum": true,
+          #"Priority": 1,
+          #"Stale": 3,
+          #"Long Poll": "N",
+          #"Quota": 1,
+          #"URL": "stratum+tcp://solo.antpool.com:3333",
+          #"Proxy": "",
+          #"Get Failures": 1,
+          #"Diff1 Shares": 0,
+          #"Best Share": 255598083,
+          #"Stratum Active": true,
+          #"POOL": 0,
+          #"Has GBT": false,
+          #"User": "antminer_1",
+          #"Status": "Alive",
+          #"Stratum URL": "solo.antpool.com",
+          #"Remote Failures": 1,
+          #"Difficulty Rejected": 983040,
+          #"Difficulty Stale": 0
+class AvailablePool(object):
+    """A pool available on a miner
+    pool_type is the miner type (e.g. Antminer S9)
+    """
+
+    def __init__(self, pool_type, named_pool=None, url='', user='', password='x', priority=None):
+        self.pool_type = pool_type
+        self.named_pool = named_pool
+        self.url = url
+        self.user = user
+        self.password = password
+        self.priority = priority
+
+    @property
+    def key(self):
+        return '{0}|{1}'.format(self.url, self.user)
+
+
 class Pool(object):
-    """A configured Pool.
+    """A configured (Named) Pool.
     Does not have to be attached to miner yet
     """
     pool_type = ''
     name = ''
     url = ''
     user = ''
-    priority = ''
+    priority = 0
     password = 'x'
 
     def __init__(self, pool_type, name, url, user, priority):
@@ -270,6 +328,9 @@ class Pool(object):
         self.url = url
         self.user = user
         self.priority = priority
+
+    def is_same_as(self, available_pool: AvailablePool):
+        return available_pool.url == self.url and available_pool.user.startswith(self.user)
 
 class MinerCurrentPool(object):
     '''The current pool where a miner is mining'''
@@ -295,7 +356,7 @@ class MinerPool(object):
     has a priority that can be switched.
     Links Miner to Pool
     '''
-    def __init__(self, miner, priority, pool):
+    def __init__(self, miner: Miner, priority, pool: AvailablePool):
         self.miner = miner
         self.priority = priority
         self.pool = pool

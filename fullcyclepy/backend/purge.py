@@ -3,7 +3,7 @@ from backend.fcmapp import ApplicationService, CacheKeys
 
 print('Starting application...')
 APP = ApplicationService()
-print('started',APP.component)
+print('started', APP.component)
 
 #purge cache
 APP.cacheclear()

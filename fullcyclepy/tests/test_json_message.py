@@ -35,8 +35,8 @@ class TestSerialization(unittest.TestCase):
         '''on windows the deserialization seems to lose the fractions of seconds
         so this test is only for seconds'''
         sch = SensorValueSchema()
-        sensorvalue = SensorValue('testid','99.9','temperature')
-        sensorvalue.sensor = Sensor('testid','temperature','controller')
+        sensorvalue = SensorValue('testid', '99.9', 'temperature')
+        sensorvalue.sensor = Sensor('testid', 'temperature', 'controller')
         sensortime = sensorvalue.sensortime
         jsensor = sch.dumps(sensorvalue).data
 

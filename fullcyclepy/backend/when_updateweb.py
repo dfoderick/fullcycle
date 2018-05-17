@@ -1,6 +1,4 @@
 '''checks for web update'''
-import datetime
-import subprocess
 import json
 import docker
 from helpers.queuehelper import QueueName
@@ -31,21 +29,21 @@ def doupdateweb(msg):
             doupdate = jline['status'].find('is up to date') < 0
 
     if doupdate:
-       COMPONENTUPDATE.app.alert('Web application needs update')
-       containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
-       try:
-           #docker stop
-           client.stop(containerName)
-           #docker rm
-           client.remove_container(containerName)
-       except BaseException as ex:
-           pass
-       #docker pull
-       client.pull(repositoryName)
-       #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
-       client = docker.from_env()
-       client.containers.run(repositoryName, name=containerName, detach=True, network_mode='host', restart_policy={"Name": "always"} )
-       COMPONENTUPDATE.app.alert('Web application updated')
+        COMPONENTUPDATE.app.alert('Web application needs update')
+        containerName = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
+        try:
+            #docker stop
+            client.stop(containerName)
+            #docker rm
+            client.remove_container(containerName)
+        except BaseException:
+            pass
+        #docker pull
+        client.pull(repositoryName)
+        #docker run --name fullcycleweb -d --network=host --restart unless-stopped fullcycle/web
+        client = docker.from_env()
+        client.containers.run(repositoryName, name=containerName, detach=True, network_mode='host', restart_policy={"Name": "always"})
+        COMPONENTUPDATE.app.alert('Web application updated')
 
 def main():
     if COMPONENTUPDATE.app.isrunnow:
@@ -56,4 +54,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
