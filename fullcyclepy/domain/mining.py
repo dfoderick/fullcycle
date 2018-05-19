@@ -322,12 +322,13 @@ class Pool(object):
     priority = 0
     password = 'x'
 
-    def __init__(self, pool_type, name, url, user, priority):
+    def __init__(self, pool_type, name, url, user, priority, password = 'x'):
         self.pool_type = pool_type
         self.name = name
         self.url = url
         self.user = user
         self.priority = priority
+        self.password = password
 
     def is_same_as(self, available_pool: AvailablePool):
         return available_pool.url == self.url and available_pool.user.startswith(self.user)

@@ -13,10 +13,10 @@ import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, Pool, MinerPool, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, Pool, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
-from messaging.messages import Message, MessageSchema, MinerMessageSchema
+from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessage, ConfigurationMessageSchema
 from domain.sensors import Sensor, SensorValue
 from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
@@ -110,6 +110,10 @@ class Cache:
     def delete(self, key):
         '''remove key'''
         self.__redis.delete(key)
+
+    def hdel(self, name, key):
+        '''remove key'''
+        self.__redis.hdel(name, key)
 
     def purge(self):
         allkeys = self.__redis.scan_iter()
@@ -347,7 +351,13 @@ class ApplicationService:
     def knownsensors(self):
         dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
         if dknownsensors is not None and dknownsensors:
-            return self.deserializelistofstrings(list(dknownsensors.values()))
+            return self.deserializelist_withschema(SensorValueSchema(), list(dknownsensors.values()))
+        return None
+
+    def knownpools(self):
+        dknownpools = self.__cache.gethashset(CacheKeys.knownpools)
+        if dknownpools:
+            return self.deserializelist_withschema(AvailablePoolSchema(), list(dknownpools.values()))
         return None
 
     def addknownsensor(self, sensorvalue):
@@ -412,6 +422,12 @@ class ApplicationService:
             val = self.jsonserialize(AvailablePoolSchema(), minerpool.pool)
             self.__cache.putinhashset(CacheKeys.knownpools, minerpool.pool.key, val)
 
+    def update_pool(self, key, pool: AvailablePool):
+        self.__cache.hdel(CacheKeys.knownpools, key)
+        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, pool.key)
+        if not knownpool:
+            val = self.jsonserialize(AvailablePoolSchema(), pool)
+            self.__cache.putinhashset(CacheKeys.knownpools, pool.key, val)
     #endregion
 
     def sshlogin(self):
@@ -685,6 +701,13 @@ class ApplicationService:
         entity = schema.load(message_envelope.bodyjson()).data
         return message_envelope, entity
 
+    def messagedecode_configuration(self, body):
+        '''deserialize  configuration command'''
+        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        schema = ConfigurationMessageSchema()
+        configurationmessage_dict = schema.load(message_envelope.bodyjson()).data
+        configurationmessage_entity = schema.make_configurationmessage(configurationmessage_dict)
+        return configurationmessage_entity
 
     def createmessageenvelope(self):
         '''create message envelope'''
@@ -696,7 +719,9 @@ class ApplicationService:
 
     def jsonserialize(self, sch, msg):
         '''serialize a message with schema. returns string'''
-        return json.dumps(sch.dump(msg))
+        smessage = sch.dumps(msg)
+        #json.dumps(jmessage)
+        return smessage.data
 
     def serialize(self, entity):
         '''serialize any entity
@@ -715,11 +740,17 @@ class ApplicationService:
         '''deserialize list of strings into list of miners'''
         results = []
         for item in the_list:
-            #thejson = json.loads(self.safestring(item))
-            #miner = Miner(**thejson)
-            #TODO: the miner here is a Miner but the children are dicts
             miner = self.deserialize(MinerSchema(), self.safestring(item))
             results.append(miner)
+        return results
+
+    def deserializelist_withschema(self, schema, the_list):
+        '''deserialize list of strings into entities'''
+        results = []
+        for item in the_list:
+            entity = self.deserialize(schema, self.safestring(item))
+            #todo:for pools the entry is a list
+            results.append(entity)
         return results
 
     def deserialize(self, sch, msg):
