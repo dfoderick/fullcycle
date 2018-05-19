@@ -99,10 +99,10 @@ class PoolSchema(Schema):
 class AvailablePoolSchema(Schema):
     '''schema for available pool'''
     pool_type = fields.Str()
-    named_pool = fields.Nested(PoolSchema)
+    named_pool = fields.Nested(PoolSchema, allow_none=True)
     url = fields.Str()
     user = fields.Str()
-    password = fields.Str()
+    password = fields.Str(required=False)
     priority = fields.Int()
 
     @post_load

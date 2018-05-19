@@ -11,5 +11,11 @@ class Test_test_app(unittest.TestCase):
         self.assertTrue(isinstance(strpool, str))
         self.assertFalse(strpool.startswith('['))
 
+    def test_app_knownpools(self):
+        app = ApplicationService(component='test')
+        pools = app.knownpools()
+        for pool in pools:
+            self.assertTrue(isinstance(pool,AvailablePool))
+
 if __name__ == '__main__':
     unittest.main()
