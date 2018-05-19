@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7dfacff8-8abe-4af3-8c58-61a88ae44e0d}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>tests\test_pools.py</StartupFile>
+    <StartupFile>tests\test_config.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -82,6 +82,9 @@
     </Compile>
     <Compile Include="backend\when_monitor.py" />
     <Compile Include="backend\when_restart.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\when_save.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="backend\when_sensor.py">
@@ -168,7 +171,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="messaging\__init__.py" />
+    <Compile Include="tests\test_app.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_broadcast.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_config.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\test_db.py">
