@@ -7,7 +7,7 @@ from when_monitorminer import domonitorminer
 from when_runrules import dorules
 from when_offline import dooffline
 from when_online import doonline
-from when_reset import dorestart
+from when_restart import dorestart
 
 def dispatchmessages(mainapp, entries):
     '''process the messages'''

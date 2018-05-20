@@ -43,7 +43,8 @@ def domonitorminer(miner):
         savedminer = miner
     try:
         #individual miner can be monitored even if manually disabled
-        if not savedminer.should_monitor():
+        #todo:savedminer and knownminer out of sync. this will be fixed in refactoring redis
+        if not savedminer.should_monitor() and not miner.should_monitor():
             print('skipped monitoring {0}'.format(miner.name))
             return entries
         mineroriginalstatus = savedminer.status
@@ -116,6 +117,7 @@ def domonitorminer(miner):
         # we have to consider any exception to be a miner error. sets status to offline
         #if str(e) == "timed out": #(timeout('timed out',),)
         APPMONITOR.app.logexception(ex)
+    #TODO: review usage of savedminer and knownminer. should only go with one
     APPMONITOR.app.putminer(savedminer)
     APPMONITOR.app.updateknownminer(savedminer)
     return entries
@@ -123,11 +125,11 @@ def domonitorminer(miner):
 def main():
     '''main'''
     if APPMONITOR.app.isrunnow:
-        test_miner = mining.Miner("S9000", ipaddress='192.168.1.210', port='4028')
-        test_miner.lastmonitor = datetime.datetime.utcnow()
-        test_miner.offline_now()
-        APPMONITOR.app.putminer(test_miner)
-        domonitorminer(test_miner)
+        test_miner = APPMONITOR.app.getknownminerbyname('192.168.1.177')
+        if not test_miner:
+            test_miner = APPMONITOR.app.getknownminerbyname('#S9000')
+        if test_miner:
+            domonitorminer(test_miner)
         APPMONITOR.app.shutdown()
     else:
         APPMONITOR.listeningqueue = APPMONITOR.app.subscribe_and_listen(QueueName.Q_MONITORMINER, when_monitorminer)

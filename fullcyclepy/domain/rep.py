@@ -34,6 +34,15 @@ class PoolRepository(BaseRepository):
         #TODO:Remove disabled pools
         return poollist
 
+    def add(self, pool, file_name, sch):
+        pools = self.readpools(file_name)
+        if not any(x.name == pool.name for x in pools):
+            pools.append(pool)
+        
+        jsonpools = [sch.dump(k).data for k in pools]
+        with open(file_name, 'w') as f:
+            json.dump(jsonpools, f, sort_keys = True, indent = 4, ensure_ascii = False)
+
 
 class LoginRepository(object):
     '''login repository'''

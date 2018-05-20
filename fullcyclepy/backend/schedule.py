@@ -51,20 +51,22 @@ while True:
             DISCOVER.lastrun = datetime.datetime.now()
 
         if CAMERA.is_time_to_run():
-            if APP.is_enabled_configuration('telegram') and APP.configuration('camera.size') is not None:
+            if APP.configuration('camera.size') is not None:
                 print("[{0}] sending camera".format(APP.now()))
                 photo_name = APP.take_picture()
                 APP.store_picture_cache(photo_name)
-                APP.sendtelegramphoto(photo_name)
+                if APP.is_enabled_configuration('telegram'):
+                    APP.sendtelegramphoto(photo_name)
             CAMERA.lastrun = datetime.datetime.now()
 
         if TEMPERATURE.is_time_to_run():
-            if APP.is_enabled_configuration('temperature') and APP.is_enabled_configuration('telegram'):
+            if APP.is_enabled_configuration('temperature'):
                 print("[{0}] sending temperature".format(APP.now()))
                 SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
-                if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
-                    MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
-                    APP.sendtelegrammessage(MESSAGE)
+                if APP.is_enabled_configuration('telegram'):
+                    if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
+                        MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
+                        APP.sendtelegrammessage(MESSAGE)
             TEMPERATURE.lastrun = datetime.datetime.now()
 
         if HEARTBEAT.is_time_to_run():

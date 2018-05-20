@@ -7,9 +7,9 @@ from domain.logging import MinerLog
 
 print('Starting application...')
 APP = ApplicationService()
-print('started',APP.component)
+print('started', APP.component)
 
-APP.tryputcache(key='test',value='value')
+APP.tryputcache(key='test', value='value')
 CACHE_VALUE = APP.safestring(APP.trygetvaluefromcache('test'))
 if CACHE_VALUE == 'value':
     print(Fore.GREEN+'cache is working')
@@ -23,8 +23,8 @@ try:
     else:
         print(Fore.RED+'message bus is broken')
 except BaseException as ex:
-        print(Fore.RED+'message bus is broken')
-        print(APP.exceptionmessage(ex))
+    print(Fore.RED+'message bus is broken')
+    print(APP.exceptionmessage(ex))
 
 try:
     log = MinerLog()
@@ -42,5 +42,5 @@ try:
     else:
         print(Fore.RED+'database is broken')
 except BaseException as ex:
-        print(Fore.RED+'database is broken')
-        print(APP.exceptionmessage(ex))
+    print(Fore.RED+'database is broken')
+    print(APP.exceptionmessage(ex))

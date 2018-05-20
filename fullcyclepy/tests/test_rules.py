@@ -62,7 +62,7 @@ class TestRules(unittest.TestCase):
     def test_controller_high_temp_reset_null(self):
         '''test when controller temp is high on miner. no reset'''
         self.minerstats.controllertemp = 101
-        params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 40, 55, 60*10, maxtempreset = None)
+        params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 40, 55, 60*10, maxtempreset=None)
         rules = MinerStatisticsRule(self.miner, self.minerstats, params)
 
         isbroken = rules.isbroken()
@@ -72,20 +72,20 @@ class TestRules(unittest.TestCase):
 
     def test_only_one_reset(self):
         rules = MinerStatisticsRule(self.miner, None, None)
-        rules.addbrokenrule(BrokenRule(self.miner,'restart',''))
-        rules.addbrokenrule(BrokenRule(self.miner,'restart',''))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', ''))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', ''))
         self.assertTrue(len(rules.brokenrules) == 1)
 
     def test_only_one_reboot(self):
         rules = MinerStatisticsRule(self.miner, None, None)
-        rules.addbrokenrule(BrokenRule(self.miner,'restart','reboot'))
-        rules.addbrokenrule(BrokenRule(self.miner,'restart','reboot'))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', 'reboot'))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', 'reboot'))
         self.assertTrue(len(rules.brokenrules) == 1)
 
     def test_reset_leaves_reboot(self):
         rules = MinerStatisticsRule(self.miner, None, None)
-        rules.addbrokenrule(BrokenRule(self.miner,'restart','reboot'))
-        rules.addbrokenrule(BrokenRule(self.miner,'restart',''))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', 'reboot'))
+        rules.addbrokenrule(BrokenRule(self.miner, 'restart', ''))
         self.assertTrue(len(rules.brokenrules) == 1)
         self.assertTrue(rules.brokenrules[0].parameter == 'reboot')
 

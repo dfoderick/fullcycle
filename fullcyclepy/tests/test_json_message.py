@@ -9,7 +9,7 @@ import unittest
 import datetime
 from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool, MinerStatistics
 from domain.sensors import SensorValue, Sensor
-from messaging.messages import MinerSchema
+from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 
 class TestSerialization(unittest.TestCase):
@@ -35,8 +35,8 @@ class TestSerialization(unittest.TestCase):
         '''on windows the deserialization seems to lose the fractions of seconds
         so this test is only for seconds'''
         sch = SensorValueSchema()
-        sensorvalue = SensorValue('testid','99.9','temperature')
-        sensorvalue.sensor = Sensor('testid','temperature','controller')
+        sensorvalue = SensorValue('testid', '99.9', 'temperature')
+        sensorvalue.sensor = Sensor('testid', 'temperature', 'controller')
         sensortime = sensorvalue.sensortime
         jsensor = sch.dumps(sensorvalue).data
 
@@ -49,6 +49,17 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(resensor.sensortime.second == sensortime.second)
         self.assertTrue(isinstance(resensor.sensor, Sensor))
         self.assertTrue(resensor.sensorid == resensor.sensor.sensorid)
+
+    def test_configuration_serialization(self):
+        sch = ConfigurationMessageSchema()
+        msg = ConfigurationMessage('save','','pool',{"id":"name"}, [{"name":"my pool"}])
+        jconfig = sch.dumps(msg).data
+        reconfig = sch.loads(jconfig).data
+        self.assertTrue(isinstance(reconfig, ConfigurationMessage))
+        self.assertTrue(isinstance(reconfig.command, str))
+        self.assertTrue(isinstance(reconfig.parameter, str))
+        self.assertTrue(isinstance(reconfig.id, dict))
+        self.assertTrue(isinstance(reconfig.values, list))
 
 if __name__ == '__main__':
     unittest.main()

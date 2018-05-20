@@ -3,7 +3,7 @@ from domain.mining import Miner, MinerStatistics
 
 class RuleParameters(object):
     '''configurable parameters for rules'''
-    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, maxtempreset = None):
+    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, maxtempreset=None):
         self.minertype = minertype
         self.hashlimit = hashlimit
         self.controllertemplimit = controllertemplimit

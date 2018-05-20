@@ -13,13 +13,13 @@ import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, Pool, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
-from messaging.messages import Message, MessageSchema, MinerMessageSchema
+from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessage, ConfigurationMessageSchema
 from domain.sensors import Sensor, SensorValue
 from messaging.sensormessages import SensorValueMessage, SensorValueSchema
-from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
+from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
 from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
 from helpers.antminerhelper import MinerMonitorException, setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
@@ -88,6 +88,8 @@ class Cache:
 
     def putinhashset(self, name, key, value):
         '''store value into key at name'''
+        if not isinstance(value, str):
+            raise ValueError('hashset value must be a string')
         self.__redis.hset(name, key, value)
 
     def getfromhashset(self, name, key):
@@ -104,9 +106,21 @@ class Cache:
     def set(self, key, value):
         '''save value to cache key'''
         self.__redis.set(key, value)
+
     def delete(self, key):
         '''remove key'''
         self.__redis.delete(key)
+
+    def hdel(self, name, key):
+        '''remove key'''
+        self.__redis.hdel(name, key)
+
+    def purge(self):
+        allkeys = self.__redis.scan_iter()
+        for key in allkeys:
+            self.delete(key)
+            print("deleted key: {}".format(key))
+
     def close(self):
         '''close the cache'''
         self.__redis = None
@@ -114,7 +128,9 @@ class Cache:
 class CacheKeys:
     '''all keys stored in cache'''
     knownminers = 'knownminers'
+    knownpools = 'knownpools'
     knownsensors = 'knownsensors'
+    #named pools, a big string. obsolete
     pools = 'pools'
     miners = 'miners'
     camera = 'camera'
@@ -238,7 +254,7 @@ class ApplicationService:
             return False
         value = self.__config[lookupkey]
         if isinstance(value,str):
-            return (value == 'true' or value == 'True')
+            return value == 'true' or value == 'True'
         return value
 
     def initminercache(self):
@@ -260,10 +276,7 @@ class ApplicationService:
 
     def cacheclear(self):
         '''clear the cache'''
-        for miner in self.miners():
-            self.__cache.delete(miner.name)
-        self.__cache.delete(CacheKeys.knownminers)
-        self.__cache.delete(CacheKeys.knownsensors)
+        self.__cache.purge()
 
     def initlogger(self):
         '''set up logging application info'''
@@ -338,18 +351,22 @@ class ApplicationService:
     def knownsensors(self):
         dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
         if dknownsensors is not None and dknownsensors:
-            return self.deserializelistofstrings(list(dknownsensors.values()))
+            return self.deserializelist_withschema(SensorValueSchema(), list(dknownsensors.values()))
+        return None
+
+    def knownpools(self):
+        dknownpools = self.__cache.gethashset(CacheKeys.knownpools)
+        if dknownpools:
+            return self.deserializelist_withschema(AvailablePoolSchema(), list(dknownpools.values()))
         return None
 
     def addknownsensor(self, sensorvalue):
         val = self.jsonserialize(SensorValueSchema(), sensorvalue)
         self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
 
-    def updateknownsensor(self, sensorvalue):
-#        ssensor = self.__cache.getfromhashset(CacheKeys.knownsensors, sensorvalue.sensorid)
-#        memsensor = self.deserialize(SensorValueSchema(), self.safestring(ssensor))
-        val = self.serialize(memminer)
-        self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
+    #def updateknownsensor(self, sensorvalue):
+    #    val = self.serialize(memminer)
+    #    self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
 
     def minersummary(self, maxNumber = 10):
         '''show a summary of known miners
@@ -373,6 +390,7 @@ class ApplicationService:
         val = self.serialize(memminer)
         self.__cache.putinhashset(CacheKeys.knownminers, miner.key(), val)
 
+    #region Pools
     def pools(self):
         '''configured pools'''
         pools = PoolRepository().readpools(self.getconfigfilename('config/pools.conf'))
@@ -385,6 +403,32 @@ class ApplicationService:
             if minerpool.currentpool == pool.url and minerpool.currentworker.startswith(pool.user):
                 return pool
         return None
+
+    def getpool(self, miner: Miner):
+        '''get pool from cache'''
+        valu = self.trygetvaluefromcache(miner.name + '.pool')
+        if valu is None: return None
+        entity = MinerCurrentPool(miner, **self.deserialize(MinerCurrentPoolSchema(), valu))
+        #entity.Miner = miner
+        return entity
+
+    def add_pool(self, minerpool: MinerPool):
+        '''see if pool is known or not, then add it'''
+        #if minerpool.pool.named_pool:
+        #    #if pool associated with named pool then no need to add it
+        #    return
+        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, minerpool.pool.key)
+        if not knownpool:
+            val = self.jsonserialize(AvailablePoolSchema(), minerpool.pool)
+            self.__cache.putinhashset(CacheKeys.knownpools, minerpool.pool.key, val)
+
+    def update_pool(self, key, pool: AvailablePool):
+        self.__cache.hdel(CacheKeys.knownpools, key)
+        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, pool.key)
+        if not knownpool:
+            val = self.jsonserialize(AvailablePoolSchema(), pool)
+            self.__cache.putinhashset(CacheKeys.knownpools, pool.key, val)
+    #endregion
 
     def sshlogin(self):
         '''return contents of login file'''
@@ -428,7 +472,7 @@ class ApplicationService:
         if qregister.queue_name not in self._queues.keys():
             self._queues[qregister.queue_name] = qregister
 
-    def shutdown(self, exitstatus=None):
+    def shutdown(self, exitstatus=0):
         '''shut down app services'''
         self.loginfo('Shutting down fcm app...')
         self.closequeues()
@@ -535,8 +579,9 @@ class ApplicationService:
 
     def putminer(self, miner: Miner):
         '''put miner in cache'''
-        valu = self.serialize(miner)
-        self.tryputcache('miner.{0}'.format(miner.key()), valu)
+        if miner and miner.key():
+            valu = self.serialize(miner)
+            self.tryputcache('miner.{0}'.format(miner.key()), valu)
 
     def getminer(self, miner: Miner):
         '''strategies for getting miner from cache
@@ -547,24 +592,35 @@ class ApplicationService:
         if valu is None:
             return None
         minerfromstore = self.deserialize(MinerSchema(), self.safestring(valu))
+        if not minerfromstore.key():
+            #do not allow entry with no key
+            return None
         minerfromstore.store = 'mem'
         return minerfromstore
 
     def getknownminer(self, miner: Miner):
         '''get a known miner'''
-        return self.getknownminerbyname(miner.key())
+        return self.getknownminerbykey(miner.key())
 
     def getminerbyname(self, minername):
         filtered = [x for x in self.miners() if x.name == minername]
         if filtered: return filtered[0]
         return None
 
-    def getknownminerbyname(self, minername):
+    def getknownminerbykey(self, minername):
         '''todo: rename to bykey'''
         str_miner = self.__cache.getfromhashset(CacheKeys.knownminers, minername)
         if str_miner is None:
             return None
         return self.deserialize(MinerSchema(), self.safestring(str_miner))
+
+    def getknownminerbyname(self, minername):
+        '''this could be slow if there are lots of miners'''
+        known = self.knownminers()
+        for miner in known:
+            if miner.name == minername:
+                return miner
+        return None
 
     def tryputcache(self, key, value):
         '''put value in cache key'''
@@ -599,14 +655,6 @@ class ApplicationService:
         valu = self.trygetvaluefromcache(miner.name + '.stats')
         if valu is None: return None
         entity = MinerStatistics(miner, **self.deserialize(MinerStatsSchema(), valu))
-        return entity
-
-    def getpool(self, miner: Miner):
-        '''get pool from cache'''
-        valu = self.trygetvaluefromcache(miner.name + '.pool')
-        if valu is None: return None
-        entity = MinerCurrentPool(miner, **self.deserialize(MinerCurrentPoolSchema(), valu))
-        #entity.Miner = miner
         return entity
 
     def safestring(self, thestring):
@@ -653,6 +701,13 @@ class ApplicationService:
         entity = schema.load(message_envelope.bodyjson()).data
         return message_envelope, entity
 
+    def messagedecode_configuration(self, body):
+        '''deserialize  configuration command'''
+        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        schema = ConfigurationMessageSchema()
+        configurationmessage_dict = schema.load(message_envelope.bodyjson()).data
+        configurationmessage_entity = schema.make_configurationmessage(configurationmessage_dict)
+        return configurationmessage_entity
 
     def createmessageenvelope(self):
         '''create message envelope'''
@@ -663,8 +718,10 @@ class ApplicationService:
         return self._schemamsg.dumps(msg).data
 
     def jsonserialize(self, sch, msg):
-        '''serialize a message with schema'''
-        return json.dumps(sch.dump(msg))
+        '''serialize a message with schema. returns string'''
+        smessage = sch.dumps(msg)
+        #json.dumps(jmessage)
+        return smessage.data
 
     def serialize(self, entity):
         '''serialize any entity
@@ -683,11 +740,17 @@ class ApplicationService:
         '''deserialize list of strings into list of miners'''
         results = []
         for item in the_list:
-            #thejson = json.loads(self.safestring(item))
-            #miner = Miner(**thejson)
-            #TODO: the miner here is a Miner but the children are dicts
             miner = self.deserialize(MinerSchema(), self.safestring(item))
             results.append(miner)
+        return results
+
+    def deserializelist_withschema(self, schema, the_list):
+        '''deserialize list of strings into entities'''
+        results = []
+        for item in the_list:
+            entity = self.deserialize(schema, self.safestring(item))
+            #todo:for pools the entry is a list
+            results.append(entity)
         return results
 
     def deserialize(self, sch, msg):
@@ -730,7 +793,7 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        return self.send(QueueName.Q_ALERT, message)
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, message,QueueType.broadcast))
 
     def send(self, q_name, message):
         '''send message to queue'''

@@ -11,7 +11,6 @@ class QueueName:
     Q_LOG = 'log'
     Q_PROVISION = 'provision'
     Q_SWITCH = 'switch'
-    Q_RESET = 'reset'
     Q_RESTART = 'restart'
     Q_ALERT = 'alert'
     Q_DISCOVER = 'discover'
@@ -27,6 +26,7 @@ class QueueName:
     Q_EMAIL = 'email'
     Q_SENSOR = 'sensor'
     Q_UPDATEWEB = 'updateweb'
+    Q_SAVE = 'save'
 
     def isvalidqname(self, queue_name):
         #pylint: disable=too-many-return-statements
@@ -37,8 +37,6 @@ class QueueName:
         if queue_name == self.Q_PROVISION:
             return True
         if queue_name == self.Q_SWITCH:
-            return True
-        if queue_name == self.Q_RESET:
             return True
         if queue_name == self.Q_RESTART:
             return True
@@ -94,7 +92,7 @@ class QueueEntries(object):
         self.entries.append(QueueEntry(queuename, message, QueueType.broadcast))
 
     def addalert(self, message):
-        self.add(QueueName.Q_ALERT, message)
+        self.addbroadcast(QueueName.Q_ALERT, message)
 
     def hasentries(self):
         if self.entries is None:

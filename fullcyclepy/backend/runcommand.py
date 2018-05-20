@@ -7,7 +7,7 @@
 #   runcommand.py switch S9102 3
 '''
 import sys
-from helpers.queuehelper import QueueName, Queue
+from helpers.queuehelper import QueueName, Queue, BroadcastSender
 #from messaging.messages import *
 from domain.mining import Miner, MinerCommand
 from domain.rep import MinerRepository
@@ -23,9 +23,14 @@ def doit(args):
     cmd = args[1]
     if len(args) == 2:
         #single command, no miner specified
-        queue_command = Queue(cmd, APP.getservice('rabbit'))
-        queue_command.publish('{0} runcommand called on {1}'.format(APP.now(), cmd))
-        queue_command.close()
+        if cmd == 'alert':
+            queue_command = BroadcastSender(cmd, APP.getservice('rabbit'))
+            APP.trybroadcast(queue_command, '{0}: runcommand called on {1}'.format(APP.now(), cmd))
+            queue_command.close()
+        else:
+            queue_command = Queue(cmd, APP.getservice('rabbit'))
+            queue_command.publish('{0}: runcommand called on {1}'.format(APP.now(), cmd))
+            queue_command.close()
         print('sent command {0}'.format(cmd))
     else:
         minertofind = args[2]

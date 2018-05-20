@@ -100,6 +100,8 @@ class Message(object):
         jsonlist = json.loads(self.body)
         if 'miner' in jsonlist:
             return jsonlist
+        if not isinstance(jsonlist,list):
+            return jsonlist
         return jsonlist[0]
 
     def bodyonlyjson(self):
@@ -146,3 +148,42 @@ class Message(object):
     #    msg = SensorMessage(sensor.sensorid, sensor.value)
     #    self.body = self.jsonserialize(SensorSchema(),msg)
     #    return self
+
+class ConfigurationMessage(object):
+    """ A configuration message
+    Used to save full cycle configuration values
+    example: command = 'save', entity='pool', id={"poolid":"1"}, values = [{"name":"my pool"}]
+    """
+    def __init__(self, command=None, parameter=None, entity=None, id=None, values=None):
+        self.command = command
+        self.parameter = parameter
+        self.entity = entity
+        self.id = id
+        self.values = values
+
+class ConfigurationMessageSchema(Schema):
+    '''schema for Configuration Message'''
+    command = fields.Str()
+    parameter = fields.Str()
+    entity = fields.Str()
+    id = fields.Dict()
+    values = fields.List(fields.Dict())
+
+    @post_load
+    def make_configurationmessage(self, data):
+        '''reconstitute a configurationmessage'''
+        command = None
+        parameter = None
+        entity = None
+        id = None
+        values = None
+        command = data['command']
+        if 'parameter' in data:
+            parameter = data['parameter']
+        entity = data['entity']
+        if 'id' in data:
+            id = data['id']
+        if 'values' in data:
+            values = data['values']
+        msg = ConfigurationMessage(command, parameter, entity, id, values)
+        return msg

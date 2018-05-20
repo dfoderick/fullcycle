@@ -1,7 +1,6 @@
 '''serialization schema'''
 from marshmallow import Schema, fields, post_load
-#from messaging.messages import *
-from domain.mining import MinerInfo, MinerCurrentPool, MinerStatistics, Miner, MinerCommand
+from domain.mining import MinerInfo, MinerCurrentPool, MinerStatistics, Miner, Pool, MinerCommand, AvailablePool
 
 class MinerInfoSchema(Schema):
     '''schema for miner information'''
@@ -83,6 +82,29 @@ class MinerCommandSchema(Schema):
     def make_command(self, data):
         return MinerCommand(**data)
 
-#class EventSchema(Schema):
-#    """Event? """
-#    todo = fields.Str()
+class PoolSchema(Schema):
+    pool_type = fields.Str()
+    name = fields.Str()
+    url = fields.Str()
+    user = fields.Str()
+    password = fields.Str()
+    priority = fields.Int()
+    password = fields.Str()
+
+    @post_load
+    def make(self, data):
+        return Pool(**data)
+
+
+class AvailablePoolSchema(Schema):
+    '''schema for available pool'''
+    pool_type = fields.Str()
+    named_pool = fields.Nested(PoolSchema, allow_none=True)
+    url = fields.Str()
+    user = fields.Str()
+    password = fields.Str(required=False)
+    priority = fields.Int()
+
+    @post_load
+    def make(self, data):
+        return AvailablePool(**data)

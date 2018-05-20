@@ -1,7 +1,7 @@
 '''test mining domain'''
 import unittest
 import datetime
-from domain.mining import Miner, MinerStatus
+from domain.mining import Miner, MinerStatus, MinerInfo
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -67,10 +67,32 @@ class TestMiner(unittest.TestCase):
     def test_miner_status_no_you_cant(self):
         miner = Miner('test')
         def setStatusTest():
-            miner.status = 'you can be anyting' 
+            miner.status = 'you can be anyting'
         self.assertRaises(ValueError, setStatusTest)
-        
 
+    def test_miner_reset_offline_count(self):
+        miner = Miner('test')
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        miner.offline_now()
+        self.assertFalse(miner.is_send_offline_alert())
+        miner.online_now()
+        self.assertTrue(miner.offlinecount == 0)
+        self.assertTrue(miner.is_send_offline_alert())
+
+    def test_miner_setminerinfo(self):
+        miner = Miner('test')
+        minerinfo = MinerInfo('testminertype', miner.minerid)
+        miner.setminerinfo(minerinfo)
+        self.assertTrue(miner.miner_type == minerinfo.miner_type)
+
+    def test_miner_shouldmonitor(self):
+        miner = Miner('test')
+        miner.lastmonitor = ""
+        self.assertTrue(miner.should_monitor())
 
 if __name__ == '__main__':
     unittest.main()
