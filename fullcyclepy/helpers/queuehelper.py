@@ -92,7 +92,7 @@ class QueueEntries(object):
         self.entries.append(QueueEntry(queuename, message, QueueType.broadcast))
 
     def addalert(self, message):
-        self.add(QueueName.Q_ALERT, message)
+        self.addbroadcast(QueueName.Q_ALERT, message)
 
     def hasentries(self):
         if self.entries is None:

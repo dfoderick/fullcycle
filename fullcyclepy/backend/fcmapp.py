@@ -793,7 +793,7 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        return self.send(QueueName.Q_ALERT, message)
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, message,QueueType.broadcast))
 
     def send(self, q_name, message):
         '''send message to queue'''

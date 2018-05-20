@@ -32,7 +32,7 @@ def dodiscovered(miner):
     else:
         COMPONENTDISCOVERED.app.updateknownminer(miner)
 
-    entries.add(QueueName.Q_ALERT, 'discovered miner {0}'.format(miner.name))
+    entries.addbroadcast(QueueName.Q_ALERT, 'discovered miner {0}'.format(miner.name))
     print("Discovered {0}".format(miner.name))
     return entries
 
