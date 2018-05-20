@@ -260,7 +260,8 @@ paket-files/
 __pycache__/
 *.pyc
 
-.mypy_cache
+# mypy
+.mypy_cache/
 
 fcmapp.log
 fcm.log
