@@ -18,7 +18,7 @@ def doalert(alertmsg):
     print("Sent telegram {0}".format(alertmsg))
 
 def main():
-    ALERT.listeningqueue = ALERT.app.subscribe_and_listen(QueueName.Q_ALERT, when_alert)
+    ALERT.listeningqueue = ALERT.app.listen_to_broadcast(QueueName.Q_ALERT, when_alert)
 
 if __name__ == "__main__":
     main()
