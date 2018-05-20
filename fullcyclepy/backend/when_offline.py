@@ -25,7 +25,7 @@ def dooffline(miner: mining.Miner):
         if savedminer.is_send_offline_alert():
             #update status to offline and alert
             savedminer.status = mining.MinerStatus.Offline
-            alertmsg = 'miner {0} is offline! since...'.format(savedminer.name)
+            alertmsg = 'miner {0} is offline! since {1}'.format(savedminer.name, savedminer.laststatuschanged)
             OFFLINE.app.putminer(savedminer)
             entries.addalert(alertmsg)
             print("Sent offline alert '{0}'".format(alertmsg))

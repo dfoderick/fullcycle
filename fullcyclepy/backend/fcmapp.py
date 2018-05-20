@@ -583,7 +583,7 @@ class ApplicationService:
             valu = self.serialize(miner)
             self.tryputcache('miner.{0}'.format(miner.key()), valu)
 
-    def getminer(self, miner: Miner):
+    def getminer(self, miner: Miner) -> Miner:
         '''strategies for getting miner from cache
         originally was key=miner.name but that was not good
         changed to key='miner.'+minerid
