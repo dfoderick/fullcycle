@@ -563,7 +563,7 @@ class ApplicationService:
             return False
 
     def trybroadcast(self, thequeue, msg):
-        '''broadcase a message to all queue listeners'''
+        '''broadcast a message to all queue listeners'''
         try:
             thequeue.broadcast(msg)
             return True
@@ -818,10 +818,11 @@ class ApplicationService:
         if entry.eventtype == 'broadcast':
             thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
             self.registerqueue(thequeue)
-            self.trybroadcast(thequeue, entry.message)
+            send_result = self.trybroadcast(thequeue, entry.message)
             self.closequeue(thequeue)
+            return send_result
         else:
-            self.send(entry.queuename, entry.message)
+            return self.send(entry.queuename, entry.message)
 
     def take_picture(self, file_name='fullcycle_camera.png'):
         pic = take_picture(file_name, 
