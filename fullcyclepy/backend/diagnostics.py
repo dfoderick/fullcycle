@@ -34,11 +34,14 @@ try:
     log.action = 'diagnostics'
     SUCCESS = APP.log_mineractivity(log)
 
-    for log in getminerlog(APP.getsession()):
-        print(log.__dict__)
+    LOGS = getminerlog(APP.getsession())
+    #print(log.__dict__)
+    LOG_CNT = 0
+    for log in LOGS:
+        LOG_CNT += 1
 
-    if SUCCESS:
-        print(Fore.GREEN+'database is working')
+    if SUCCESS and LOG_CNT > 0:
+        print(Fore.GREEN+'database is working, {0} logs'.format(LOG_CNT))
     else:
         print(Fore.RED+'database is broken')
 except BaseException as ex:
