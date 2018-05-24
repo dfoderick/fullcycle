@@ -195,7 +195,7 @@ class ApplicationService:
         self.init_application()
         self.init_sensors()
         if announceyourself:
-            self.sendqueueitem(QueueEntry(QueueName.Q_LOG, '{0} Started {1}'.format(self.now(), self.component), QueueType.broadcast))
+            self.sendqueueitem(QueueEntry(QueueName.Q_LOG, self.stamp('Started {0}'.format(self.component)), QueueType.broadcast))
 
     def initargs(self, option):
         '''process command line arguments'''
@@ -244,6 +244,7 @@ class ApplicationService:
         '''configuration is loaded once at startup'''
         raw = BaseRepository().readrawfile(self.getconfigfilename('config/fullcycle.conf'))
         self.__config = json.loads(raw)
+        self.applicationid = self.configuration('applicationid')
 
     def configuration(self, key):
         return self.__config[key]
@@ -791,9 +792,12 @@ class ApplicationService:
         message = message.make_minerstats(miner, minerstats=None, minerpool=None)
         return self._schemamsg.dumps(message).data
 
+    def stamp(self, message):
+        return '{0}:{1}: {2}'.format(self.now(), self.applicationid, message)
+
     def alert(self, message):
         '''send alert message'''
-        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, message,QueueType.broadcast))
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.broadcast))
 
     def send(self, q_name, message):
         '''send message to queue'''
