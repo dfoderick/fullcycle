@@ -181,6 +181,8 @@ class ApplicationService:
     __logger_debug = None
     __logger_error = None
     antminer = None
+    #temporary reference to mq connection at app level
+    dummy_queue = None
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself = False):
         self.component = component
@@ -195,6 +197,8 @@ class ApplicationService:
         self.initcache()
         self.init_application()
         self.init_sensors()
+
+        self.dummy_queue = self.makequeue(QueueName.Q_DUMMY, self.component)
         if announceyourself:
             self.sendqueueitem(QueueEntry(QueueName.Q_LOG, self.stamp('Started {0}'.format(self.component)), QueueType.broadcast))
 
@@ -533,16 +537,22 @@ class ApplicationService:
         self.registerqueue(thequeue)
         return thequeue
 
+    #todo: this should only be called once per app
     def subscribe(self, q_name, callback, no_acknowledge=True):
         '''subscribe to a queue'''
-        thequeue = Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
+        #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
+        thequeue = self.dummy_queue
+        #change the name of the dummy queue to the one the caller wants
+        thequeue.queue_name = q_name
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
         thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
+        #returning a reference to the renamed dummy queue
         return thequeue
 
     #[obsolete], caller needs reference to q before listening
     def subscribe_and_listen(self, q_name, callback, no_acknowledge=True):
-        '''listen to a queue'''
+        '''listen to a queue
+        todo: replace with separate calls to subscribe then listen'''
         thequeue = self.subscribe(q_name, callback, no_acknowledge=True)
         self.listen(thequeue)
         #this will never return because listen is blocking call
@@ -559,23 +569,23 @@ class ApplicationService:
         self.listen(thebroadcast)
         return thebroadcast
 
-    def trypublish(self, thequeue, msg: str):
+    def trypublish(self, queue_name, msg: str):
         '''publish a message to the queue'''
         try:
-            thequeue.publish(msg)
+            self.dummy_queue.publish_channel(queue_name, msg)
             return True
         except pika.exceptions.ConnectionClosed as ex:
-            logmessage = 'Error publishing to {0} {1}'.format(thequeue.queue_name, self.exceptionmessage(ex))
+            logmessage = 'Error publishing to {0} {1}'.format(queue_name, self.exceptionmessage(ex))
             self.logerror(logmessage)
             return False
 
-    def trybroadcast(self, thequeue, msg):
+    def trybroadcast(self, exchange_name, msg):
         '''broadcast a message to all queue listeners'''
         try:
-            thequeue.broadcast(msg)
+            self.dummy_queue.broadcast_channel(exchange_name, msg)
             return True
         except pika.exceptions.ConnectionClosed as conxex:
-            self.logerror('Error broadcasting to {0} {1}'.format(thequeue.queue_name, self.exceptionmessage(conxex)))
+            self.logerror('Error broadcasting to {0} {1}'.format(exchange_name, self.exceptionmessage(conxex)))
             return False
 
     def queuestatus(self):
@@ -807,9 +817,9 @@ class ApplicationService:
 
     def send(self, q_name, message):
         '''send message to queue'''
-        thequeue = self.makequeue(q_name, self.component)
-        success = self.trypublish(thequeue, message)
-        self.closequeue(thequeue)
+        #thequeue = self.makequeue(q_name, self.component)
+        success = self.trypublish(q_name, message)
+        #self.closequeue(thequeue)
         return success
 
     def enqueue(self, queuelist):
@@ -825,13 +835,13 @@ class ApplicationService:
     def sendqueueitem(self, entry):
         '''send one queue item'''
         if entry.eventtype == 'broadcast':
-            thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
-            self.registerqueue(thequeue)
-            send_result = self.trybroadcast(thequeue, entry.message)
-            self.closequeue(thequeue)
+            #thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
+            #self.registerqueue(thequeue)
+            send_result = self.trybroadcast(entry.queuename, entry.message)
+            #self.closequeue(thequeue)
             return send_result
         else:
-            return self.send(entry.queuename, entry.message)
+            return self.send(self.dummy_queue, entry.queuename, entry.message)
 
     def take_picture(self, file_name='fullcycle_camera.png'):
         pic = take_picture(file_name, 
