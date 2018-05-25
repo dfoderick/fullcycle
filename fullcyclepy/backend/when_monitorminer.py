@@ -1,6 +1,5 @@
 '''#David Foderick, Skylake Software Inc.
 #Runs behind firewall
-#TODO: Review error reporting, need place to log errors
 '''
 import time
 import datetime

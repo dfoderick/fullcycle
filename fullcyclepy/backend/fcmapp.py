@@ -168,6 +168,7 @@ class ApplicationService:
     programnamefull = ''
     programname = ''
     component = ComponentName.fullcycle
+    loglevel = 0
     #true if user passed in -now command line argument
     isrunnow = False
     #dictionary of queues managed by this app
@@ -245,6 +246,7 @@ class ApplicationService:
         raw = BaseRepository().readrawfile(self.getconfigfilename('config/fullcycle.conf'))
         self.__config = json.loads(raw)
         self.applicationid = self.configuration('applicationid')
+        self.loglevel = self.configuration('loglevel')
 
     def configuration(self, key):
         return self.__config[key]
@@ -315,6 +317,8 @@ class ApplicationService:
 
     def logdebug(self, message):
         '''log debug message'''
+        if not self.loglevel or self.loglevel == 0:
+            return
         logmsg = '{0}: {1}'.format(self.programname, message)
         self.__logger_debug.debug(logmsg)
         print(Fore.GREEN+logmsg)
@@ -470,6 +474,7 @@ class ApplicationService:
 
     def registerqueue(self, qregister: Queue):
         '''register a queue'''
+        self.logdebug(self.stamp('Registered queue {}'.format(qregister.queue_name)))
         if qregister.queue_name not in self._queues.keys():
             self._queues[qregister.queue_name] = qregister
 
@@ -486,6 +491,7 @@ class ApplicationService:
         if thequeue is None: return
         try:
             if thequeue is not None:
+                self.logdebug(self.stamp('closing queue {0}'.format(thequeue.queue_name)))
                 thequeue.close()
             del self._queues[thequeue.queue_name]
         except Exception as ex:
@@ -818,7 +824,6 @@ class ApplicationService:
 
     def sendqueueitem(self, entry):
         '''send one queue item'''
-        #self.logdebug('{0}->{1} {2}'.format(entry.eventtype, entry.queuename, entry.message[:20]))
         if entry.eventtype == 'broadcast':
             thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
             self.registerqueue(thequeue)
