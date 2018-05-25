@@ -841,7 +841,7 @@ class ApplicationService:
             #self.closequeue(thequeue)
             return send_result
         else:
-            return self.send(self.dummy_queue, entry.queuename, entry.message)
+            return self.send(entry.queuename, entry.message)
 
     def take_picture(self, file_name='fullcycle_camera.png'):
         pic = take_picture(file_name, 
