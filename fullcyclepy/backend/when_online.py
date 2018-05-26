@@ -30,7 +30,7 @@ def doonline(miner):
     #just provision the miner and start to monitor
     entries.add(QueueName.Q_PROVISION, ONLINE.app.messageencode(savedminer))
     #tell them something good happened
-    msg = 'miner {0} is back online'.format(savedminer.name)
+    msg = ONLINE.app.stamp('miner {0} is back online'.format(savedminer.name))
     entries.addalert(msg)
     print(msg)
     return entries

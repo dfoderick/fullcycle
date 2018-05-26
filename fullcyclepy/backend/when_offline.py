@@ -25,14 +25,14 @@ def dooffline(miner: mining.Miner):
         if savedminer.is_send_offline_alert():
             #update status to offline and alert
             savedminer.status = mining.MinerStatus.Offline
-            alertmsg = 'miner {0} is offline! since {1}'.format(savedminer.name, savedminer.laststatuschanged)
+            alertmsg = OFFLINE.app.stamp('miner {0} is offline! since {1}'.format(savedminer.name, savedminer.laststatuschanged))
             OFFLINE.app.putminer(savedminer)
             entries.addalert(alertmsg)
             print("Sent offline alert '{0}'".format(alertmsg))
         else:
             #stop annoying the user, disable the miner to stop sending alerts
             savedminer.status = mining.MinerStatus.Disabled
-            alertmsg = 'miner {0} is Disabled after many offline alerts. No more alerts will be sent for this miner.'.format(savedminer.name)
+            alertmsg = OFFLINE.app.stamp('miner {0} is Disabled after many offline alerts. No more alerts will be sent for this miner.'.format(savedminer.name))
             OFFLINE.app.putminer(savedminer)
             entries.addalert(alertmsg)
             print("Sent disabled alert for {0}".format(savedminer.name))

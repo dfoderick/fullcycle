@@ -48,10 +48,10 @@ def rules(miner, minerstats, minerpool):
             RULES.app.log_mineractivity(log)
 
             if rule.action == 'alert':
-                entries.addalert(RULES.addalert(rule.parameter))
+                entries.addalert(RULES.addalert(RULES.app.stamp(rule.parameter)))
             elif rule.action == 'restart':
                 entries.add(QueueName.Q_RESTART, RULES.app.createmessagecommand(rule.miner, cmd_restart))
-                entries.addalert(RULES.addalert('Restarted {0}'.format(rule.miner.name)))
+                entries.addalert(RULES.addalert(RULES.app.stamp('Restarted {0}'.format(rule.miner.name))))
             else:
                 RULES.app.logerror('did not process broken rule {0}'.format(rule.parameter))
 
