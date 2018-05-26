@@ -629,28 +629,7 @@ class ApplicationService:
         self.sendqueueitem(item)
         print(logmessage)
 
-    def makequeue(self, qname, userlogin=None):
-        '''create a queue from the name'''
-        thelogin = userlogin
-        if userlogin is None:
-            thelogin = self.component
-        service_login = self.getservice(ServiceName.messagebus)
-        service_login.user = thelogin
-        thequeue = Queue(qname, service_login)
-        self.registerqueue(thequeue)
-        return thequeue
 
-    ##todo: this should only be called once per app
-    #def subscribe(self, q_name, callback, no_acknowledge=True):
-    #    '''subscribe to a queue'''
-    #    #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
-    #    thequeue = self.dummy_queue
-    #    #change the name of the dummy queue to the one the caller wants
-    #    thequeue.queue_name = q_name
-    #    print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
-    #    thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
-    #    #returning a reference to the renamed dummy queue
-    #    return thequeue
 
     def subscribe(self, name, callback, no_acknowledge=True):
         '''subscribe to a queue'''

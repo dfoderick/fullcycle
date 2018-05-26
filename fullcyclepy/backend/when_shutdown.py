@@ -15,11 +15,8 @@ def when_shutdown(channel, method, properties, body):
         shutdown(miner, SHUTDOWN.app.sshlogin())
 
 def main():
-    qshut = Queue(QueueName.Q_SHUTDOWN, SHUTDOWN.app.getservice('rabbit'))
-    qshut.subscribe(when_shutdown)
-
-    print('Waiting for shutdown command. To exit press CTRL+C')
-    SHUTDOWN.app.listen(qshut)
+    SHUTDOWN.listeningqueue = SHUTDOWN.app.subscribe(QueueName.Q_SHUTDOWN, when_shutdown, no_acknowledge=True)
+    SHUTDOWN.app.listen(SHUTDOWN.listeningqueue)
 
 if __name__ == "__main__":
     main()

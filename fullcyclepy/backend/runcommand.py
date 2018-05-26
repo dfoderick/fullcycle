@@ -46,15 +46,13 @@ def doit(args):
         if not qnames.isvalidqname(cmd):
             print('Queue {0} is not valid'.format(cmd))
             sys.exit(1)
-        queue_command = Queue(cmd, APP.getservice('rabbit'))
         #TODO: cleanup logic here. when to call app and when to override with just miner and command
         if cmd:
             qmess = MinerCommand(cmd, cmdparam)
             msg = APP.createmessagecommand(miner, qmess)
-            queue_command.publish(msg)
+            APP.bus.publish(msg)
         else:
-            queue_command.publish(APP.messageencode(miner))
-        queue_command.close()
+             APP.bus.publish(APP.messageencode(miner))
         print('sent command {0} for miner {1}'.format(cmd, miner.name))
 
 def main():
