@@ -183,7 +183,7 @@ class Bus:
     def publish(self, queue_name, msg, exchange=''):
         """Publishes message on new channel"""
         localchannel = self.connection().channel()
-        localchannel.queue_declare(queue=queue_name, durable=_durable)
+        localchannel.queue_declare(queue=queue_name, durable=self._durable)
         localchannel.basic_publish(exchange=exchange, routing_key=queue_name, body=msg)
         localchannel.close()
 
