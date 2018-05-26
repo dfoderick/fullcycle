@@ -31,15 +31,15 @@ def when_restart(channel, method, properties, body):
         minermsg = COMPONENTACTION.app.messagedecodeminercommand(body)
         qreset = enthread(target=dorestart, args=(minermsg.miner, minermsg.command, ))
         qreset.get()
-        COMPONENTACTION.listeningqueue.acknowledge(method.delivery_tag)
+        COMPONENTACTION.app.bus.acknowledge(COMPONENTACTION.listeningqueue, method.delivery_tag)
     except json.decoder.JSONDecodeError:
-        COMPONENTACTION.listeningqueue.reject(method.delivery_tag)
+        COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)
         COMPONENTACTION.app.logexception(ex)
         #could be json error so log the message
         COMPONENTACTION.app.logdebug(COMPONENTACTION.app.exceptionmessage(ex))
         COMPONENTACTION.app.logdebug(COMPONENTACTION.app.safestring(body))
     except BaseException as ex:
-        COMPONENTACTION.listeningqueue.reject(method.delivery_tag)
+        COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)
         COMPONENTACTION.app.logexception(ex)
         print(Fore.RED+'Could not run restart command: ' + COMPONENTACTION.app.exceptionmessage(ex))
 

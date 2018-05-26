@@ -32,9 +32,9 @@ def when_switch(channel, method, properties, body):
         qswitch = enthread(target=doswitch, args=(minermsg.miner, minermsg.command, ))
         qswitch.get()
 
-        COMPONENTACTION.listeningqueue.acknowledge(method.delivery_tag)
+        COMPONENTACTION.app.bus.acknowledge(COMPONENTACTION.listeningqueue, method.delivery_tag)
     except BaseException as ex:
-        COMPONENTACTION.listeningqueue.reject(method.delivery_tag)
+        COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)
         print(Fore.RED + 'Could not run switch command: ' + COMPONENTACTION.app.exceptionmessage(ex))
 
 def doswitch(miner, command: MinerCommand):

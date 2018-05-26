@@ -11,11 +11,11 @@ def when_discovered(channel, method, properties, body):
         print("[{0}] Received discovered notice".format(COMPONENTDISCOVERED.app.now()))
         entries = dodiscovered(COMPONENTDISCOVERED.app.messagedecodeminer(body))
         COMPONENTDISCOVERED.app.enqueue(entries)
-        COMPONENTDISCOVERED.listeningqueue.acknowledge(method.delivery_tag)
+        COMPONENTDISCOVERED.app.bus.acknowledge(COMPONENTDISCOVERED.listeningqueue, method.delivery_tag)
 
     except Exception as ex:
         COMPONENTDISCOVERED.app.logexception(ex)
-        COMPONENTDISCOVERED.listeningqueue.reject(method.delivery_tag)
+        COMPONENTDISCOVERED.app.bus.reject(COMPONENTDISCOVERED.listeningqueue, method.delivery_tag)
 
 def dodiscovered(miner):
     '''then provision it'''

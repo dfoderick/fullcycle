@@ -36,9 +36,9 @@ def when_provision(channel, method, properties, body):
             except Exception as ex:
                 PROVISION.listeningqueue.sleep(3)
         PROVISION.app.enqueue(entries)
-        PROVISION.listeningqueue.acknowledge(method.delivery_tag)
+        PROVISION.app.bus.acknowledge(PROVISION.listeningqueue, method.delivery_tag)
     except Exception as ex:
-        PROVISION.listeningqueue.reject(method.delivery_tag)
+        PROVISION.app.bus.reject(PROVISION.listeningqueue, method.delivery_tag)
         PROVISION.app.logexception(ex)
 
 def doprovision(miner):

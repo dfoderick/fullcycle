@@ -221,6 +221,14 @@ class Bus:
         '''listen to queue. this is a blocking call'''
         channel.start_consuming()
 
+    def acknowledge(self, channel, delivery_tag):
+        '''acknowledge that message was processed'''
+        channel.basic_ack(delivery_tag)
+
+    def reject(self, channel, delivery_tag):
+        '''tell queue that message was not processed'''
+        channel.basic_nack(delivery_tag)
+
 
 
 class ApplicationService:
