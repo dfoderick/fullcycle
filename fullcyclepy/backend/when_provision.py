@@ -34,7 +34,7 @@ def when_provision(channel, method, properties, body):
                 entries = qprov.get(False, timeout=3)
                 break
             except Exception as ex:
-                PROVISION.listeningqueue.sleep(3)
+                PROVISION.app.bus.sleep(3)
         PROVISION.app.enqueue(entries)
         PROVISION.app.bus.acknowledge(PROVISION.listeningqueue, method.delivery_tag)
     except Exception as ex:

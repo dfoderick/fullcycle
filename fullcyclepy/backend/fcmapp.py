@@ -180,6 +180,10 @@ class Bus:
             self._connection = pika.BlockingConnection(parameters)
         return self._connection
 
+    def sleep(self, seconds):
+        if self._connection:
+            self._connection.sleep(seconds)
+
     def publish(self, queue_name, msg, exchange=''):
         """Publishes message on new channel"""
         localchannel = self.connection().channel()
