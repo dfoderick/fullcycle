@@ -118,6 +118,9 @@ class Queue:
             self._userlogin = 'fullcycle'
         self.initialize(queueName)
 
+    def connection(self):
+        return self._connection
+
     def getparameters(self):
         credentials = pika.PlainCredentials(self._userlogin, self._servicelogin.password)
         parameters = pika.ConnectionParameters(self._servicelogin.host, self._servicelogin.port, '/', credentials)
@@ -184,7 +187,7 @@ class Queue:
 
     def close(self):
         """close the queue"""
-        if self.channel != None:
+        if self.channel:
             self.channel.close()
             self.channel = None
             self._connection = None
@@ -240,3 +243,49 @@ class BroadcastListener(BroadcastBase):
         result = self.channel.queue_declare(exclusive=True)
         self.queue_name = result.method.queue
         self.channel.queue_bind(exchange=self._exchangename, queue=self.queue_name)
+
+
+class ChannelListener():
+    _connection = None
+    channel = None
+    queue_name = None
+
+    def __init__(self, connection, name):
+        self._connection = connection
+        self.queue_name = name
+        self.setupchannel()
+        self.setupbroadcast(name)
+        self.declarechannel()
+
+    def setupchannel(self):
+        self.channel = self._connection.channel()
+
+    def setupbroadcast(self, name):
+        '''set up the exchange for broadcasting'''
+        return self.setupexchange(name, 'fanout')
+
+    def setupexchange(self, name, exchange_type):
+        '''set up the exchange for broadcasting'''
+        self._exchangename = name
+        self._exchangetype = exchange_type
+        self.channel.exchange_declare(exchange=name, exchange_type=exchange_type)
+        return self
+
+    def declarechannel(self):
+        '''declare the channel'''
+        result = self.channel.queue_declare(exclusive=True)
+        self.queue_name = result.method.queue
+        self.channel.queue_bind(exchange=self._exchangename, queue=self.queue_name)
+
+    def close(self):
+        if self.channel:
+            self.channel.close()
+
+    def subscribe(self, callback, no_acknowledge=True, prefetch_count=1):
+        """Consumes messages from one queue"""
+        self.channel.basic_qos(prefetch_count=prefetch_count)
+        self.channel.basic_consume(callback, queue=self.queue_name, no_ack=no_acknowledge)
+
+    def listen(self):
+        '''listen to queue'''
+        self.channel.start_consuming()

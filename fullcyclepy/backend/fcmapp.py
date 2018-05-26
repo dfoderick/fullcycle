@@ -20,7 +20,7 @@ from messaging.messages import Message, MessageSchema, MinerMessageSchema, Confi
 from domain.sensors import Sensor, SensorValue
 from messaging.sensormessages import SensorValueMessage, SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
-from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
+from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType, ChannelListener
 from helpers.camerahelper import take_picture
 from helpers.antminerhelper import MinerMonitorException, setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
 from helpers.temperaturehelper import readtemperature
@@ -35,6 +35,7 @@ class Component(object):
     '''A component is a unit of execution of FCM'''
     def __init__(self, componentname, option=''):
         self.app = ApplicationService(component=componentname, option=option)
+        #was a queue, now its a channel
         self.listeningqueue = None
 
 class ServiceName:
@@ -173,6 +174,7 @@ class ApplicationService:
     isrunnow = False
     #dictionary of queues managed by this app
     _queues = {}
+    _channels = []
     #the startup directory
     homedirectory = None
     __cache = None
@@ -181,7 +183,7 @@ class ApplicationService:
     __logger_debug = None
     __logger_error = None
     antminer = None
-    #temporary reference to mq connection at app level
+    #temporary reference to mq connection at app level. only use as a wrapper around reusable connection
     dummy_queue = None
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself = False):
@@ -478,13 +480,21 @@ class ApplicationService:
 
     def registerqueue(self, qregister: Queue):
         '''register a queue'''
-        self.logdebug(self.stamp('Registered queue {}'.format(qregister.queue_name)))
+        self.logdebug(self.stamp('Registered queue {0}'.format(qregister.queue_name)))
         if qregister.queue_name not in self._queues.keys():
             self._queues[qregister.queue_name] = qregister
+
+    def registerchannel(self, ch: ChannelListener):
+        '''register a queue'''
+        self.logdebug(self.stamp('Registered channel {0}'.format(qregister.queue_name)))
+        if ch.queue_name not in self._channels.keys():
+            self._channels[ch.name] = ch
+
 
     def shutdown(self, exitstatus=0):
         '''shut down app services'''
         self.loginfo('Shutting down fcm app...')
+        self.close_channels()
         self.closequeues()
         if self.__cache is not None:
             self.__cache.close()
@@ -492,7 +502,7 @@ class ApplicationService:
 
     def closequeue(self, thequeue):
         '''close the queue'''
-        if thequeue is None: return
+        if not thequeue: return
         try:
             if thequeue is not None:
                 self.logdebug(self.stamp('closing queue {0}'.format(thequeue.queue_name)))
@@ -505,6 +515,21 @@ class ApplicationService:
         '''close a bunch of queues'''
         for k in list(self._queues):
             self.closequeue(self._queues[k])
+
+    def close_channel(self, ch):
+        if not ch: return
+        try:
+            if ch.name in self._channels:
+                self.logdebug(self.stamp('closing channel {0}'.format(ch.name)))
+                ch.close()
+                del self._channels[ch.name]
+        except Exception as ex:
+            self.logexception(ex)
+
+    def close_channels(self):
+        '''close all channels'''
+        for k in list(self._channels):
+            self.close_channel(self._channels[k])
 
     def unhandledexception(self, unhandled):
         '''what to do when there is an exception that app cannot handle'''
@@ -537,17 +562,27 @@ class ApplicationService:
         self.registerqueue(thequeue)
         return thequeue
 
-    #todo: this should only be called once per app
-    def subscribe(self, q_name, callback, no_acknowledge=True):
+    ##todo: this should only be called once per app
+    #def subscribe(self, q_name, callback, no_acknowledge=True):
+    #    '''subscribe to a queue'''
+    #    #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
+    #    thequeue = self.dummy_queue
+    #    #change the name of the dummy queue to the one the caller wants
+    #    thequeue.queue_name = q_name
+    #    print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
+    #    thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
+    #    #returning a reference to the renamed dummy queue
+    #    return thequeue
+
+    def subscribe(self, name, callback, no_acknowledge=True):
         '''subscribe to a queue'''
         #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
-        thequeue = self.dummy_queue
-        #change the name of the dummy queue to the one the caller wants
-        thequeue.queue_name = q_name
-        print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
-        thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
+        chan = ChannelListener(self.dummy_queue.connection(), name)
+        chan.subscribe(callback, no_acknowledge)
+        print('Waiting for messages on {0}. To exit press CTRL+C'.format(name))
+        chan.subscribe(callback, no_acknowledge=no_acknowledge)
         #returning a reference to the renamed dummy queue
-        return thequeue
+        return chan
 
     #[obsolete], caller needs reference to q before listening
     def subscribe_and_listen(self, q_name, callback, no_acknowledge=True):
@@ -813,7 +848,7 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.broadcast))
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.publish))
 
     def send(self, q_name, message):
         '''send message to queue'''
