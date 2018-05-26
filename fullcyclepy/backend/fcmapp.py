@@ -535,11 +535,11 @@ class ApplicationService:
         return service
     #endregion lookups
 
-    def listen(self, qlisten: Queue):
+    def listen(self, qlisten):
         """Goes into listening mode on a queue"""
-        self.registerqueue(qlisten)
+        #self.registerqueue(qlisten)
         try:
-            qlisten.listen()
+            self.bus.listen(qlisten)
         except KeyboardInterrupt:
             self.shutdown()
         except BaseException as unhandled:
