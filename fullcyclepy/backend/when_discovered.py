@@ -43,9 +43,8 @@ def main():
         dodiscovered(miner)
         COMPONENTDISCOVERED.app.shutdown()
     else:
-        print('Waiting for messages on {0}. To exit press CTRL+C'.format(QueueName.Q_DISCOVERED))
-        COMPONENTDISCOVERED.listeningqueue = COMPONENTDISCOVERED.app.makequeue(QueueName.Q_DISCOVERED)
-        COMPONENTDISCOVERED.listeningqueue.subscribe(when_discovered, no_acknowledge=False)
+
+        COMPONENTDISCOVERED.listeningqueue = COMPONENTDISCOVERED.app.subscribe(QueueName.Q_DISCOVERED, when_discovered, no_acknowledge=False)
         COMPONENTDISCOVERED.app.listen(COMPONENTDISCOVERED.listeningqueue)
 
 if __name__ == "__main__":

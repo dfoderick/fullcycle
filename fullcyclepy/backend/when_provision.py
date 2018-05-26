@@ -139,11 +139,8 @@ def main():
                 PROVISION.app.logexception(ex)
         PROVISION.app.shutdown()
     else:
-        print('Waiting for messages on {0}. To exit press CTRL+C'.format(QueueName.Q_PROVISION))
-        qprovision = PROVISION.app.makequeue(QueueName.Q_PROVISION)
-        PROVISION.listeningqueue = qprovision
-        qprovision.subscribe(when_provision, no_acknowledge=False)
-        PROVISION.app.listen(qprovision)
+        PROVISION.listeningqueue = PROVISION.app.subscribe(QueueName.Q_PROVISION, when_provision, no_acknowledge=False)
+        PROVISION.app.listen(PROVISION.listeningqueue)
 
 if __name__ == "__main__":
     main()

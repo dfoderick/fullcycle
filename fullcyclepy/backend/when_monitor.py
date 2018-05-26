@@ -35,7 +35,8 @@ def main():
         domonitor()
         MONITOR.app.shutdown()
     else:
-        MONITOR.listeningqueue = MONITOR.app.subscribe_and_listen(QueueName.Q_MONITOR, when_monitor)
+        MONITOR.listeningqueue = MONITOR.app.subscribe(QueueName.Q_MONITOR, when_monitor)
+        MONITOR.app.listen(MONITOR.listeningqueue)
 
 if __name__ == "__main__":
     main()

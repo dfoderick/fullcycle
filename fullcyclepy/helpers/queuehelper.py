@@ -118,6 +118,9 @@ class Queue:
             self._userlogin = 'fullcycle'
         self.initialize(queueName)
 
+    def connection(self):
+        return self._connection
+
     def getparameters(self):
         credentials = pika.PlainCredentials(self._userlogin, self._servicelogin.password)
         parameters = pika.ConnectionParameters(self._servicelogin.host, self._servicelogin.port, '/', credentials)
@@ -129,7 +132,7 @@ class Queue:
         self.declare(name)
 
     def setupchannel(self):
-        '''create the channel'''
+        '''create the channel. also creates connection'''
         self._connection = pika.BlockingConnection(self.getparameters())
         self.channel = self._connection.channel()
 
@@ -141,6 +144,18 @@ class Queue:
         """Publishes message for one consumer"""
         if self.channel != None:
             self.channel.basic_publish(exchange=exchange, routing_key=self.queue_name, body=msg)
+
+    def publish_channel(self, queue_name, msg, exchange=''):
+        """Publishes message on new channel"""
+        localchannel = self._connection.channel()
+        localchannel.basic_publish(exchange=exchange, routing_key=queue_name, body=msg)
+        localchannel.close()
+
+    def broadcast_channel(self, exchange_name, msg):
+        '''broadcast a message to anyone that is listening'''
+        localchannel = self._connection.channel()
+        localchannel.basic_publish(exchange=exchange_name, routing_key='', body=msg)
+        localchannel.close()
 
     def subscribe(self, callback, no_acknowledge=True, prefetch_count=1):
         """Consumes messages from one queue"""
@@ -172,7 +187,7 @@ class Queue:
 
     def close(self):
         """close the queue"""
-        if self.channel != None:
+        if self.channel:
             self.channel.close()
             self.channel = None
             self._connection = None

@@ -35,6 +35,7 @@ class Component(object):
     '''A component is a unit of execution of FCM'''
     def __init__(self, componentname, option=''):
         self.app = ApplicationService(component=componentname, option=option)
+        #was a queue, now its a channel
         self.listeningqueue = None
 
 class ServiceName:
@@ -162,6 +163,65 @@ class Antminer():
         '''restart miner through ssh'''
         return restartminer(miner, self.__login)
 
+class Bus:
+    _connection = None
+    _durable = False
+
+    def __init__(self, servicelogin):
+        self._servicelogin = servicelogin
+        self._userlogin = self._servicelogin.user
+        if self._userlogin is None:
+            self._userlogin = 'fullcycle'
+
+    def connection(self):
+        if not self._connection:
+            credentials = pika.PlainCredentials(self._userlogin, self._servicelogin.password)
+            parameters = pika.ConnectionParameters(self._servicelogin.host, self._servicelogin.port, '/', credentials)
+            self._connection = pika.BlockingConnection(parameters)
+        return self._connection
+
+    def publish(self, queue_name, msg, exchange=''):
+        """Publishes message on new channel"""
+        localchannel = self.connection().channel()
+        localchannel.queue_declare(queue=queue_name, durable=self._durable)
+        localchannel.basic_publish(exchange=exchange, routing_key=queue_name, body=msg)
+        localchannel.close()
+
+    def broadcast(self, exchange_name, msg):
+        '''broadcast a message to anyone that is listening'''
+        localchannel = self.connection().channel()
+        localchannel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
+        localchannel.basic_publish(exchange=exchange_name, routing_key='', body=msg)
+        localchannel.close()
+
+    def subscribe(self, name, callback, no_acknowledge=True, prefetch_count=1):
+        """basic subscribe messages from one queue
+        remember to listen to channel to get messages
+        """
+        localchannel = self.connection().channel()
+        self._state = localchannel.queue_declare(queue=name)
+        localchannel.basic_qos(prefetch_count=prefetch_count)
+        localchannel.basic_consume(callback, queue=name, no_ack=no_acknowledge)
+        return localchannel
+
+    def subscribe_broadcast(self, name, callback, no_acknowledge=True, prefetch_count=1):
+        """Consumes messages from one queue"""
+        localchannel = self.connection().channel()
+        localchannel.exchange_declare(exchange=name, exchange_type='fanout')
+
+        result = localchannel.queue_declare(exclusive=True)
+        queue_name = result.method.queue
+        localchannel.queue_bind(exchange=name, queue=queue_name)
+
+        localchannel.basic_qos(prefetch_count=prefetch_count)
+        localchannel.basic_consume(callback, queue=queue_name, no_ack=no_acknowledge)
+        return localchannel
+
+    def listen(self, channel):
+        '''listen to queue. this is a blocking call'''
+        channel.start_consuming()
+
+
 
 class ApplicationService:
     '''Application Services'''
@@ -173,9 +233,11 @@ class ApplicationService:
     isrunnow = False
     #dictionary of queues managed by this app
     _queues = {}
+    _channels = []
     #the startup directory
     homedirectory = None
     __cache = None
+    __bus = None
     __config = {}
     __logger = None
     __logger_debug = None
@@ -193,8 +255,10 @@ class ApplicationService:
         self.initmessaging()
         #this is slow. should be option to opt out of cache?
         self.initcache()
+        self.initbus()
         self.init_application()
         self.init_sensors()
+
         if announceyourself:
             self.sendqueueitem(QueueEntry(QueueName.Q_LOG, self.stamp('Started {0}'.format(self.component)), QueueType.broadcast))
 
@@ -230,6 +294,15 @@ class ApplicationService:
         except Exception as ex:
             #cache is offline. try to run in degraded mode
             self.logexception(ex)
+
+    def initbus(self):
+        '''start up message bus'''
+        login = self.getservice(ServiceName.messagebus)
+        self.__bus = Bus(login)
+
+    @property
+    def bus(self):
+        return self.__bus
 
     def init_sensors(self):
         self.sensor = Sensor('controller', 'DHT22', 'controller')
@@ -462,11 +535,11 @@ class ApplicationService:
         return service
     #endregion lookups
 
-    def listen(self, qlisten: Queue):
+    def listen(self, qlisten):
         """Goes into listening mode on a queue"""
-        self.registerqueue(qlisten)
+        #self.registerqueue(qlisten)
         try:
-            qlisten.listen()
+            self.bus.listen(qlisten)
         except KeyboardInterrupt:
             self.shutdown()
         except BaseException as unhandled:
@@ -474,13 +547,20 @@ class ApplicationService:
 
     def registerqueue(self, qregister: Queue):
         '''register a queue'''
-        self.logdebug(self.stamp('Registered queue {}'.format(qregister.queue_name)))
+        self.logdebug(self.stamp('Registered queue {0}'.format(qregister.queue_name)))
         if qregister.queue_name not in self._queues.keys():
             self._queues[qregister.queue_name] = qregister
+
+    #def registerchannel(self, ch: ChannelListener):
+    #    '''register a queue'''
+    #    self.logdebug(self.stamp('Registered channel {0}'.format(qregister.queue_name)))
+    #    if ch.queue_name not in self._channels.keys():
+    #        self._channels[ch.name] = ch
 
     def shutdown(self, exitstatus=0):
         '''shut down app services'''
         self.loginfo('Shutting down fcm app...')
+        self.close_channels()
         self.closequeues()
         if self.__cache is not None:
             self.__cache.close()
@@ -488,7 +568,7 @@ class ApplicationService:
 
     def closequeue(self, thequeue):
         '''close the queue'''
-        if thequeue is None: return
+        if not thequeue: return
         try:
             if thequeue is not None:
                 self.logdebug(self.stamp('closing queue {0}'.format(thequeue.queue_name)))
@@ -501,6 +581,21 @@ class ApplicationService:
         '''close a bunch of queues'''
         for k in list(self._queues):
             self.closequeue(self._queues[k])
+
+    def close_channel(self, ch):
+        if not ch: return
+        try:
+            if ch.name in self._channels:
+                self.logdebug(self.stamp('closing channel {0}'.format(ch.name)))
+                ch.close()
+                del self._channels[ch.name]
+        except Exception as ex:
+            self.logexception(ex)
+
+    def close_channels(self):
+        '''close all channels'''
+        for k in list(self._channels):
+            self.close_channel(self._channels[k])
 
     def unhandledexception(self, unhandled):
         '''what to do when there is an exception that app cannot handle'''
@@ -533,49 +628,68 @@ class ApplicationService:
         self.registerqueue(thequeue)
         return thequeue
 
-    def subscribe(self, q_name, callback, no_acknowledge=True):
+    ##todo: this should only be called once per app
+    #def subscribe(self, q_name, callback, no_acknowledge=True):
+    #    '''subscribe to a queue'''
+    #    #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
+    #    thequeue = self.dummy_queue
+    #    #change the name of the dummy queue to the one the caller wants
+    #    thequeue.queue_name = q_name
+    #    print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
+    #    thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
+    #    #returning a reference to the renamed dummy queue
+    #    return thequeue
+
+    def subscribe(self, name, callback, no_acknowledge=True):
         '''subscribe to a queue'''
-        thequeue = Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
-        print('Waiting for messages on {0}. To exit press CTRL+C'.format(q_name))
-        thequeue.subscribe(callback, no_acknowledge=no_acknowledge)
-        return thequeue
+        #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
+        #chan = ChannelListener(self.bus.connection(), name)
+        #chan.subscribe(callback, no_acknowledge=no_acknowledge)
+        chan = self.bus.subscribe(name, callback, no_acknowledge=no_acknowledge)
+        print('Waiting for messages on {0}. To exit press CTRL+C'.format(name))
+        #returning a reference to the renamed dummy queue
+        return chan
 
     #[obsolete], caller needs reference to q before listening
     def subscribe_and_listen(self, q_name, callback, no_acknowledge=True):
-        '''listen to a queue'''
-        thequeue = self.subscribe(q_name, callback, no_acknowledge=True)
-        self.listen(thequeue)
+        '''listen to a queue
+        todo: replace with separate calls to subscribe then listen'''
+        chan = self.subscribe(q_name, callback, no_acknowledge=True)
+        self.bus.listen(chan)
         #this will never return because listen is blocking call
-        return thequeue
+        return chan
 
-    def makebroadcastlistener(self, broadcast_name):
-        broadcast = BroadcastListener(broadcast_name, servicelogin=self.getservice_useroverride(ServiceName.messagebus))
-        return broadcast
+    #def makebroadcastlistener(self, broadcast_name):
+    #    broadcast = BroadcastListener(broadcast_name, servicelogin=self.getservice_useroverride(ServiceName.messagebus))
+    #    return broadcast
 
     def listen_to_broadcast(self, broadcast_name, callback, no_acknowledge=True):
-        thebroadcast = self.makebroadcastlistener(broadcast_name)
-        print('Waiting for messages on {0}. To exit press CTRL+C'.format(thebroadcast.queue_name))
-        thebroadcast.subscribe(callback, no_acknowledge=no_acknowledge)
-        self.listen(thebroadcast)
+        #thebroadcast = self.makebroadcastlistener(broadcast_name)
+        thebroadcast = self.bus.subscribe_broadcast(broadcast_name, callback, no_acknowledge)
+        #print('Waiting for messages on {0}. To exit press CTRL+C'.format(thebroadcast.queue_name))
+        print('Waiting for messages on {0}. To exit press CTRL+C'.format(broadcast_name))
+        #thebroadcast.subscribe(callback, no_acknowledge=no_acknowledge)
+        self.bus.listen(thebroadcast)
+        #never returns becuase listen is blocking
         return thebroadcast
 
-    def trypublish(self, thequeue, msg: str):
+    def trypublish(self, queue_name, msg: str):
         '''publish a message to the queue'''
         try:
-            thequeue.publish(msg)
+            self.bus.publish(queue_name, msg)
             return True
         except pika.exceptions.ConnectionClosed as ex:
-            logmessage = 'Error publishing to {0} {1}'.format(thequeue.queue_name, self.exceptionmessage(ex))
+            logmessage = 'Error publishing to {0} {1}'.format(queue_name, self.exceptionmessage(ex))
             self.logerror(logmessage)
             return False
 
-    def trybroadcast(self, thequeue, msg):
+    def trybroadcast(self, exchange_name, msg):
         '''broadcast a message to all queue listeners'''
         try:
-            thequeue.broadcast(msg)
+            self.bus.broadcast(exchange_name, msg)
             return True
         except pika.exceptions.ConnectionClosed as conxex:
-            self.logerror('Error broadcasting to {0} {1}'.format(thequeue.queue_name, self.exceptionmessage(conxex)))
+            self.logerror('Error broadcasting to {0} {1}'.format(exchange_name, self.exceptionmessage(conxex)))
             return False
 
     def queuestatus(self):
@@ -803,13 +917,13 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.broadcast))
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.publish))
 
     def send(self, q_name, message):
         '''send message to queue'''
-        thequeue = self.makequeue(q_name, self.component)
-        success = self.trypublish(thequeue, message)
-        self.closequeue(thequeue)
+        #thequeue = self.makequeue(q_name, self.component)
+        success = self.trypublish(q_name, message)
+        #self.closequeue(thequeue)
         return success
 
     def enqueue(self, queuelist):
@@ -825,10 +939,10 @@ class ApplicationService:
     def sendqueueitem(self, entry):
         '''send one queue item'''
         if entry.eventtype == 'broadcast':
-            thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
-            self.registerqueue(thequeue)
-            send_result = self.trybroadcast(thequeue, entry.message)
-            self.closequeue(thequeue)
+            #thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
+            #self.registerqueue(thequeue)
+            send_result = self.trybroadcast(entry.queuename, entry.message)
+            #self.closequeue(thequeue)
             return send_result
         else:
             return self.send(entry.queuename, entry.message)

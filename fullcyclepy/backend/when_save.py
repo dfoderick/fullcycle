@@ -47,7 +47,8 @@ def dosave(msg):
                 COMPONENTSAVE.app.update_pool(oldkey, known)
 
 def main():
-        COMPONENTSAVE.listeningqueue = COMPONENTSAVE.app.subscribe_and_listen(QueueName.Q_SAVE, when_save)
+        COMPONENTSAVE.listeningqueue = COMPONENTSAVE.app.subscribe(QueueName.Q_SAVE, when_save)
+        COMPONENTSAVE.app.listen(COMPONENTSAVE.listeningqueue)
 
 if __name__ == "__main__":
     main()

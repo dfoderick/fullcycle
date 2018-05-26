@@ -171,6 +171,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="messaging\__init__.py" />
+    <Compile Include="tests\benchmark_runner.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\benchmark_worker.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_app.py">
       <SubType>Code</SubType>
     </Compile>

@@ -88,13 +88,7 @@ def main():
             rules(miner, stats, pool)
         RULES.app.shutdown()
     else:
-        queue_stats = RULES.app.makebroadcastlistener(QueueName.Q_STATISTICSUPDATED)
-
-        print('Waiting for statisticsupdated on {0}. To exit press CTRL+C'.format(queue_stats.queue_name))
-
-        queue_stats.subscribe(when_statisticsupdated)
-
-        RULES.app.listen(queue_stats)
+        RULES.listeningqueue = RULES.app.listen_to_broadcast(QueueName.Q_STATISTICSUPDATED, when_statisticsupdated)
 
 if __name__ == "__main__":
     main()
