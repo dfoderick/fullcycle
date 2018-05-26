@@ -24,13 +24,9 @@ def doit(args):
     if len(args) == 2:
         #single command, no miner specified
         if cmd == 'alert':
-            queue_command = BroadcastSender(cmd, APP.getservice('rabbit'))
-            APP.trybroadcast(queue_command, '{0}: runcommand called on {1}'.format(APP.now(), cmd))
-            queue_command.close()
+            APP.trybroadcast(cmd, '{0}: runcommand called on {1}'.format(APP.now(), cmd))
         else:
-            queue_command = Queue(cmd, APP.getservice('rabbit'))
-            queue_command.publish('{0}: runcommand called on {1}'.format(APP.now(), cmd))
-            queue_command.close()
+            APP.trypublish(cmd, '{0}: runcommand called on {1}'.format(APP.now(), cmd))
         print('sent command {0}'.format(cmd))
     else:
         minertofind = args[2]
