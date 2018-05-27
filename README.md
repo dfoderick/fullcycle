@@ -15,16 +15,18 @@ https://github.com/dfoderick/fullcycle/wiki/Hardware-Reference
 ![Bitcoin Mining Controller UI](/images/FullCycleReact.png?raw=true "Bitcoin Mining Controller Web Site")
 https://github.com/dfoderick/fullcyclereact
 
-## Contents
+# Contents
 [Requirements](#requirements)  
 [Installation Overview](#installation-overview)  
 [Troubleshooting](docs/Troubleshooting.md)  
 [Next Steps](#now-what)  
+[Development Roadmap](docs/roadmap.md)  
 
-## Requirements
+
+# Requirements
 
 Full Cycle Mining has been tested on Antminer S9, A3 and D3.
-Requirements to run it include the following.  
+Requirements to run it include the following.   
 
 1. Python version 3.5 (or newer)
 2. Rabbit Message Broker
@@ -37,7 +39,7 @@ The following are Optional but recommended.
 6. DHT22 Temperature and Humidity Sensor
 7. Telegram Account
 
-## Installation Overview
+# Installation Overview
 
 This installation assumes you are using a newly flashed Raspberry Pi
 but should also work for most flavors of Linux. FCM can
@@ -235,7 +237,7 @@ The URL is the ip address of your controller with 9009 as the default port numbe
 You can start and stop individual components and spy on their inner workings to see if there are any errors.  
 ![Full Cycle Supervisor Tail](/images/fullcycle_supervisor_tail.png?raw=true "Full Cycle Supervisor Tail")
 
-## Now What?
+# Now What?
 Congratulations on making it this far!  
 If everything was successful then your Full Cycle Controller
 will be hard at work discovering and monitoring your miners.
