@@ -68,7 +68,7 @@ def stats(miner: Miner):
                 entity.controllertemp = jsonstats['temp_max']
             #should be 3
             #tempcount = jsonstats['temp_num']
-            if minertype == 'Antminer S9':
+            if minertype.startswith('Antminer S9'):
                 entity.tempboard1 = int(jsonstats['temp2_6'])
                 entity.tempboard2 = int(jsonstats['temp2_7'])
                 entity.tempboard3 = int(jsonstats['temp2_8'])
@@ -282,7 +282,7 @@ def addpool(miner: Miner, pool):
 def getminerfilename(miner: Miner):
     '''cgminer for D3 and A3'''
     minerfilename = 'cgminer'
-    if miner.miner_type == 'Antminer S9':
+    if miner.miner_type.startswith('Antminer S9'):
         minerfilename = 'bmminer'
     return minerfilename
 
