@@ -7,7 +7,7 @@ def poolstoadd(miner, minerpool, poollist):
     poolsneeded = []
     #loop through pools for miner type
     for pool in poollist:
-        if pool.pool_type == miner.minerinfo.miner_type and pool.url is not None and pool.url != "":
+        if miner.minerinfo.miner_type.startswith(pool.pool_type) and pool.url is not None and pool.url != "":
             foundpool = None
             jpools = minerpool.allpools["POOLS"]
             for existingpool in jpools:

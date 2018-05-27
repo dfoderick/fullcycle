@@ -86,22 +86,6 @@ def doprovision(miner):
             else:
                 print(result)
 
-        #enforce default pool if miner has one set up
-        if miner.defaultpool:
-            founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
-            if founddefault is not None:
-                switchtopool(miner, founddefault)
-
-        #enforce default pool if it doesnt have one. find highest priority pool
-        if not miner.defaultpool:
-            def sort_by_priority(j):
-                return j.priority
-            filtered = [x for x in poollist if x.pool_type == miner.miner_type]
-            filtered.sort(key=sort_by_priority)
-            #foundpriority = next((p for p in poollist if p.priority == 0), None)
-            if filtered:
-                switchtopool(miner, filtered[0])
-
         namedpools = PROVISION.app.pools()
         #process the pools found on the miner. This will pick up any pools added manually
         for pool in miner.pools_available:
@@ -117,6 +101,22 @@ def doprovision(miner):
                 pool.user = foundnamed.user
             PROVISION.app.add_pool(MinerPool(miner, pool.priority,pool))
 
+        #enforce default pool if miner has one set up
+        if miner.defaultpool:
+            founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
+            if founddefault is not None:
+                switchtopool(miner, founddefault)
+
+        #enforce default pool if it doesnt have one. find highest priority pool
+        if not miner.defaultpool:
+            def sort_by_priority(j):
+                return j.priority
+            filtered = [x for x in poollist if miner.miner_type.startswith(x.pool_type)]
+            filtered.sort(key=sort_by_priority)
+            #foundpriority = next((p for p in poollist if p.priority == 0), None)
+            if filtered:
+                switchtopool(miner, filtered[0])
+
         entries.add(QueueName.Q_MONITORMINER, PROVISION.app.messageencode(miner))
     return entries
 
@@ -129,6 +129,8 @@ def switchtopool(miner, pooltoswitch):
         if switchtopoolnumber is not None and switchtopoolnumber > 0:
             antminerhelper.switch(miner, switchtopoolnumber)
             print(Fore.YELLOW + PROVISION.app.now(), miner.name, 'switched to {0}({1})'.format(pooltoswitch.name, pooltoswitch.url))
+        else:
+            print(Fore.RED + PROVISION.app.now(), miner.name, 'could not switch to {0}({1})'.format(pooltoswitch.name, pooltoswitch.url))
 
 def main():
     if PROVISION.app.isrunnow:
