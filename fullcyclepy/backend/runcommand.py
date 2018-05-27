@@ -50,7 +50,7 @@ def doit(args):
         if cmd:
             qmess = MinerCommand(cmd, cmdparam)
             msg = APP.createmessagecommand(miner, qmess)
-            APP.bus.publish(msg)
+            APP.bus.publish(cmd, msg)
         else:
              APP.bus.publish(APP.messageencode(miner))
         print('sent command {0} for miner {1}'.format(cmd, miner.name))

@@ -180,6 +180,10 @@ class Bus:
             self._connection = pika.BlockingConnection(parameters)
         return self._connection
 
+    def close(self):
+        if self._connection:
+            self._connection.close()
+
     def sleep(self, seconds):
         if self._connection:
             self._connection.sleep(seconds)
@@ -574,6 +578,8 @@ class ApplicationService:
         self.loginfo('Shutting down fcm app...')
         self.close_channels()
         self.closequeues()
+        if self.__bus:
+            self.bus.close()
         if self.__cache is not None:
             self.__cache.close()
         sys.exit(exitstatus)
