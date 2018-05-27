@@ -43,7 +43,7 @@ def getminerinfo(miner: Miner):
         else:
             if toplevelstatus['Description'].startswith('cgminer'):
                 minertype = toplevelstatus['Description']
-        if minertype == 'Antminer S9':
+        if minertype.startswith('Antminer S9'):
             minerid = details['miner_id']
     minerinfo = MinerInfo(minertype, minerid)
     return minerinfo
