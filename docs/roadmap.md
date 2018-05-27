@@ -36,7 +36,7 @@ Release of version 0.2 is rapidly approaching. Once the real time data for stats
 4. Push Real time stats, alerts and sensor data to web browser
 
 ## Version 0.1
-Version 0.1 was released in March 2018 with the initial commit to GitHub.
+Version 0.1 was released in May 2018 with the initial commit to GitHub.
 1. Validate Proof of Concept
 2. Address technology risk and evaluate technology stack
 - Message Bus
