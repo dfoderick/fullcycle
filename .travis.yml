@@ -6,4 +6,5 @@ cache: pip
 install:
   - pip install -r fullcyclepy/requirements.txt
 script:
+  - export PYTHONPATH = $PYTHONPATH:fullcyclepy/
   - python fullcyclepy/tests/test_mining.py
