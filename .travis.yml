@@ -1,0 +1,10 @@
+language: python
+python:
+    - 3.5
+    - 3.6
+cache: pip
+install:
+  - pip install -r fullcyclepy/requirements.txt
+script:
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)/fullcyclepy/
+  - python fullcyclepy/tests/test_mining.py
