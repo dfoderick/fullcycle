@@ -553,7 +553,6 @@ class ApplicationService:
 
     def listen(self, qlisten):
         """Goes into listening mode on a queue"""
-        #self.registerqueue(qlisten)
         try:
             self.bus.listen(qlisten)
         except KeyboardInterrupt:
@@ -936,10 +935,7 @@ class ApplicationService:
     def sendqueueitem(self, entry):
         '''send one queue item'''
         if entry.eventtype == 'broadcast':
-            #thequeue = BroadcastSender(entry.queuename, self.getservice_useroverride(ServiceName.messagebus))
-            #self.registerqueue(thequeue)
             send_result = self.trybroadcast(entry.queuename, entry.message)
-            #self.closequeue(thequeue)
             return send_result
         else:
             return self.send(entry.queuename, entry.message)
@@ -982,7 +978,7 @@ class ApplicationService:
     def sendsensor(self, reading):
         message = self.createmessageenvelope()
         sensorjson = message.jsonserialize(SensorValueSchema(), reading)
-        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson))))
+        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
 
     def sendtelegrammessage(self, message):
         sendalert(message, self.getservice('telegram'))

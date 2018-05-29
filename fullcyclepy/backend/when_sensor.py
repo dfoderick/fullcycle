@@ -18,7 +18,7 @@ def dosensor(message, sensorvalue):
     SENSOR.app.addknownsensor(sensorvalue)
 
 def main():
-    SENSOR.listeningqueue = SENSOR.app.subscribe_and_listen(QueueName.Q_SENSOR, when_sensor)
+    SENSOR.listeningqueue = SENSOR.app.listen_to_broadcast(QueueName.Q_SENSOR, when_sensor)
 
 if __name__ == "__main__":
     main()
