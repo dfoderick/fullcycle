@@ -10,6 +10,9 @@ Monitoring and active management for your Bitcoin mining operation.
 8. Configurable, extensible architecture built on workflow components and microservices
 9. Web UI for monitoring and management (https://github.com/dfoderick/fullcyclereact)
 
+Additional documentation and help can be found here:  
+https://dfoderick.github.io/fullcycle/
+
 ![Bitcoin Mining Controller Hardware](/images/FullCycle_Controller.png?raw=true "Bitcoin Mining Controller Hardware")
 https://github.com/dfoderick/fullcycle/wiki/Hardware-Reference
 ![Bitcoin Mining Controller UI](/images/FullCycleReact.png?raw=true "Bitcoin Mining Controller Web Site")
@@ -20,6 +23,7 @@ https://github.com/dfoderick/fullcyclereact
 [Installation Overview](#installation-overview)  
 [Troubleshooting](docs/Troubleshooting.md)  
 [Next Steps](#now-what)  
+[Documentation](https://dfoderick.github.io/fullcycle/)  
 [Development Roadmap](docs/roadmap.md)  
 
 
@@ -49,7 +53,7 @@ FCM has been thoroughly tested on Raspbian Stretch.
 The current version of Raspbian Stretch is April 2018.  
 https://www.raspberrypi.org/downloads/raspbian/
 Instructions on getting set up are here  
-![Raspberry Pi Setup](/docs/RaspberryPiSetup.md "Raspberry Pi Setup")  
+[Raspberry Pi Setup](docs/RaspberryPiSetup.md)  
 
 You should run the FCM installation steps using a terminal window.
 You can copy and paste commands from this document into your terminal
@@ -60,8 +64,7 @@ It is highly recommended to use the Docker installation option to make it
 easier, quicker and safer to manage the application.
 
 # Docker install on Raspberry Pi
-If you do not have Docker installed on your Raspberry Pi then follow these
-instructions.
+If you do not have Docker installed on your Raspberry Pi then follow these instructions.
 ```
 sudo apt-get install -y apt-transport-https
 sudo curl -sSL https://get.docker.com | sudo sh
