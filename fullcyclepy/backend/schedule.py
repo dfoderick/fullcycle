@@ -63,10 +63,9 @@ while True:
             if APP.is_enabled_configuration('temperature'):
                 print("[{0}] sending temperature".format(APP.now()))
                 SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
-                if APP.is_enabled_configuration('telegram'):
-                    if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
-                        MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
-                        APP.sendtelegrammessage(MESSAGE)
+                if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
+                    MESSAGE = '{0}: Temp={1:0.1f}*  Humidity={2:0.1f}%'.format(APP.now(), SENSOR_TEMP, SENSOR_HUMID)
+                    APP.alert(MESSAGE)
             TEMPERATURE.lastrun = datetime.datetime.now()
 
         if HEARTBEAT.is_time_to_run():
@@ -78,8 +77,7 @@ while True:
                 if SENSOR_HUMID is not None and SENSOR_TEMP is not None:
                     MSG = MSG + 'Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(SENSOR_TEMP, SENSOR_HUMID)
             MSG = MSG + '\n{0}'.format(APP.minersummary())
-            if APP.is_enabled_configuration('telegram'):
-                APP.sendtelegrammessage(MSG)
+            APP.alert(MSG)
             APP.sendqueueitem(QueueEntry(QueueName.Q_LOG, MSG, 'broadcast'))
             HEARTBEAT.lastrun = datetime.datetime.now()
 
