@@ -1,5 +1,42 @@
-## Full Cycle Mining Troubleshooting tips
+# Full Cycle Mining Troubleshooting tips
+Use the following guides to troubleshoot issues with Full Cycle.
 
+Full Cycle installs some helpful commands into the ~/bin directory. You can use them to help troubleshoot and administer your installation.
+
+## fcmdiag
+This command will run diagnotics on your install and report any issues. If it reports any problems then fix those issues to see if it resolves your problem.
+
+## fcmtest
+Gets a status of your miners
+
+## fcmstop/fcmstart
+These commands stop and start Full Cyle in case it needs to be restarted.
+
+## fcmps
+This command displays information about the processes on your machine.
+
+## docker logs fullcycleweb
+This command shows the web logs.
+
+## fcmlog
+This command diplays Full Cycle process logs
+
+## fcmupdate
+Updates Full Cycle backend to master branch on GitHub
+
+## fcmsetup
+Reinstalls Full Cycle Mining
+
+## fcmupdateweb
+Updates Full Cycle front end to latest build on Docker Hub
+
+## rabbitstart/rabbitstart/rabbitstatus
+Controls rabbitmq
+
+## fcmsimple
+Does a one-time run of Full Cycle workflows for discovering, provisioning and monitoring the miners.
+
+## Additional Troubleshooting help
 Find out which version of Python you have installed.
 ```
 python3 -V
