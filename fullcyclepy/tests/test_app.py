@@ -15,7 +15,7 @@ class Test_test_app(unittest.TestCase):
         app = ApplicationService(component='test')
         pools = app.knownpools()
         for pool in pools:
-            self.assertTrue(isinstance(pool,AvailablePool))
+            self.assertTrue(isinstance(pool, AvailablePool))
 
 if __name__ == '__main__':
     unittest.main()

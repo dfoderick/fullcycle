@@ -43,7 +43,7 @@ def findminers(hosts_list, knownminers):
                         for known in knownminers:
                             if known.networkid == miner.networkid or known.minerid == miner.minerid:
                                 found = known
-                        if found is not None:
+                        if found:
                             print(Fore.YELLOW + '   already know about {0}'.format(found.name))
                         else:
                             minersnew += 1

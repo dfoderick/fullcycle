@@ -16,7 +16,7 @@ class MinerApi(object):
         socket.setdefaulttimeout(self.timeout)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         retries_remaining = self.retry_count
-        while (retries_remaining > 0):
+        while retries_remaining > 0:
             try:
                 sock.connect((self.host, self.port))
                 payload = {"command": command}

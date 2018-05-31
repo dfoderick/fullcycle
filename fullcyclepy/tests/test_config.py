@@ -4,25 +4,20 @@ from marshmallow import pprint
 from domain.mining import Pool
 from domain.rep import PoolRepository
 from messaging.schema import PoolSchema
-from backend.fcmapp import Component
 
-sch = PoolSchema()
-pools = PoolRepository()
-savedpools = pools.readpools("backend/config/pools.conf")
+SCH = PoolSchema()
+POOLS = PoolRepository()
+SAVEDPOOLS = POOLS.readpools("backend/config/pools.conf")
 
-pool1 = Pool('Antminer 1', 'Name 1', 'http://url1','user1.',1)
+POOL1 = Pool('Antminer 1', 'Name 1', 'http://url1', 'user1.', 1)
 #pools.add(pool1,PoolSchema())
-pool2 = Pool('Antminer 2', 'Name 2', 'http://url2','user2.',2)
+POOL2 = Pool('Antminer 2', 'Name 2', 'http://url2', 'user2.', 2)
 #pools.add(pool2,PoolSchema())
-savedpools.append(pool1)
-savedpools.append(pool2)
+SAVEDPOOLS.append(POOL1)
+SAVEDPOOLS.append(POOL2)
 
-#savedpools = pools.readpools()
-#for pool in savedpools:
-#    print(pool.__dict__)
+JSON_POOLS = [SCH.dump(k).data for k in SAVEDPOOLS]
 
-jsonpools = [sch.dump(k).data for k in savedpools]
-
-s = json.dumps(jsonpools, sort_keys = True, indent = 4, ensure_ascii = False)
-print(s)
+FORMATTED_JSON = json.dumps(JSON_POOLS, sort_keys=True, indent=4, ensure_ascii=False)
+pprint(FORMATTED_JSON)
 input('any key')

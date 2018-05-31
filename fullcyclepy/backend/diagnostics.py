@@ -27,12 +27,12 @@ except BaseException as ex:
     print(APP.exceptionmessage(ex))
 
 try:
-    log = MinerLog()
-    log.createdate = datetime.datetime.utcnow()
-    log.minerid = 'diag'
-    log.minername = 'diagnostics'
-    log.action = 'diagnostics'
-    SUCCESS = APP.log_mineractivity(log)
+    LOG = MinerLog()
+    LOG.createdate = datetime.datetime.utcnow()
+    LOG.minerid = 'diag'
+    LOG.minername = 'diagnostics'
+    LOG.action = 'diagnostics'
+    SUCCESS = APP.log_mineractivity(LOG)
 
     LOGS = getminerlog(APP.getsession())
     #print(log.__dict__)

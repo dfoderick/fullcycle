@@ -1,6 +1,5 @@
 '''#discovered something that responds to cgminer api'''
 from helpers.queuehelper import QueueName, QueueEntries
-from domain.mining import Miner
 from fcmapp import Component
 
 COMPONENTDISCOVERED = Component(componentname='discover', option='')
@@ -37,7 +36,6 @@ def dodiscovered(miner):
     return entries
 
 def main():
-    '''main'''
     if COMPONENTDISCOVERED.app.isrunnow:
         miner = COMPONENTDISCOVERED.app.getknownminerbyname('S9102')
         dodiscovered(miner)

@@ -13,7 +13,7 @@ class Sensor(object):
 class SensorValue(object):
     """A Sesnor Reading"""
 
-    def __init__(self, sensorid='', value='', valuetype='', sensor = None, sensortime = datetime.datetime.utcnow()):
+    def __init__(self, sensorid='', value='', valuetype='', sensor=None, sensortime=datetime.datetime.utcnow()):
         self.sensorid = sensorid
         self.valuetype = valuetype
         self.value = value

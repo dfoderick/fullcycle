@@ -1,8 +1,7 @@
-'''#what to do when miner is online
-#should enable, provision and start monitoring
+'''what to do when miner becomes online
+enable, provision and start monitoring
 '''
 from helpers.queuehelper import QueueName, QueueEntries
-from domain import mining
 from fcmapp import Component
 
 ONLINE = Component('online')

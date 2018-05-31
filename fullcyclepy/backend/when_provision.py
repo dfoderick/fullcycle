@@ -99,7 +99,7 @@ def doprovision(miner):
                 #pool should take on the cononical attributes of the named pool
                 pool.named_pool = foundnamed
                 pool.user = foundnamed.user
-            PROVISION.app.add_pool(MinerPool(miner, pool.priority,pool))
+            PROVISION.app.add_pool(MinerPool(miner, pool.priority, pool))
 
         #enforce default pool if miner has one set up
         if miner.defaultpool:

@@ -74,7 +74,7 @@ class Miner(object):
     minerstats = None
 
     def __init__(self, name, status='', miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
-                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged = None):
+                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None):
         self.name = name
         self._status = status
         self.miner_type = miner_type
@@ -322,7 +322,7 @@ class Pool(object):
     priority = 0
     password = 'x'
 
-    def __init__(self, pool_type, name, url, user, priority, password = 'x'):
+    def __init__(self, pool_type, name, url, user, priority, password='x'):
         self.pool_type = pool_type
         self.name = name
         self.url = url

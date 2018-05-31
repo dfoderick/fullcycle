@@ -1,5 +1,5 @@
 '''purge all data. go back to clean slate'''
-from backend.fcmapp import ApplicationService, CacheKeys
+from backend.fcmapp import ApplicationService
 
 print('Starting application...')
 APP = ApplicationService()
@@ -9,5 +9,3 @@ print('started', APP.component)
 APP.cacheclear()
 #purge rabbit
 APP.shutdown()
-
-

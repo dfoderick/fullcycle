@@ -10,7 +10,7 @@ import datetime
 from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool, MinerStatistics
 from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
-from messaging.sensormessages import SensorValueMessage, SensorValueSchema
+from messaging.sensormessages import SensorValueSchema
 
 class TestSerialization(unittest.TestCase):
     def test_minerserialization(self):
@@ -52,7 +52,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_configuration_serialization(self):
         sch = ConfigurationMessageSchema()
-        msg = ConfigurationMessage('save','','pool',{"id":"name"}, [{"name":"my pool"}])
+        msg = ConfigurationMessage('save', '', 'pool', {"id":"name"}, [{"name":"my pool"}])
         jconfig = sch.dumps(msg).data
         reconfig = sch.loads(jconfig).data
         self.assertTrue(isinstance(reconfig, ConfigurationMessage))

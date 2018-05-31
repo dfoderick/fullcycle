@@ -1,5 +1,5 @@
 '''shut down a miner'''
-from helpers.queuehelper import QueueName, Queue
+from helpers.queuehelper import QueueName
 from helpers.antminerhelper import shutdown
 from fcmapp import Component
 

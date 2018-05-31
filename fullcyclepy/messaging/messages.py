@@ -100,7 +100,7 @@ class Message(object):
         jsonlist = json.loads(self.body)
         if 'miner' in jsonlist:
             return jsonlist
-        if not isinstance(jsonlist,list):
+        if not isinstance(jsonlist, list):
             return jsonlist
         return jsonlist[0]
 

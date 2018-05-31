@@ -216,6 +216,7 @@ def reboot(miner: Miner, login):
     response = connection.exec_command('/sbin/reboot')
     print_connection_data(connection)
     connection.close_connection()
+    return response
 
 def shutdown(miner: Miner, login):
     """ shutdown the miner through ftp

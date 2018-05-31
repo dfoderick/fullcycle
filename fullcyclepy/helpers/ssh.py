@@ -31,7 +31,7 @@ class Ssh:
         This is the preferred way to communicate with miner
         returns a list of lines as the response to the command
         '''
-        stdin_, stdout_, stderr_ = self.client.exec_command(command)
+        _, stdout_, _ = self.client.exec_command(command)
         #this will make it block until response is received
         stdout_.channel.recv_exit_status()
         return stdout_.readlines()
@@ -61,7 +61,7 @@ class Ssh:
 
     def process(self):
         '''process the commands'''
-        while self.closed == False:
+        while self.closed is False:
             # Print data when available
             if self.shell != None and self.shell.recv_ready():
                 alldata = self.shell.recv(1024)

@@ -8,8 +8,8 @@ APP = ApplicationService(ComponentName.fullcycle)
 MINER = APP.getminerbyname('TEST')
 MINER.ftpport = '22'
 
-response = getminerconfig(MINER, APP.sshlogin())
-print_response(response)
+RESPONSE = getminerconfig(MINER, APP.sshlogin())
+print_response(RESPONSE)
 
 ACCESS_ORIGINAL = APP.antminer.getaccesslevel(MINER)
 print('original', ACCESS_ORIGINAL)

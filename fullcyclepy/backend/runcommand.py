@@ -7,13 +7,25 @@
 #   runcommand.py switch S9102 3
 '''
 import sys
-from helpers.queuehelper import QueueName, Queue, BroadcastSender
+from helpers.queuehelper import QueueName
 #from messaging.messages import *
 from domain.mining import Miner, MinerCommand
 from domain.rep import MinerRepository
 from fcmapp import ApplicationService
 
 APP = ApplicationService()
+
+def findminerbyname(minertofind):
+    miners = MinerRepository()
+    miner = miners.getminerbyname(minertofind, APP.getconfigfilename('config/miners.conf'))
+    if miner is None:
+        miner = APP.getknownminerbyname(minertofind)
+    if miner is None:
+        miner = APP.getminer(Miner(name=minertofind))
+    if miner is None:
+        print('Miner {0} does not exist'.format(minertofind))
+        sys.exit(1)
+    return miner
 
 def doit(args):
     if len(args) < 2:
@@ -30,30 +42,20 @@ def doit(args):
         print('sent command {0}'.format(cmd))
     else:
         minertofind = args[2]
+        miner = findminerbyname(minertofind)
         cmdparam = ''
         if len(args) > 3:
             cmdparam = args[3]
-        miners = MinerRepository()
-        miner = miners.getminerbyname(minertofind, APP.getconfigfilename('config/miners.conf'))
-        if miner is None:
-            miner = APP.getknownminerbyname(minertofind)
-        if miner is None:
-            miner = APP.getminer(Miner(name=minertofind))
-        if miner is None:
-            print('Miner {0} does not exist'.format(minertofind))
-            sys.exit(1)
         qnames = QueueName()
         if not qnames.isvalidqname(cmd):
             print('Queue {0} is not valid'.format(cmd))
             sys.exit(1)
-        #TODO: cleanup logic here. when to call app and when to override with just miner and command
+
         if cmd:
             qmess = MinerCommand(cmd, cmdparam)
             msg = APP.createmessagecommand(miner, qmess)
-            APP.bus.publish(cmd, msg)
-        else:
-             APP.bus.publish(APP.messageencode(miner))
-        print('sent command {0} for miner {1}'.format(cmd, miner.name))
+            APP.bus.publish(queue_name=cmd, msg=msg)
+            print('sent command {0} for miner {1}'.format(cmd, miner.name))
 
 def main():
     if len(sys.argv) < 2:

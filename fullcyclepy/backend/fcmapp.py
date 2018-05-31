@@ -13,16 +13,16 @@ import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, Pool, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
-from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessage, ConfigurationMessageSchema
 from domain.sensors import Sensor, SensorValue
-from messaging.sensormessages import SensorValueMessage, SensorValueSchema
+from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
+from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
-from helpers.queuehelper import QueueName, Queue, BroadcastListener, BroadcastSender, QueueEntry, QueueType
+from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
-from helpers.antminerhelper import MinerMonitorException, setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
+from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
 from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
 
@@ -207,7 +207,7 @@ class Bus:
         remember to listen to channel to get messages
         """
         localchannel = self.connection().channel()
-        self._state = localchannel.queue_declare(queue=name)
+        localchannel.queue_declare(queue=name)
         localchannel.basic_qos(prefetch_count=prefetch_count)
         localchannel.basic_consume(callback, queue=name, no_ack=no_acknowledge)
         return localchannel
@@ -260,7 +260,7 @@ class ApplicationService:
     __logger_error = None
     antminer = None
 
-    def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself = False):
+    def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself=False):
         self.component = component
         self.initargs(option)
         self.startupstuff()
@@ -345,7 +345,7 @@ class ApplicationService:
         if not lookupkey in self.__config:
             return False
         value = self.__config[lookupkey]
-        if isinstance(value,str):
+        if isinstance(value, str):
             return value == 'true' or value == 'True'
         return value
 
@@ -462,10 +462,10 @@ class ApplicationService:
     #    val = self.serialize(memminer)
     #    self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
 
-    def minersummary(self, maxNumber = 10):
+    def minersummary(self, max_number=10):
         '''show a summary of known miners
         '''
-        return '\n'.join([m.summary() for m in self.knownminers()[:maxNumber]])
+        return '\n'.join([m.summary() for m in self.knownminers()[:max_number]])
 
     def addknownminer(self, miner):
         '''add miner to known miners list'''
@@ -599,20 +599,20 @@ class ApplicationService:
         for k in list(self._queues):
             self.closequeue(self._queues[k])
 
-    def close_channel(self, ch):
-        if not ch: return
+    def close_channel(self, chan):
+        if not chan: return
         try:
-            if ch.name in self._channels:
-                self.logdebug(self.stamp('closing channel {0}'.format(ch.name)))
-                ch.close()
-                del self._channels[ch.name]
+            if chan.name in self._channels:
+                self.logdebug(self.stamp('closing channel {0}'.format(chan.name)))
+                chan.close()
+                del self._channels[chan.name]
         except Exception as ex:
             self.logexception(ex)
 
     def close_channels(self):
         '''close all channels'''
-        for k in list(self._channels):
-            self.close_channel(self._channels[k])
+        for chan in list(self._channels):
+            self.close_channel(self._channels[chan])
 
     def unhandledexception(self, unhandled):
         '''what to do when there is an exception that app cannot handle'''
@@ -898,10 +898,9 @@ class ApplicationService:
         message = message.make_minercommand(miner, command)
         return self.serializemessageenvelope(message)
 
-    def messageencode(self, miner):
+    def messageencode(self, miner: Miner):
         '''command is optional, however should convert this call into minercommand'''
         #always save the miner so the next guy can get latest changes
-        #todo: should only put if it came from redis
         if miner.store == 'mem':
             self.putminer(miner)
         message = self.createmessageenvelope()
@@ -935,11 +934,10 @@ class ApplicationService:
         if entry.eventtype == 'broadcast':
             send_result = self.trybroadcast(entry.queuename, entry.message)
             return send_result
-        else:
-            return self.send(entry.queuename, entry.message)
+        return self.send(entry.queuename, entry.message)
 
     def take_picture(self, file_name='fullcycle_camera.png'):
-        pic = take_picture(file_name, 
+        pic = take_picture(file_name,
                            self.configuration('camera.size'),
                            self.configuration('camera.quality'),
                            self.configuration('camera.brightness'),
