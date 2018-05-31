@@ -913,13 +913,11 @@ class ApplicationService:
 
     def alert(self, message):
         '''send alert message'''
-        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.publish))
+        return self.sendqueueitem(QueueEntry(QueueName.Q_ALERT, self.stamp(message), QueueType.broadcast))
 
     def send(self, q_name, message):
         '''send message to queue'''
-        #thequeue = self.makequeue(q_name, self.component)
         success = self.trypublish(q_name, message)
-        #self.closequeue(thequeue)
         return success
 
     def enqueue(self, queuelist):
@@ -981,11 +979,13 @@ class ApplicationService:
         self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
 
     def sendtelegrammessage(self, message):
-        sendalert(message, self.getservice('telegram'))
+        if self.is_enabled_configuration('telegram'):
+            sendalert(message, self.getservice('telegram'))
 
     def sendtelegramphoto(self, file_name):
         if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
-            sendphoto(file_name, self.getservice('telegram'))
+            if self.is_enabled_configuration('telegram'):
+                sendphoto(file_name, self.getservice('telegram'))
 
     def getsession(self):
         service = self.getservice(ServiceName.database)
