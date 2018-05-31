@@ -1,6 +1,48 @@
 # Full Cycle Mining Troubleshooting tips
 Use the following guides to troubleshoot issues with Full Cycle.
 
+## General Outline for debugging
+1. Run `fcmdiag` for diagnostics. Output should appear similar to below. If there are errors then restart the affected service.
+```
+pi@raspberrypi:~/ $ fcmdiag
+Starting application...
+Starting FCM
+started fullcycle
+cache is working
+message bus is working
+database is working, 8513 logs
+```
+2. Once all services are running then check Full Cycle status with `fcmstatus`. All processes should have RUNNING status. If not, then stop and start processes with `fcmstop` and `fcmstart` commands.
+```
+pi@raspberrypi:~/bin $ fcmstatus
+fullcycle:fcmalert               RUNNING   pid 8960, uptime 8:09:15
+fullcycle:fcmcomponent           RUNNING   pid 8966, uptime 8:09:15
+fullcycle:fcmdiscover            RUNNING   pid 8954, uptime 8:09:15
+fullcycle:fcmdiscovered          RUNNING   pid 8961, uptime 8:09:15
+fullcycle:fcmlog                 RUNNING   pid 8956, uptime 8:09:15
+fullcycle:fcmmonitor             RUNNING   pid 8958, uptime 8:09:15
+fullcycle:fcmmonitorminer        RUNNING   pid 8952, uptime 8:09:15
+fullcycle:fcmoffline             RUNNING   pid 8957, uptime 8:09:15
+fullcycle:fcmonline              RUNNING   pid 8964, uptime 8:09:15
+fullcycle:fcmprovision           RUNNING   pid 8953, uptime 8:09:15
+fullcycle:fcmprovisiondispatch   RUNNING   pid 8962, uptime 8:09:15
+fullcycle:fcmrestart             RUNNING   pid 8955, uptime 8:09:15
+fullcycle:fcmrules               RUNNING   pid 8963, uptime 8:09:15
+fullcycle:fcmschedule            RUNNING   pid 8965, uptime 8:09:15
+fullcycle:fcmswitch              RUNNING   pid 8959, uptime 8:09:15
+```
+3. Once Full Cycle is operating normally then the website will need to be reset with Docker.
+```
+pi@raspberrypi:~/ $ docker stop fullcycleweb
+fullcycleweb
+pi@raspberrypi:~/ $ docker start fullcycleweb
+fullcycleweb
+```
+
+4. Refresh your browser and everything should be working.
+5. If you continue to have problems then use `fcmlog` to see what errors are getting logged. If you believe it is an issue with Full Cycle then add the issue to GitHub.
+
+# Full Cycle command details
 Full Cycle installs some helpful commands into the ~/bin directory. You can use them to help troubleshoot and administer your installation.
 
 ## fcmdiag
@@ -43,27 +85,6 @@ python3 -V
 ```
 It needs to be version 3.5 or higher.
 
-Run `fcmstatus` to see what is the status of the application.
-It should show the status as RUNNING. If you see anything else then
-the application is encountering an error.
-```
-pi@raspberrypi:~/bin $ fcmstatus
-fullcycle:fcmalert               RUNNING   pid 8960, uptime 8:09:15
-fullcycle:fcmcomponent           RUNNING   pid 8966, uptime 8:09:15
-fullcycle:fcmdiscover            RUNNING   pid 8954, uptime 8:09:15
-fullcycle:fcmdiscovered          RUNNING   pid 8961, uptime 8:09:15
-fullcycle:fcmlog                 RUNNING   pid 8956, uptime 8:09:15
-fullcycle:fcmmonitor             RUNNING   pid 8958, uptime 8:09:15
-fullcycle:fcmmonitorminer        RUNNING   pid 8952, uptime 8:09:15
-fullcycle:fcmoffline             RUNNING   pid 8957, uptime 8:09:15
-fullcycle:fcmonline              RUNNING   pid 8964, uptime 8:09:15
-fullcycle:fcmprovision           RUNNING   pid 8953, uptime 8:09:15
-fullcycle:fcmprovisiondispatch   RUNNING   pid 8962, uptime 8:09:15
-fullcycle:fcmrestart             RUNNING   pid 8955, uptime 8:09:15
-fullcycle:fcmrules               RUNNING   pid 8963, uptime 8:09:15
-fullcycle:fcmschedule            RUNNING   pid 8965, uptime 8:09:15
-fullcycle:fcmswitch              RUNNING   pid 8959, uptime 8:09:15
-```
 Run `fcmlog` to see if it shows any output that will give you a clue
 about the error.
 
