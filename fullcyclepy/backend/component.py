@@ -20,4 +20,5 @@ def docomponent(msg):
     APP.sendtelegrammessage(msg)
     print("Sent telegram {0}".format(msg))
 
-Q = APP.subscribe_and_listen(QueueName.Q_COMPONENT, when_component)
+Q = APP.subscribe(QueueName.Q_COMPONENT, when_component)
+APP.bus.listen(Q)

@@ -88,7 +88,8 @@ def main():
         dodiscover()
         DISCOVER.app.shutdown()
     else:
-        DISCOVER.listeningqueue = DISCOVER.app.subscribe_and_listen(QueueName.Q_DISCOVER, when_discover)
+        DISCOVER.listeningqueue = DISCOVER.app.subscribe(QueueName.Q_DISCOVER, when_discover)
+        DISCOVER.listen()
 
 if __name__ == "__main__":
     main()

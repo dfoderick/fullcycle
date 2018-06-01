@@ -38,6 +38,10 @@ class Component(object):
         #was a queue, now its a channel
         self.listeningqueue = None
 
+    def listen(self):
+        if self.listeningqueue:
+            self.app.bus.listen(self.listeningqueue)
+
 class ServiceName:
     '''names of infrastructure services'''
     messagebus = 'rabbit'
@@ -634,25 +638,10 @@ class ApplicationService:
         self.sendqueueitem(item)
         print(logmessage)
 
-
-
     def subscribe(self, name, callback, no_acknowledge=True):
         '''subscribe to a queue'''
-        #Queue(q_name, self.getservice_useroverride(ServiceName.messagebus))
-        #chan = ChannelListener(self.bus.connection(), name)
-        #chan.subscribe(callback, no_acknowledge=no_acknowledge)
         chan = self.bus.subscribe(name, callback, no_acknowledge=no_acknowledge)
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(name))
-        #returning a reference to the renamed dummy queue
-        return chan
-
-    #[obsolete], caller needs reference to q before listening
-    def subscribe_and_listen(self, q_name, callback, no_acknowledge=True):
-        '''listen to a queue
-        todo: replace with separate calls to subscribe then listen'''
-        chan = self.subscribe(q_name, callback, no_acknowledge=True)
-        self.bus.listen(chan)
-        #this will never return because listen is blocking call
         return chan
 
     #def makebroadcastlistener(self, broadcast_name):
@@ -662,9 +651,7 @@ class ApplicationService:
     def listen_to_broadcast(self, broadcast_name, callback, no_acknowledge=True):
         #thebroadcast = self.makebroadcastlistener(broadcast_name)
         thebroadcast = self.bus.subscribe_broadcast(broadcast_name, callback, no_acknowledge)
-        #print('Waiting for messages on {0}. To exit press CTRL+C'.format(thebroadcast.queue_name))
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(broadcast_name))
-        #thebroadcast.subscribe(callback, no_acknowledge=no_acknowledge)
         self.bus.listen(thebroadcast)
         #never returns becuase listen is blocking
         return thebroadcast
@@ -725,7 +712,6 @@ class ApplicationService:
         return None
 
     def getknownminerbykey(self, minername):
-        '''todo: rename to bykey'''
         str_miner = self.__cache.getfromhashset(CacheKeys.knownminers, minername)
         if str_miner is None:
             return None
@@ -883,7 +869,7 @@ class ApplicationService:
 
     def createmessagestats(self, miner, minerstats, minerpool):
         #always save the miner so the next guy can get latest changes
-        #todo: should only put if it came from cache
+        #only put in cache if it came from cache
         if miner.store == 'mem':
             self.putminer(miner)
         message = self.createmessageenvelope()

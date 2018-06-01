@@ -131,7 +131,8 @@ def main():
             domonitorminer(test_miner)
         APPMONITOR.app.shutdown()
     else:
-        APPMONITOR.listeningqueue = APPMONITOR.app.subscribe_and_listen(QueueName.Q_MONITORMINER, when_monitorminer)
+        APPMONITOR.listeningqueue = APPMONITOR.app.subscribe(QueueName.Q_MONITORMINER, when_monitorminer)
+        APPMONITOR.listen()
 
 if __name__ == "__main__":
     main()

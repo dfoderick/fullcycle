@@ -50,7 +50,8 @@ def main():
         doupdateweb('updateweb')
         COMPONENTUPDATE.app.shutdown()
     else:
-        COMPONENTUPDATE.listeningqueue = COMPONENTUPDATE.app.subscribe_and_listen(QueueName.Q_UPDATEWEB, when_updateweb)
+        COMPONENTUPDATE.listeningqueue = COMPONENTUPDATE.app.subscribe(QueueName.Q_UPDATEWEB, when_updateweb)
+        COMPONENTUPDATE.listen()
 
 if __name__ == "__main__":
     main()

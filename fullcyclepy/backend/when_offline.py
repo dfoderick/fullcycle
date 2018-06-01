@@ -43,7 +43,8 @@ def dooffline(miner: mining.Miner):
     return entries
 
 def main():
-    OFFLINE.listeningqueue = OFFLINE.app.subscribe_and_listen(QueueName.Q_OFFLINE, when_offline)
+    OFFLINE.listeningqueue = OFFLINE.app.subscribe(QueueName.Q_OFFLINE, when_offline)
+    OFFLINE.listen()
 
 if __name__ == "__main__":
     main()

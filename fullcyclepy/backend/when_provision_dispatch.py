@@ -54,7 +54,8 @@ def main():
         PROVISION_DISPATCH.app.enqueue(entries)
         PROVISION_DISPATCH.app.shutdown()
     else:
-        PROVISION_DISPATCH.listeningqueue = PROVISION_DISPATCH.app.subscribe_and_listen(QueueName.Q_POOLCONFIGURATIONCHANGED, when_provisiondispatch)
+        PROVISION_DISPATCH.listeningqueue = PROVISION_DISPATCH.app.subscribe(QueueName.Q_POOLCONFIGURATIONCHANGED, when_provisiondispatch)
+        PROVISION_DISPATCH.listen()
 
 if __name__ == "__main__":
     main()

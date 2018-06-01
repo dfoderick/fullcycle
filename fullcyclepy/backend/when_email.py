@@ -54,7 +54,8 @@ def doemail(msg):
     print('email sent')
 
 def main():
-    EMAIL.listeningqueue = EMAIL.app.subscribe_and_listen(QueueName.Q_EMAIL, when_email)
+    EMAIL.listeningqueue = EMAIL.app.subscribe(QueueName.Q_EMAIL, when_email)
+    EMAIL.listen()
 
 if __name__ == "__main__":
     main()

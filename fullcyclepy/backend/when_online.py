@@ -35,7 +35,8 @@ def doonline(miner):
     return entries
 
 def main():
-    ONLINE.listeningqueue = ONLINE.app.subscribe_and_listen(QueueName.Q_ONLINE, when_online)
+    ONLINE.listeningqueue = ONLINE.app.subscribe(QueueName.Q_ONLINE, when_online)
+    ONLINE.listen()
 
 if __name__ == "__main__":
     main()

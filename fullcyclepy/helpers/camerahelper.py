@@ -14,7 +14,6 @@ def take_picture(image_name, size="small", quality=10, brightness=50, contrast=5
         with picamera.PiCamera() as camera:
             camera.start_preview()
             try:
-                #todo: make configurable
                 camera.resolution = (1280, 1024)
                 camera.brightness = brightness
                 camera.contrast = contrast

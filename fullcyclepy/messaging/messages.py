@@ -27,10 +27,6 @@ class MinerCommandMessage(object):
         self.command = command
         self.parameter = parameter
 
-#class Event(object):
-#    """Event? """
-#    todo = ''
-
 class MinerMessage(object):
     """ Miner information for a message
     Miner could be None, meaning message is for all
@@ -57,7 +53,7 @@ class MinerMessageSchema(Schema):
         minerstats = None
         minerpool = None
         if 'miner' in data:
-            #todo:find out why miner sometimes comes in as dict instead of entity
+            #miner comes in as dict instead of entity when there is an error in the schema
             if isinstance(data['miner'], Miner):
                 miner = data['miner']
             else:
