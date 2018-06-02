@@ -390,5 +390,13 @@ class MinerStatistics(object):
     def tempboardmax(self):
         return max(self.tempboard1, self.tempboard2, self.tempboard3)
 
+    def format_elapsed(self):
+        seconds = self.elapsed
+        numdays = seconds // 86400
+        numhours = (seconds % 86400) // 3600
+        numminutes = ((seconds % 86400) % 3600) // 60
+        numseconds = ((seconds % 86400) % 3600) % 60
+        return '{0}:{1}:{2}:{2}'.format(numdays, numhours, numminutes, numseconds)
+
     def stats_summary(self):
-        return '{0} {1}/{2} {3}s'.format(self.currenthash, self.controllertemp, self.tempboardmax(), self.elapsed)
+        return '{0} {1}/{2} {3}'.format(self.currenthash, self.controllertemp, self.tempboardmax(), self.format_elapsed())

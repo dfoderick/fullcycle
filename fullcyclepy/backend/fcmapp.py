@@ -2,13 +2,12 @@
 Gateway into most of application functionality'''
 import sys
 import os
-#import os.path
 import datetime
 import logging
 import json
 import base64
-from colorama import init
-from colorama import Fore
+from colorama import init, Fore
+from collections import defaultdict
 import redis
 import pika
 from sqlalchemy.orm import sessionmaker
@@ -342,6 +341,7 @@ class ApplicationService:
         self.loglevel = self.configuration('loglevel')
 
     def configuration(self, key):
+        if not key in self.__config: return None
         return self.__config[key]
 
     def is_enabled_configuration(self, key):
@@ -462,14 +462,29 @@ class ApplicationService:
         val = self.jsonserialize(SensorValueSchema(), sensorvalue)
         self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
 
-    #def updateknownsensor(self, sensorvalue):
-    #    val = self.serialize(memminer)
-    #    self.__cache.putinhashset(CacheKeys.knownsensors, sensor.sensorid, val)
-
     def minersummary(self, max_number=10):
         '''show a summary of known miners
         '''
-        return '\n'.join([m.summary() for m in self.knownminers()[:max_number]])
+        mode = self.configuration('summary')
+        if not mode: mode = 'auto'
+        knownminers = self.knownminers()
+        if len(knownminers) <= max_number:
+            return '\n'.join([m.summary() for m in knownminers])
+        groupbystatus = defaultdict(list)
+        for miner in knownminers:
+            groupbystatus[miner.status].append(miner)
+        return '\n'.join(['{0}: {1}'.format(s, self.summary_by_status(s, groupbystatus[s])) for s in groupbystatus])
+
+    def summary_by_status(self, key, minerlist):
+        if key == 'online':
+            return '{0} miners hash {1}'.format(self.summarize_count(minerlist), self.summarize_hash(minerlist))
+        return self.summarize_count(minerlist)
+
+    def summarize_count(self, minerlist):
+        return len(minerlist)
+
+    def summarize_hash(self, minerlist):
+        return sum(miner.minerstats.currenthash for miner in minerlist)
 
     def addknownminer(self, miner):
         '''add miner to known miners list'''

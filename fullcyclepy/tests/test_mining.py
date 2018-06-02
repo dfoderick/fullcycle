@@ -1,7 +1,7 @@
 '''test mining domain'''
 import unittest
 import datetime
-from domain.mining import Miner, MinerStatus, MinerInfo
+from domain.mining import Miner, MinerStatus, MinerInfo, MinerStatistics
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -101,6 +101,11 @@ class TestMiner(unittest.TestCase):
         miner = Miner('test')
         miner.lastmonitor = ""
         self.assertTrue(miner.should_monitor())
+
+    def test_miner_elapsed_format(self):
+        miner = Miner('test')
+        miner.minerstats = MinerStatistics(miner)
+        self.assertTrue(miner.minerstats.format_elapsed() == "0:0:0:0")
 
 if __name__ == '__main__':
     unittest.main()
