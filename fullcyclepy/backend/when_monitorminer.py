@@ -74,7 +74,9 @@ def domonitorminer(miner):
 
             APPMONITOR.app.putminerandstats(savedminer, minerstats, minerpool)
             #TODO:show name of current pool instead of worker
-            poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
+            poolname = '?'
+            if minerpool:
+                poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
             foundpool = APPMONITOR.app.findpool(minerpool)
             if foundpool is not None:
                 poolname = foundpool.name
