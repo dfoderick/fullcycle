@@ -84,7 +84,7 @@ def domonitorminer(miner):
 
             #most users won't want to mine solo, so provision the miner
             if not APPMONITOR.app.configuration('mining.allowsolomining'):
-                if minerpool.currentpool.startswith(APPMONITOR.app.configuration('mining.solopool')):
+                if not minerpool.currentpool or minerpool.currentpool.startswith(APPMONITOR.app.configuration('mining.solopool')):
                     entries.add(QueueName.Q_PROVISION, APPMONITOR.app.messageencode(savedminer))
 
             print(Fore.CYAN+str(APPMONITOR.app.now()), savedminer.name, savedminer.status,
