@@ -23,7 +23,7 @@ def when_provisiondispatch(channel, method, properties, body):
 def doprovisiondispatch(miner_type=None):
     '''put all miners in provision worker queue'''
     entries = QueueEntries()
-    miners = PROVISION_DISPATCH.app.miners()
+    miners = PROVISION_DISPATCH.app.knownminers()
     print("{0} miners configured".format(len(miners)))
     for miner in miners:
         if miner.is_disabled():
@@ -44,11 +44,11 @@ def doprovisiondispatch(miner_type=None):
             else:
                 entries.add(QueueName.Q_PROVISION, PROVISION_DISPATCH.app.messageencode(miner))
         except BaseException as ex:
+            print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
             print(PROVISION_DISPATCH.app.exceptionmessage(ex))
     return entries
 
 def main():
-    '''main...'''
     if PROVISION_DISPATCH.app.isrunnow:
         entries = doprovisiondispatch()
         PROVISION_DISPATCH.app.enqueue(entries)
