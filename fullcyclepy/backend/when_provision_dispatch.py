@@ -51,7 +51,7 @@ def doprovisiondispatch(miner_type=None):
     return entries
 
 def main():
-    if True: #PROVISION_DISPATCH.app.isrunnow:
+    if PROVISION_DISPATCH.app.isrunnow:
         entries = doprovisiondispatch()
         PROVISION_DISPATCH.app.enqueue(entries)
         PROVISION_DISPATCH.app.shutdown()

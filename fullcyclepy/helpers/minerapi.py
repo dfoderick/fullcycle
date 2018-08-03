@@ -28,7 +28,6 @@ class MinerApi(object):
                 received = self._receive(sock)
                 sock.shutdown(socket.SHUT_RDWR)
             except Exception as ex:
-                print(ex)
                 retries_remaining -= 1
                 if retries_remaining <= 0:
                     return dict({'STATUS': [{'STATUS': 'error', 'description': "{0}:{1}".format(self.host, ex)}]})
