@@ -3,7 +3,7 @@
 #of a particular type
 '''
 from colorama import Fore
-from helpers import antminerhelper
+from helpers.antminerhelper import MinerMonitorException, getminerinfo
 from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import MinerAccessLevel
 from fcmapp import Component
@@ -29,7 +29,7 @@ def doprovisiondispatch(miner_type=None):
         if miner.is_disabled():
             continue
         try:
-            minerinfo = antminerhelper.getminerinfo(miner)
+            minerinfo = getminerinfo(miner)
             if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
                 continue
             mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
@@ -43,13 +43,15 @@ def doprovisiondispatch(miner_type=None):
                 print("    skipping restricted access")
             else:
                 entries.add(QueueName.Q_PROVISION, PROVISION_DISPATCH.app.messageencode(miner))
+        except MinerMonitorException as minerex:
+            print(minerex)
         except BaseException as ex:
             print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
             print(PROVISION_DISPATCH.app.exceptionmessage(ex))
     return entries
 
 def main():
-    if PROVISION_DISPATCH.app.isrunnow:
+    if True: #PROVISION_DISPATCH.app.isrunnow:
         entries = doprovisiondispatch()
         PROVISION_DISPATCH.app.enqueue(entries)
         PROVISION_DISPATCH.app.shutdown()
