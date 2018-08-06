@@ -14,10 +14,10 @@ class MinerApi(object):
 
     def command(self, command, arg=None):
         socket.setdefaulttimeout(self.timeout)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         retries_remaining = self.retry_count
         while retries_remaining > 0:
             try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.host, self.port))
                 payload = {"command": command}
                 if arg is not None:
@@ -30,7 +30,7 @@ class MinerApi(object):
             except Exception as ex:
                 retries_remaining -= 1
                 if retries_remaining <= 0:
-                    return dict({'STATUS': [{'STATUS': 'error', 'description': ex}]})
+                    return dict({'STATUS': [{'STATUS': 'error', 'description': "{0}:{1}".format(self.host, ex)}]})
             else:
                 # remove null byte in first character and add missing comma in stats command
                 # fix lcd command
