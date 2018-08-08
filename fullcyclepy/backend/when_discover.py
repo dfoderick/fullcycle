@@ -40,8 +40,9 @@ def findminers(hosts_list, knownminers):
                         print(Fore.GREEN + '   found {0} with id {1}'.format(minerinfo.miner_type, minerinfo.minerid))
                         #find by mac address or miner_id, not name
                         found = None
+                        #if miner.minerid != "unknown"
                         for known in knownminers:
-                            if known.networkid == miner.networkid or known.minerid == miner.minerid:
+                            if known.networkid == miner.networkid or (miner.minerid != "unknown" and known.minerid == miner.minerid):
                                 found = known
                         if found:
                             print(Fore.YELLOW + '   already know about {0}'.format(found.name))
