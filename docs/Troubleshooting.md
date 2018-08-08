@@ -110,3 +110,9 @@ redis-cli -a mining ping
 If you have any problem installing redis then see if there are
 updated instructions at https://redis.io/topics/quickstart especially
 the section "Installing Redis more properly"
+
+# Other Questions
+
+Question: Why does FullCycle not automatically discover my miner?  
+Answer: FullCycle probes for port 4028 on your device which means the miner software must be running in order to identify it as a miner. Therefore, the mining software (bmminer or cgminer) must be running on the miner before it can be discovered. Please note that if there are hardware issues with the miner then the mining software will not run. Fix the hardware issue, make sure the mining software is running and then FullCycle will discover the miner.
+
