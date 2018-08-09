@@ -385,9 +385,9 @@ class MinerStatistics(object):
         self.fan1 = fan1
         self.fan2 = fan2
         self.fan3 = fan3
-        self.boardstatus1=boardstatus1
-        self.boardstatus2=boardstatus2
-        self.boardstatus3=boardstatus3
+        self.boardstatus1 = boardstatus1
+        self.boardstatus2 = boardstatus2
+        self.boardstatus3 = boardstatus3
         self.frequency = frequency
         self.rawstats = rawstats
 

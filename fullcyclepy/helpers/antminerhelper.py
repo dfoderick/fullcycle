@@ -66,6 +66,10 @@ def stats(miner: Miner):
             entity.currenthash = int(float(jsonstats['GHS 5s']))
             entity.frequency = jsonstats['frequency']
             minertype = status['Type']
+            
+            frequencies = {k:v for (k,v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
+            entity.frequency = str(int(sum(frequencies.values()) / len(frequencies)))
+
             controllertemps = {k:v for (k,v) in jsonstats.items() if k in ['temp6','temp7','temp8']}
             entity.controllertemp = max(controllertemps.values())
             #should be 3
