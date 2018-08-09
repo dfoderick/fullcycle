@@ -21,7 +21,7 @@ from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
-from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartminer, restart
+from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
 from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
 
@@ -162,9 +162,17 @@ class Antminer():
     def restart(self, miner):
         return restart(miner)
 
+    def stopmining(self, miner):
+        '''stop miner through ssh.'''
+        return stopmining(miner, self.__login)
+
     def restartssh(self, miner):
-        '''restart miner through ssh'''
-        return restartminer(miner, self.__login)
+        '''restart miner through ssh. start mining again'''
+        return restartmining(miner, self.__login)
+
+    def set_frequency(self, miner):
+        return set_frequency(miner, self.__login)
+
 
 class Bus:
     _connection = None
@@ -584,12 +592,6 @@ class ApplicationService:
         self.logdebug(self.stamp('Registered queue {0}'.format(qregister.queue_name)))
         if qregister.queue_name not in self._queues.keys():
             self._queues[qregister.queue_name] = qregister
-
-    #def registerchannel(self, ch: ChannelListener):
-    #    '''register a queue'''
-    #    self.logdebug(self.stamp('Registered channel {0}'.format(qregister.queue_name)))
-    #    if ch.queue_name not in self._channels.keys():
-    #        self._channels[ch.name] = ch
 
     def shutdown(self, exitstatus=0):
         '''shut down app services'''

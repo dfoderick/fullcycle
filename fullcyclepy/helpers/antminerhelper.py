@@ -53,38 +53,50 @@ def stats(miner: Miner):
         entity = MinerStatistics(miner, when=datetime.datetime.utcnow())
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
         jstats = api.stats()
-        if jstats['STATUS'][0]['STATUS'] == 'error':
+        entity.rawstats = jstats
+        jstatus = jstats['STATUS']
+        if jstatus[0]['STATUS'] == 'error':
             if not miner.is_disabled():
-                raise MinerMonitorException(jstats['STATUS'][0]['description'])
+                raise MinerMonitorException(jstatus[0]['description'])
         else:
             status = jstats['STATS'][0]
             jsonstats = jstats['STATS'][1]
             entity.minercount = int(jsonstats['miner_count'])
             entity.elapsed = int(jsonstats['Elapsed'])
             entity.currenthash = int(float(jsonstats['GHS 5s']))
+            entity.frequency = jsonstats['frequency']
             minertype = status['Type']
-            entity.controllertemp = None
-            if 'temp_max' in jsonstats:
-                entity.controllertemp = jsonstats['temp_max']
+            controllertemps = {k:v for (k,v) in jsonstats.items() if k in ['temp6','temp7','temp8']}
+            entity.controllertemp = max(controllertemps.values())
             #should be 3
             #tempcount = jsonstats['temp_num']
-            if minertype.startswith('Antminer S9'):
-                entity.tempboard1 = int(jsonstats['temp2_6'])
-                entity.tempboard2 = int(jsonstats['temp2_7'])
-                entity.tempboard3 = int(jsonstats['temp2_8'])
-                entity.boardstatus1 = jsonstats['chain_acs6']
-                entity.boardstatus2 = jsonstats['chain_acs7']
-                entity.boardstatus3 = jsonstats['chain_acs8']
-                entity.fan1 = jsonstats['fan3']
-                entity.fan2 = jsonstats['fan6']
-            if minertype == 'Antminer D3':
-                entity.tempboard1 = int(jsonstats['temp2_1'])
-                entity.tempboard2 = int(jsonstats['temp2_2'])
-                entity.tempboard3 = int(jsonstats['temp2_3'])
-            if minertype == 'Antminer A3':
-                entity.tempboard1 = int(jsonstats['temp2_1'])
-                entity.tempboard2 = int(jsonstats['temp2_2'])
-                entity.tempboard3 = int(jsonstats['temp2_3'])
+            boardtemps = {k:v for (k,v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
+            boardtempkeys=list(boardtemps.keys())
+            if len(boardtemps) > 0:
+                entity.tempboard1 = boardtemps[boardtempkeys[0]]
+            if len(boardtemps) > 1:
+                entity.tempboard2 = boardtemps[boardtempkeys[1]]
+            if len(boardtemps) > 2:
+                entity.tempboard3 = boardtemps[boardtempkeys[2]]
+
+            fans = {k:v for (k,v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
+            fankeys=list(fans.keys())
+            if len(fans) > 0:
+                entity.fan1 = fans[fankeys[0]]
+            if len(fans) > 1:
+                entity.fan2 = fans[fankeys[1]]
+            if len(fans) > 2:
+                entity.fan3 = fans[fankeys[2]]
+
+            chains = {k:v for (k,v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
+            chainkeys=list(chains.keys())
+            if len(chains) > 0:
+                entity.boardstatus1 = chains[chainkeys[0]]
+            if len(chains) > 1:
+                entity.boardstatus2 = chains[chainkeys[1]]
+            if len(chains) > 2:
+                entity.boardstatus3 = chains[chainkeys[2]]
+
             return entity
     except BaseException as ex:
         print('Failed to call miner stats api: ' + str(ex))
@@ -188,14 +200,21 @@ def getminerconfig(miner: Miner, login):
     connection.close_connection()
     return config
 
-def restartminer(miner: Miner, login):
-    '''restart miner through ssh'''
+def stopmining(miner: Miner, login):
+    miner_shell_command(miner, login, 'restart', 15)
+
+def restartmining(miner: Miner, login):
+    miner_shell_command(miner, login, 'restart', 15)
+
+def miner_shell_command(miner: Miner, login, command, timetorun):
+    '''send the command stop/restart to miner shell command'''
     connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
     connection.open_shell()
-    connection.send_shell('/etc/init.d/{0}.sh restart'.format(getminerfilename(miner)))
-    time.sleep(15)
+    connection.send_shell('/etc/init.d/{0}.sh {1}'.format(getminerfilename(miner), command))
+    time.sleep(timetorun)
     print_connection_data(connection)
     connection.close_connection()
+
 
 def changesshpassword(miner: Miner, oldlogin, newlogin):
     """ change the factory ssh password """
@@ -301,14 +320,17 @@ def get_changeconfigcommands(configfilename, setting, newvalue):
     return commands
 
 def sendcommands_and_restart(miner: Miner, login, commands):
-    connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
-    connection.open_shell()
-    for cmd in commands:
-        connection.send_shell(cmd)
-    time.sleep(5)
-    print_connection_data(connection)
-    connection.close_connection()
-    restartminer(miner, login)
+    stopmining(miner, login)
+    try:
+        connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
+        connection.open_shell()
+        for cmd in commands:
+            connection.send_shell(cmd)
+        time.sleep(5)
+        print_connection_data(connection)
+        connection.close_connection()
+    finally:
+        restartmining(miner, login)
 
 def setprivileged(miner: Miner, login, allowsetting):
     """ Set miner to privileged mode """
@@ -322,8 +344,37 @@ def setrestricted(miner: Miner, login, allowsetting):
 
 def set_frequency(miner: Miner, login, frequency):
     """ Set miner frequency
-    Does not work for S9 with auto tune"""
+    Does not work for S9 with auto tune.
+    Fixed frequency firmware (650m) has to be loaded first before frequency can be adjusted
+    """
     #default for S9 is 550
     #"bitmain-freq" : "550",
     commands = get_changeconfigcommands(getminerfilename(miner), 'bitmain-freq', frequency)
     sendcommands_and_restart(miner, login, commands)
+
+def load_firmware():
+    """
+    TODO: load firmware file
+    this will probably change the ip address of the miner
+    """
+    pass
+
+def load_miner():
+    """
+    change the miner software
+    """
+    #ftp the new miner
+    commands = []
+    commands.append('cd /usr/bin')
+    commands.append('cp bmminer bmminer.original')
+    commands.append('cp bmminer880 bmminer')
+    commands.append('chmod +x bmminer')
+    sendcommands_and_restart(miner, login, commands)
+
+def file_upload(miner, login, localfile, remotefile):
+    connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
+    connection.put(localfile,remotefile)
+
+def file_download(miner, login, localfile, remotefile):
+    connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
+    connection.get(localfile,remotefile)

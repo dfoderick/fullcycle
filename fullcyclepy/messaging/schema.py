@@ -36,10 +36,15 @@ class MinerStatsSchema(Schema):
     tempboard1 = fields.Int()
     tempboard2 = fields.Int()
     tempboard3 = fields.Int()
+    boardstatus1 = fields.Str(allow_none=True)
+    boardstatus2 = fields.Str(allow_none=True)
+    boardstatus3 = fields.Str(allow_none=True)
     elapsed = fields.Int()
     fan1 = fields.Str()
     fan2 = fields.Str()
     fan3 = fields.Str()
+    frequency = fields.Str(allow_none=True)
+    rawstats = fields.Dict(allow_none=True)
 
     @post_load
     def make(self, data):
