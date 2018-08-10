@@ -362,6 +362,11 @@ class MinerPool(object):
         self.priority = priority
         self.pool = pool
 
+class MinerType(object):
+    def __init__(self, minertype, defaultpool):
+        self.minertype = minertype
+        self.defaultpool = defaultpool
+
 class MinerStatistics(object):
     '''Statistics for a miner
     temperature and hash

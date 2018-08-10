@@ -205,7 +205,7 @@ def getminerconfig(miner: Miner, login):
     return config
 
 def stopmining(miner: Miner, login):
-    miner_shell_command(miner, login, 'restart', 15)
+    miner_shell_command(miner, login, 'stop', 15)
 
 def restartmining(miner: Miner, login):
     miner_shell_command(miner, login, 'restart', 15)
@@ -323,9 +323,7 @@ def get_changeconfigcommands(configfilename, setting, newvalue):
     commands.append('chmod u=r {0}.conf'.format(configfilename))
     return commands
 
-def sendcommands_and_restart(miner: Miner, login, commands):
-    stopmining(miner, login)
-    try:
+def run_commands(miner: Miner, login, commands):
         connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
         connection.open_shell()
         for cmd in commands:
@@ -333,6 +331,11 @@ def sendcommands_and_restart(miner: Miner, login, commands):
         time.sleep(5)
         print_connection_data(connection)
         connection.close_connection()
+
+def sendcommands_and_restart(miner: Miner, login, commands):
+    stopmining(miner, login)
+    try:
+        run_commands(miner, login, commands)
     finally:
         restartmining(miner, login)
 

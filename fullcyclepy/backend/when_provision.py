@@ -102,8 +102,13 @@ def doprovision(miner):
             PROVISION.app.add_pool(MinerPool(miner, pool.priority, pool))
 
         #enforce default pool if miner has one set up
-        if miner.defaultpool:
-            founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
+        minerdefault = miner.defaultpool
+        #if not minerdefault:
+        #    minertype = PROVISION.app.get_miner_type(miner.miner_type)
+        #    if minertype:
+        #        minerdefault = minertype.defaultpool
+        if minerdefault:
+            founddefault = next((p for p in poollist if p.name == minerdefault), None)
             if founddefault is not None:
                 switchtopool(miner, founddefault)
 
@@ -134,11 +139,13 @@ def switchtopool(miner, pooltoswitch):
 
 def main():
     if PROVISION.app.isrunnow:
-        for miner in PROVISION.app.knownminers():
-            try:
-                doprovision(miner)
-            except Exception as ex:
-                PROVISION.app.logexception(ex)
+        miner = PROVISION.app.getknownminerbyname('192.168.1.218')
+        doprovision(miner)
+        #for miner in PROVISION.app.knownminers():
+        #    try:
+        #        doprovision(miner)
+        #    except Exception as ex:
+        #        PROVISION.app.logexception(ex)
         PROVISION.app.shutdown()
     else:
         PROVISION.listeningqueue = PROVISION.app.subscribe(QueueName.Q_PROVISION, when_provision, no_acknowledge=False)

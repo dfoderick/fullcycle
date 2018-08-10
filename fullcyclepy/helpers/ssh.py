@@ -75,11 +75,15 @@ class Ssh:
         print("ssh process closed")
 
     def get(self, remotefile, localfile):
-        ftp_client=self.client.open_sftp()
-        ftp_client.get(remotefile, localfile)
-        ftp_client.close()
+        #ftp_client=self.client.open_sftp()
+        #ftp_client.get(remotefile, localfile)
+        #ftp_client.close()
+        pass
 
     def put(self, localfile, remotefile):
-        ftp_client=self.client.open_sftp()
-        ftp_client.put(localfile, remotefile)
-        ftp_client.close()
+        transport = self.client.get_transport()
+        with transport.open_channel(kind='session') as channel:
+            with open(localfile, 'rb') as config_file:
+                file_data = config_file.read()
+            channel.exec_command('cat > {0}'.format(remotefile))
+            channel.sendall(file_data)

@@ -12,7 +12,7 @@ import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus, MinerType
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from domain.sensors import Sensor, SensorValue
@@ -21,7 +21,7 @@ from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
-from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
+from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, reboot, set_frequency, file_upload, run_commands
 from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
 
@@ -162,6 +162,9 @@ class Antminer():
     def restart(self, miner):
         return restart(miner)
 
+    def reboot(self, miner):
+        return reboot(miner, self.__login)
+
     def stopmining(self, miner):
         '''stop miner through ssh.'''
         return stopmining(miner, self.__login)
@@ -170,8 +173,33 @@ class Antminer():
         '''restart miner through ssh. start mining again'''
         return restartmining(miner, self.__login)
 
-    def set_frequency(self, miner):
-        return set_frequency(miner, self.__login)
+    def set_frequency(self, miner, frequency):
+        return set_frequency(miner, self.__login, frequency)
+
+    def file_upload(self, miner, localfile, remotefile):
+        return file_upload(miner, self.__login, localfile, remotefile)
+
+    def load_firmware(self, miner, version = 'fixed'):
+        if miner.type != 'Antminer S9':
+            print('I only know how to flash the S9 at this time.')
+            return
+        file = 'Antminer-S9_-all-201705031838-650M-user-Update2UBI-NF.tar.gz'
+        if version == 'auto':
+            file = 'Antminer-S9-all-201711171757-autofreq-user-Update2UBI-NF.tar.gz'
+        #upload firmware
+        print('Uploading {0} to {1}. This could take a few minutes...'.format(file, miner.name))
+        self.file_upload(miner, 'c:/source/miner/{0}'.format(file),'/dev/fullcycle.tar.gz')
+        #unpack
+        print('Unpacking firmware on miner...')
+        run_commands(miner, self.__login, ['cd /dev','tar -zxvf fullcycle.tar.gz'])
+        #runshell
+        print('Installing firmware on miner. Miner should reboot after its done...')
+        run_commands(miner, self.__login, ['cd /dev','sh runme.sh'])
+        print('Rebooting miner...')
+        self.reboot(miner)
+        #miner will come online. it may have a different ip address if this is the first time flashing
+        #self.waitforonline(miner)
+        #provision
 
 
 class Bus:
@@ -336,6 +364,11 @@ class ApplicationService:
 
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
+
+    def download_firmwares(self):
+        #https://file11.bitmain.com/shop-product/firmware/Antminer-S9-all-201705031838-650M-user-Update2UBI-NF.tar.gz
+        #https://file11.bitmain.com/shop-product/firmware/Antminer-S9-all-201711171757-autofreq-user-Update2UBI-NF.tar.gz
+        pass
 
     def getconfigfilename(self, configfilename):
         '''get the contents of a config file'''
@@ -740,6 +773,11 @@ class ApplicationService:
         for miner in known:
             if miner.name == minername:
                 return miner
+        return None
+
+    def get_miner_type(self, typename):
+        if typename == 'Antminer S9':
+            return MinerType(typename, 'Via BCH')
         return None
 
     def tryputcache(self, key, value):
