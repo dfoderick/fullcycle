@@ -133,7 +133,7 @@ def switchtopool(miner, pooltoswitch):
             print(Fore.RED + PROVISION.app.now(), miner.name, 'could not switch to {0}({1})'.format(pooltoswitch.name, pooltoswitch.url))
 
 def main():
-    if PROVISION.app.isrunnow:
+    if PROVISION.app.isrunnow or PROVISION.app.isdebug:
         for miner in PROVISION.app.knownminers():
             try:
                 doprovision(miner)
