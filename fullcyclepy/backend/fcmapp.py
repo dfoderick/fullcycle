@@ -337,6 +337,9 @@ class ApplicationService:
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
 
+    def isdebug(self):
+        return sys.flags.debug
+
     def getconfigfilename(self, configfilename):
         '''get the contents of a config file'''
         return os.path.join(self.homedirectory, configfilename)
