@@ -23,7 +23,7 @@ def when_provisiondispatch(channel, method, properties, body):
 def doprovisiondispatch(miner_type=None):
     '''put all miners in provision worker queue'''
     entries = QueueEntries()
-    miners = PROVISION_DISPATCH.app.knownminers()
+    miners = PROVISION_DISPATCH.app.allminers()
     print("{0} miners configured".format(len(miners)))
     for miner in miners:
         if miner.is_disabled():
@@ -51,7 +51,7 @@ def doprovisiondispatch(miner_type=None):
     return entries
 
 def main():
-    if PROVISION_DISPATCH.app.isrunnow:
+    if PROVISION_DISPATCH.app.isrunnow or PROVISION_DISPATCH.app.isdebug():
         entries = doprovisiondispatch()
         PROVISION_DISPATCH.app.enqueue(entries)
         PROVISION_DISPATCH.app.shutdown()

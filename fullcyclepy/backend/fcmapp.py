@@ -454,6 +454,14 @@ class ApplicationService:
         knownminers = self.miners()
         return knownminers
 
+    def allminers(self):
+        '''combined list of discovered miners and configured miners'''
+        allminers = self.knownminers()
+        for miner in self.miners():
+            foundminer = [x for x in allminers if x.key == miner.key]
+            allminers.append(miner)
+        return allminers
+
     def knownsensors(self):
         dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
         if dknownsensors is not None and dknownsensors:

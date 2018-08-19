@@ -23,7 +23,7 @@ python-telegram-bot
 #sudo apt-get install python-mysqldb
 #mysqldb
 #mysql-client
-#mysqlclient
+mysqlclient
 #mysql-python
 sqlalchemy
 #for RabbitMQ
