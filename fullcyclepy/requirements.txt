@@ -10,6 +10,7 @@
 #sudo apt-get install nmap
 #
 ###### Requirements without Version Specifiers ######
+colorama
 jsonpickle
 marshmallow
 #not nmap!
@@ -34,8 +35,6 @@ docker
 #python3-picamera
 #opencv not working
 #opencv-python
-
-#Linux doesnt seem to need colorama
 
 #for temperature module:
 #	Adafruit_DHT
