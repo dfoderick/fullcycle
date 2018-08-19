@@ -21,6 +21,7 @@ https://github.com/dfoderick/fullcyclereact
 # Contents
 [Requirements](#requirements)  
 [Installation Overview](#installation-overview)  
+[Installation on Windows](docs/windows.md)  
 [Troubleshooting](docs/Troubleshooting.md)  
 [Next Steps](#now-what)  
 [Documentation](https://dfoderick.github.io/fullcycle/)  
@@ -50,7 +51,7 @@ but should also work for most flavors of Linux. FCM can
 run on Windows but some of the installation steps will be different.
 FCM has been thoroughly tested on Raspbian Stretch.
 
-The current version of Raspbian Stretch is April 2018.  
+The current version of Raspbian Stretch is June 2018.  
 https://www.raspberrypi.org/downloads/raspbian/
 Instructions on getting set up are here  
 [Raspberry Pi Setup](docs/RaspberryPiSetup.md)  
@@ -159,13 +160,13 @@ If you have to install directly on the OS then Instructions
 are found here [rabbitmq](docs/rabbitmq.md)
 
 ## Configuring Full Cycle Mining
-Run the installation for FCM
+If you have any problem installing or running Full Cycle then see [Troubleshooting](docs/Troubleshooting.md) page and the [System Administration](SystemAdministration.md) page.
+
+Run the installation script for Full Cycle.
 ```
 bash ~/fullcycle/os/linux/setup_fullcycle.sh
 ```
 Install all the Python libraries that the application will need.
-Sometimes installing these can be problematic. See the ![Troubleshooting](docs/Troubleshooting.md)
-section if you have any problems.
 ```
 pip3 install -r ~/fullcycle/fullcyclepy/requirements.txt
 ```
