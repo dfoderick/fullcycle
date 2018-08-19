@@ -270,3 +270,4 @@ fcm.bug
 
 # seems to be associated with telegram
 *.session
+/fullcyclepy/backend/firmware/*
