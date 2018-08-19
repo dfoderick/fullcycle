@@ -3,16 +3,17 @@ from domain.mining import Miner, MinerStatistics
 
 class RuleParameters(object):
     '''configurable parameters for rules'''
-    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, maxtempreset=None):
+    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, maxtempreset=None, name=''):
         self.minertype = minertype
         self.hashlimit = hashlimit
         self.controllertemplimit = controllertemplimit
         self.boardtemplimit = boardtemplimit
         self.restartaftersec = restartaftersec
         self.maxtempreset = maxtempreset
+        self.name = name
 
 class BrokenRule(object):
-    '''broken rules'''
+    '''broken rules - when miner is not operating within rule parameters'''
     def __init__(self, miner, action, parameter):
         self.miner = miner
         self.action = action

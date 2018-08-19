@@ -6,6 +6,7 @@ import datetime
 import logging
 import json
 import base64
+import urllib.request
 from colorama import init, Fore
 from collections import defaultdict
 import redis
@@ -13,7 +14,7 @@ import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from domain.mining import Miner, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus, MinerType
-from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
+from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository, MinerTypeRepository
 #from domain.miningrules import RuleParameters
 from domain.sensors import Sensor, SensorValue
 from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
@@ -183,23 +184,23 @@ class Antminer():
         if miner.type != 'Antminer S9':
             print('I only know how to flash the S9 at this time.')
             return
-        file = 'Antminer-S9_-all-201705031838-650M-user-Update2UBI-NF.tar.gz'
+        file = self.__config['provision.firmware.fixed.name']
         if version == 'auto':
-            file = 'Antminer-S9-all-201711171757-autofreq-user-Update2UBI-NF.tar.gz'
+            file = self.__config['provision.firmware.autotune.name']
         #upload firmware
         print('Uploading {0} to {1}. This could take a few minutes...'.format(file, miner.name))
-        self.file_upload(miner, 'c:/source/miner/{0}'.format(file),'/dev/fullcycle.tar.gz')
+        self.file_upload(miner, 'firmware/{0}'.format(file),'/dev/fullcycle.tar.gz')
         #unpack
         print('Unpacking firmware on miner...')
         run_commands(miner, self.__login, ['cd /dev','tar -zxvf fullcycle.tar.gz'])
         #runshell
         print('Installing firmware on miner. Miner should reboot after its done...')
+        #TODO: add better error detection and recovery
         run_commands(miner, self.__login, ['cd /dev','sh runme.sh'])
         print('Rebooting miner...')
         self.reboot(miner)
         #miner will come online. it may have a different ip address if this is the first time flashing
-        #self.waitforonline(miner)
-        #provision
+        #TODO: schedule discovery in 3 minutes
 
 
 class Bus:
@@ -365,10 +366,21 @@ class ApplicationService:
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
 
-    def download_firmwares(self):
-        #https://file11.bitmain.com/shop-product/firmware/Antminer-S9-all-201705031838-650M-user-Update2UBI-NF.tar.gz
-        #https://file11.bitmain.com/shop-product/firmware/Antminer-S9-all-201711171757-autofreq-user-Update2UBI-NF.tar.gz
-        pass
+    def download_firmware(self):
+        try:
+            url = self.configuration('provision.firmware.fixed.url')
+            file = self.getconfigfilename('firmware/{0}'.format(self.configuration('provision.firmware.fixed.name')))
+            if not os.path.isfile(file):
+                urllib.request.urlretrieve(url, file)
+
+            url = self.configuration('provision.firmware.autotune.url')
+            file = self.getconfigfilename('firmware/{0}'.format(self.configuration('provision.firmware.autotune.name')))
+            if not os.path.isfile(file):
+                urllib.request.urlretrieve(url, file)
+        except BaseException as ex:
+            if os.path.isfile(file):
+                os.remove(file)
+            self.logexception(ex)
 
     def getconfigfilename(self, configfilename):
         '''get the contents of a config file'''
@@ -775,9 +787,13 @@ class ApplicationService:
                 return miner
         return None
 
+    def minertypes(self):
+        return MinerTypeRepository().getall(self.getconfigfilename('config/minertypes.conf'))
+
     def get_miner_type(self, typename):
-        if typename == 'Antminer S9':
-            return MinerType(typename, 'Via BCH')
+        for t in self.minertypes():
+            if t.minertype == typename:
+                return t
         return None
 
     def tryputcache(self, key, value):

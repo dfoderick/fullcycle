@@ -74,7 +74,7 @@ class Miner(object):
     minerstats = None
 
     def __init__(self, name, status='', miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
-                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None):
+                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None, firmware=''):
         self.name = name
         self._status = status
         self.miner_type = miner_type
@@ -93,6 +93,7 @@ class Miner(object):
         self.minerpool = minerpool
         self.minerstats = minerstats
         self.laststatuschanged = laststatuschanged
+        self.firmware = firmware
 
     @property
     def status(self):
@@ -363,9 +364,11 @@ class MinerPool(object):
         self.pool = pool
 
 class MinerType(object):
-    def __init__(self, minertype, defaultpool):
+    def __init__(self, minertype, defaultpool='', defaultfirmware='', defaultfrequency=''):
         self.minertype = minertype
         self.defaultpool = defaultpool
+        self.defaultfirmware = defaultfirmware
+        self.defaultfrequency = defaultfrequency
 
 class MinerStatistics(object):
     '''Statistics for a miner

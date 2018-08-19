@@ -107,6 +107,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="backend\schedule.py" />
+    <Compile Include="backend\when_configure_miner.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\when_shutdown.py">
       <SubType>Code</SubType>
     </Compile>
@@ -234,6 +237,7 @@
   <ItemGroup>
     <Folder Include="backend\" />
     <Folder Include="backend\config\" />
+    <Folder Include="backend\firmware\" />
     <Folder Include="backend\temperature\" />
     <Folder Include="db\" />
     <Folder Include="domain\" />

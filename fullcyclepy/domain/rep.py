@@ -62,3 +62,9 @@ class RuleParametersRepository(BaseRepository):
         raw = self.readrawfile(file_name)
         ruleslist = [domain.miningrules.RuleParameters(**k) for k in json.loads(raw)]
         return ruleslist
+
+class MinerTypeRepository(BaseRepository):
+    def getall(self, file_name = 'config/minertypes.conf'):
+        raw = self.readrawfile(file_name)
+        list = [domain.mining.MinerType(**k) for k in json.loads(raw)]
+        return list

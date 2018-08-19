@@ -27,6 +27,7 @@ def doprovisiondispatch(miner_type=None):
     print("{0} miners configured".format(len(miners)))
     for miner in miners:
         if miner.is_disabled():
+            print("skipping disabled miner {0}".format(miner.name))
             continue
         try:
             minerinfo = getminerinfo(miner)
@@ -48,6 +49,7 @@ def doprovisiondispatch(miner_type=None):
         except BaseException as ex:
             print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
             print(PROVISION_DISPATCH.app.exceptionmessage(ex))
+    print('Will provision {0} miners'.format(len(entries.entries)))
     return entries
 
 def main():

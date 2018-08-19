@@ -27,6 +27,7 @@ class QueueName:
     Q_SENSOR = 'sensor'
     Q_UPDATEWEB = 'updateweb'
     Q_SAVE = 'save'
+    Q_CONFIGURE = 'configure'
 
     def isvalidqname(self, queue_name):
         #pylint: disable=too-many-return-statements
