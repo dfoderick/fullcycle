@@ -8,9 +8,11 @@ sudo chmod +x /etc/init.d/supervisord
 sudo update-rc.d supervisord defaults
 sudo service supervisord start
 #copy bin files
-mkdir ~/bin
+mkdir -p ~/bin
 sudo cp -av ~/fullcycle/os/linux/fcm* ~/bin/
 sudo chmod +x ~/bin/fcm*
+sudo cp -av ~/fullcycle/os/linux/edit* ~/bin/
+sudo chmod +x ~/bin/edit*
 sudo cp -av ~/fullcycle/os/linux/rabbit* ~/bin/
 sudo chmod +x ~/bin/rabbit*
 #install nmap for network discovery
