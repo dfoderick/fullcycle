@@ -337,6 +337,7 @@ class ApplicationService:
     def init_application(self):
         self.antminer = Antminer(self.__config, self.sshlogin())
 
+    @property
     def isdebug(self):
         return sys.flags.debug
 
@@ -461,8 +462,9 @@ class ApplicationService:
         '''combined list of discovered miners and configured miners'''
         allminers = self.knownminers()
         for miner in self.miners():
-            foundminer = [x for x in allminers if x.key == miner.key]
-            allminers.append(miner)
+            foundminer = [x for x in allminers if x.key() == miner.key()]
+            if not foundminer:
+                allminers.append(miner)
         return allminers
 
     def knownsensors(self):

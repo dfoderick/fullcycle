@@ -19,7 +19,7 @@ def domonitor():
     '''queue workers to run the individual miner monitoring'''
     entries = QueueEntries()
     try:
-        miners = MONITOR.app.knownminers()
+        miners = MONITOR.app.allminers()
         print("{0} miners configured".format(len(miners)))
 
         for miner in miners:
@@ -31,7 +31,7 @@ def domonitor():
     return entries
 
 def main():
-    if MONITOR.app.isrunnow:
+    if MONITOR.app.isrunnow or MONITOR.app.isdebug:
         domonitor()
         MONITOR.app.shutdown()
     else:
