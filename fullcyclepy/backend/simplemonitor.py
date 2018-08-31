@@ -43,7 +43,7 @@ for miner in MINERS:
 
                 #switches miner to default pool
                 if miner.defaultpool:
-                    founddefault = next((p for p in POOLS if p.Name == miner.defaultpool), None)
+                    founddefault = next((p for p in POOLS if p.name == miner.defaultpool), None)
                     if founddefault is not None:
                         minerpool = antminerhelper.pools(miner)
                         if minerpool is not None:
