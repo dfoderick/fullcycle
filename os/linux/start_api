@@ -1,0 +1,2 @@
+cd ~/fullcyclereact/src/api
+sudo npm run prod
