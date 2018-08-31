@@ -91,6 +91,29 @@ about the error.
 Go to your RabbitMQ site and see if  the queues are operating correctly.
 http://raspberrypi.local:15672/
 
+# Troublehsooting supervisor
+Supervisor can be restarted completely.
+```
+service supervisor stop
+service supervisor start
+```
+
+To debug supervisord process, start supervisor in the foreground with ```supervisord -n``` to show errors. For example:
+```
+dfoderick@fullcycle-stretch:/etc$ supervisord -n
+Error: Invalid user name pi in section 'program:fcmlog' (file: 'supervisord.conf')
+For help, use /usr/local/bin/supervisord -h
+```
+
+Sometimes multiple versions of supervisor can get installed.  
+Run ```whereis supervisord```
+If it reports both /usr/bin and /usr/local/bin then there are two installations.
+Try to uninstall one of them.
+```
+cd /usr/bin
+sudo apt-get remove supervisor
+```
+
 # Troublehsooting redis
 Use the following command when testing redis installed Natively.
 These commands will not work when using the Docker install of redis.

@@ -18,7 +18,7 @@ python-nmap
 paramiko
 paho-mqtt
 #telethon
-#telegram
+telegram
 python-telegram-bot
 #sudo apt-get install python-mysqldb
 #mysqldb

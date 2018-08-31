@@ -108,7 +108,12 @@ When the environment is set correctly you will be able to print it.
 pi@raspberrypi:~/bin $ printenv PYTHONPATH
 /home/pi/fullcycle/fullcyclepy
 ```
-Install supervisor now since it will be used in the next steps.
+Check if you already have Supervisor installed
+```
+supervisord -v
+```
+If it reports that you have have version 3.3.1 or above then skip the next step.  
+!ONLY IF SUPERVISOR IS NOT ALREDY INSTALLED! Then install Supervisor now since it will be used in the next steps.
 ```
 sudo easy_install supervisor
 ```
