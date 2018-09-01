@@ -16,6 +16,9 @@ POOLS = APP.pools()
 for miner in MINERS:
     try:
         savedminer = APP.getminer(miner)
+        if not savedminer:
+            print('Could not find saved miner {0}'.format(miner.name))
+            continue
         if not miner.is_manually_disabled():
             minerpool = None
             start = time.perf_counter()

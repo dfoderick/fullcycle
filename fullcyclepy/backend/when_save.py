@@ -1,5 +1,5 @@
 '''save full cycle data'''
-from helpers.queuehelper import QueueName
+from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import Pool, Miner
 from fcmapp import Component
 
@@ -10,11 +10,14 @@ def when_save(channel, method, properties, body):
     try:
         print("[{0}] Received save message".format(COMPONENTSAVE.app.now()))
         msg = COMPONENTSAVE.app.messagedecode_configuration(body)
-        dosave(msg)
+        entries = dosave(msg)
+        COMPONENTSAVE.app.enqueue(entries)
+
     except Exception as ex:
         COMPONENTSAVE.app.logexception(ex)
 
 def dosave(msg):
+    entries = QueueEntries()
     if msg.entity == 'miner':
         #add or update miner
         minerid = name = ipaddress = port = None
@@ -29,6 +32,8 @@ def dosave(msg):
                 port = pair['port']
         miner = Miner(name,'','',ipaddress,port,'','')
         COMPONENTSAVE.app.save_miner(miner)
+        entries.add(QueueName.Q_MONITORMINER, COMPONENTSAVE.app.messageencode(miner))
+        entries.add(QueueName.Q_PROVISION, COMPONENTSAVE.app.messageencode(miner))
 
     if msg.entity == 'pool':
         #save the new named pool
@@ -46,6 +51,7 @@ def dosave(msg):
                 priority = pair['priority']
         pool = Pool(pool_type, name, url, user, priority)
         COMPONENTSAVE.app.save_pool(pool)
+    return entries
 
 def main():
     COMPONENTSAVE.listeningqueue = COMPONENTSAVE.app.subscribe(QueueName.Q_SAVE, when_save)
