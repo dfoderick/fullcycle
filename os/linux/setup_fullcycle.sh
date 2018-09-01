@@ -13,6 +13,10 @@ sudo cp -av ~/fullcycle/os/linux/fcm* ~/bin/
 sudo chmod +x ~/bin/fcm*
 sudo cp -av ~/fullcycle/os/linux/edit* ~/bin/
 sudo chmod +x ~/bin/edit*
+sudo cp -av ~/fullcycle/os/linux/start_* ~/bin/
+sudo chmod +x ~/bin/start_*
+sudo cp -av ~/fullcycle/os/linux/test_* ~/bin/
+sudo chmod +x ~/bin/test_*
 sudo cp -av ~/fullcycle/os/linux/rabbit* ~/bin/
 sudo chmod +x ~/bin/rabbit*
 #install nmap for network discovery

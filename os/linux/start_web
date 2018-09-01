@@ -1,2 +1,5 @@
 cd ~/fullcyclereact/src/web
-serve -p 3000 build
+#serve does not work with api (docker script will combine web with api for production)
+#serve -p 3000 build
+#https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#invalid-host-header-errors-after-configuring-proxy
+npm start

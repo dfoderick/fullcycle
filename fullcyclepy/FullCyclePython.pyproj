@@ -214,6 +214,9 @@
     <Compile Include="tests\test_rules.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_save.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_taskscheduler.py">
       <SubType>Code</SubType>
     </Compile>

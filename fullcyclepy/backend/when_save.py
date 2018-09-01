@@ -1,8 +1,6 @@
 '''save full cycle data'''
 from helpers.queuehelper import QueueName
-from domain.mining import Pool
-from domain.rep import PoolRepository
-from messaging.schema import PoolSchema
+from domain.mining import Pool, Miner
 from fcmapp import Component
 
 COMPONENTSAVE = Component('fullcycle')
@@ -17,6 +15,21 @@ def when_save(channel, method, properties, body):
         COMPONENTSAVE.app.logexception(ex)
 
 def dosave(msg):
+    if msg.entity == 'miner':
+        #add or update miner
+        minerid = name = ipaddress = port = None
+        for pair in msg.values:
+            if 'minerid' in pair:
+                minerid = pair['minerid']
+            if 'name' in pair:
+                name = pair['name']
+            if 'ipaddress' in pair:
+                ipaddress = pair['ipaddress']
+            if 'port' in pair:
+                port = pair['port']
+        miner = Miner(name,'','',ipaddress,port,'','')
+        COMPONENTSAVE.app.save_miner(miner)
+
     if msg.entity == 'pool':
         #save the new named pool
         pool_type = name = url = user = priority = None
@@ -32,19 +45,7 @@ def dosave(msg):
             if 'priority' in pair:
                 priority = pair['priority']
         pool = Pool(pool_type, name, url, user, priority)
-        sch = PoolSchema()
-        pools = PoolRepository()
-        pools.add(pool, COMPONENTSAVE.app.getconfigfilename('config/pools.conf'), sch)
-
-        #update the known pools
-        for known in COMPONENTSAVE.app.knownpools():
-            if pool.is_same_as(known):
-                oldkey = known.key
-                known.named_pool = pool
-                #this changes the pool key!
-                known.user = pool.user
-                #update the known pool (with new key)
-                COMPONENTSAVE.app.update_pool(oldkey, known)
+        COMPONENTSAVE.app.save_pool(pool)
 
 def main():
     COMPONENTSAVE.listeningqueue = COMPONENTSAVE.app.subscribe(QueueName.Q_SAVE, when_save)

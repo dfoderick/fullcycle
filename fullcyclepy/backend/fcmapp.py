@@ -12,13 +12,13 @@ import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, Pool, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from domain.sensors import Sensor, SensorValue
 from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
-from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema
+from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema, PoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
 from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
@@ -732,7 +732,7 @@ class ApplicationService:
         minerfromstore.store = 'mem'
         return minerfromstore
 
-    def getknownminer(self, miner: Miner):
+    def getknownminer(self, miner: Miner) -> Miner:
         '''get a known miner'''
         return self.getknownminerbykey(miner.key())
 
@@ -1016,6 +1016,34 @@ class ApplicationService:
         except BaseException as ex:
             self.logexception(ex)
         return False
+
+    def save_miner(self, miner: Miner):
+        miners = MinerRepository()
+        if not miner.minerid:
+            #there is no id so add the miner
+            self.addknownminer(miner)
+        else:
+            #miner has id so find it and update
+            found = self.getknownminer(miner)
+            if not found is None:
+                found.updatefrom(miner)
+                self.putminer(found)
+
+    def save_pool(self, pool: Pool):
+        sch = PoolSchema()
+        pools = PoolRepository()
+        pools.add(pool, self.getconfigfilename('config/pools.conf'), sch)
+
+        #update the known pools
+        for known in self.knownpools():
+            if pool.is_same_as(known):
+                oldkey = known.key
+                known.named_pool = pool
+                #this changes the pool key!
+                known.user = pool.user
+                #update the known pool (with new key)
+                self.update_pool(oldkey, known)
+
 
 def main():
     full_cycle = ApplicationService()

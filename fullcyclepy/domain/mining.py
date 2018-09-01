@@ -250,15 +250,23 @@ class Miner(object):
             self.lastmonitor = updatedminer.lastmonitor
         if updatedminer.status:
             self.status = updatedminer.status
-        self.ipaddress = updatedminer.ipaddress
-        self.port = updatedminer.port
-        self.username = updatedminer.username
-        self.password = updatedminer.password
-        self.clientid = updatedminer.clientid
-        self.networkid = updatedminer.networkid
+        if updatedminer.ipaddress:
+            self.ipaddress = updatedminer.ipaddress
+        if updatedminer.port:
+            self.port = updatedminer.port
+        if updatedminer.username:
+            self.username = updatedminer.username
+        if updatedminer.password:
+            self.password = updatedminer.password
+        if updatedminer.clientid:
+            self.clientid = updatedminer.clientid
+        if updatedminer.networkid:
+            self.networkid = updatedminer.networkid
         #self.minerid = updatedminer.minerid
-        self.offlinecount = updatedminer.offlinecount
-        self.defaultpool = updatedminer.defaultpool
+        if updatedminer.offlinecount:
+            self.offlinecount = updatedminer.offlinecount
+        if updatedminer.defaultpool:
+            self.defaultpool = updatedminer.defaultpool
         if updatedminer.minerpool is not None:
             self.minerpool = updatedminer.minerpool
         if updatedminer.minerstats is not None:

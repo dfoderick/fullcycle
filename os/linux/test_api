@@ -1,0 +1,3 @@
+wget http://127.0.0.1:5000/api/hello
+wget http://127.0.0.1:5000/api/knownminers
+wget http://127.0.0.1:5000/api/knownpools
