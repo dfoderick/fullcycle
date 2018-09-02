@@ -20,3 +20,10 @@ KNOWN2 = APP.allminers()
 CNT2 = len(KNOWN2)
 print(CNT2)
 
+APP.save_miner(MINER)
+
+KNOWN3 = APP.allminers()
+
+CNT3 = len(KNOWN3)
+print(CNT3)
+

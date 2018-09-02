@@ -1018,16 +1018,14 @@ class ApplicationService:
         return False
 
     def save_miner(self, miner: Miner):
-        miners = MinerRepository()
-        if not miner.minerid:
-            #there is no id so add the miner
+        found = self.getknownminer(miner)
+        if found is None:
             self.addknownminer(miner)
+            #miners = MinerRepository()
+            #todo:add the miner to the json config
         else:
-            #miner has id so find it and update
-            found = self.getknownminer(miner)
-            if not found is None:
-                found.updatefrom(miner)
-                self.putminer(found)
+            found.updatefrom(miner)
+            self.putminer(found)
 
     def save_pool(self, pool: Pool):
         sch = PoolSchema()
