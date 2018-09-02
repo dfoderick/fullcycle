@@ -7,3 +7,4 @@ echo Waiting 5 seconds for updates ...
 fcmrestore
 sleep 5s
 fcmstart
+cd ~/

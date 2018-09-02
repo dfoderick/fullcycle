@@ -430,7 +430,7 @@ class ApplicationService:
 
     def print(self, message):
         '''echo message to screen'''
-        print(message)
+        print('{0}: {1}'.format(self.now(), message))
 
     def now(self):
         '''current time formatted as friendly string'''

@@ -7,9 +7,9 @@ from fcmapp import ApplicationService
 # call all the api command of miner
 
 APP = ApplicationService(component='fullcycle')
-
+APP.print('started app. getting known miners')
 MINERS = APP.knownminers()
-print("{0} miners configured".format(len(MINERS)))
+APP.print("{0} miners configured".format(len(MINERS)))
 
 POOLS = APP.pools()
 
@@ -36,7 +36,7 @@ for miner in MINERS:
                 if foundpool is not None:
                     minerpool.poolname = foundpool.name
                 savedminer.monitored(minerstats, minerpool, minerinfo, monitorperf)
-                print('{0} mining at {1}'.format(savedminer.name, minerpool.poolname))
+                print('{0} mining at {1}({2})'.format(savedminer.name, minerpool.poolname, poolname))
 
                 print(Fore.CYAN + str(APP.now()), miner.name, miner.status,
                       str(minerstats.currenthash), str(minerstats.minercount),
