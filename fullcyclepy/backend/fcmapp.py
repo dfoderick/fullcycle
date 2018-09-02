@@ -372,7 +372,11 @@ class ApplicationService:
             spools = PoolRepository().readrawfile(self.getconfigfilename('config/pools.conf'))
             self.tryputcache(CacheKeys.pools, spools)
         for pool in self.pools():
+            #pool isinstance of Pool
+            availablepool = AvailablePool(pool.pool_type, pool, pool.url, pool.user, pool.password, pool.priority)
+            minerpool = MinerPool(miner = None, priority = 0, pool= availablepool)
             self.putpool(pool)
+            self.add_pool(minerpool)
 
     def initminercache(self):
         '''put known miners into cache'''
@@ -552,9 +556,6 @@ class ApplicationService:
 
     def add_pool(self, minerpool: MinerPool):
         '''see if pool is known or not, then add it'''
-        #if minerpool.pool.named_pool:
-        #    #if pool associated with named pool then no need to add it
-        #    return
         knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, minerpool.pool.key)
         if not knownpool:
             val = self.jsonserialize(AvailablePoolSchema(), minerpool.pool)

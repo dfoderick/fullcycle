@@ -13,7 +13,9 @@ class Test_test_app(unittest.TestCase):
 
     def test_app_knownpools(self):
         app = ApplicationService(component='test')
+        app.startup()
         pools = app.knownpools()
+        self.assertTrue(len(pools) > 0)
         for pool in pools:
             self.assertTrue(isinstance(pool, AvailablePool))
 
