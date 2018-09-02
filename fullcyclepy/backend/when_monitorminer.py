@@ -48,12 +48,11 @@ def domonitorminer(miner):
             return entries
         mineroriginalstatus = savedminer.status
         #minerinfo = getminerinfo(savedminer)
-        minerstats, minerinfo, apicall = stats(savedminer)
+        minerstats, minerinfo, apicall, minerpool = stats(savedminer)
         #minerlcd = antminerhelper.getminerlcd(miner)
         if minerstats is None:
             print('could not monitor {0}'.format(savedminer.name))
         else:
-            minerpool = pools(savedminer)
             #what to do if monitored miner type conflicts with saved miner type???
             #should probably provision?
             foundpool = APPMONITOR.app.findpool(minerpool)

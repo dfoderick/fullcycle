@@ -29,7 +29,7 @@ def doprovisiondispatch(miner_type=None):
         if miner.is_disabled():
             continue
         try:
-            minerstats, minerinfo, apicall = stats(miner)
+            minerstats, minerinfo, apicall, minerpool = stats(miner)
             if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
                 continue
             mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)

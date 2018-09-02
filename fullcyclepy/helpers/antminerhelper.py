@@ -27,16 +27,21 @@ def stats(miner: Miner):
     '''returns MinerStatistics, MinerInfo, and MinerApiCall'''
     if not miner.can_monitor():
         raise MinerMonitorException('miner {0} cannot be monitored. ip={1} port={2}'.format(miner.name, miner.ipaddress, miner.port))
-    minerid = 'unknown'
-    minertype = 'unknown'
 
     try:
         thecall = MinerApiCall(miner)
         entity = MinerStatistics(miner, when=datetime.datetime.utcnow())
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
+        
         thecall.start()
-        jstats = api.stats()
+        #jstats = api.stats()
+        stats_and_pools = api.command('stats+pools')
         thecall.stop()
+        if 'stats' in stats_and_pools:
+            jstats = stats_and_pools['stats'][0]
+        else:
+            #if call failed then only one result is returned, so parse it
+            jstats = stats_and_pools
         entity.rawstats = jstats
         jstatus = jstats['STATUS']
         if jstatus[0]['STATUS'] == 'error':
@@ -45,69 +50,77 @@ def stats(miner: Miner):
         else:
             status = jstats['STATS'][0]
             jsonstats = jstats['STATS'][1]
-            details = jstats['STATS'][1]
+            #details = jstats['STATS'][1]
 
-            #build MinerInfo from stats
-            if 'Type' in status:
-                minertype = status['Type']
-            else:
-                if toplevelstatus['Description'].startswith('cgminer'):
-                    minertype = toplevelstatus['Description']
-            if 'miner_id' in details:
-                minerid = details['miner_id']
-            minerinfo = MinerInfo(minertype, minerid)
+            minerinfo = parse_minerinfo(status)
 
             #build MinerStatistics from stats
-            entity.minercount = int(jsonstats['miner_count'])
-            entity.elapsed = int(jsonstats['Elapsed'])
-            entity.currenthash = int(float(jsonstats['GHS 5s']))
-            entity.frequency = jsonstats['frequency']
-            minertype = status['Type']
-            
-            frequencies = {k:v for (k,v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
-            entity.frequency = str(int(sum(frequencies.values()) / len(frequencies)))
+            parse_statistics(entity, jsonstats, status)
+            minerpool = parse_minerpool(miner, stats_and_pools['pools'][0])
 
-            controllertemps = {k:v for (k,v) in jsonstats.items() if k in ['temp6','temp7','temp8']}
-            entity.controllertemp = max(controllertemps.values())
-            #should be 3
-            #tempcount = jsonstats['temp_num']
-            boardtemps = {k:v for (k,v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
-            boardtempkeys=list(boardtemps.keys())
-            if len(boardtemps) > 0:
-                entity.tempboard1 = boardtemps[boardtempkeys[0]]
-            if len(boardtemps) > 1:
-                entity.tempboard2 = boardtemps[boardtempkeys[1]]
-            if len(boardtemps) > 2:
-                entity.tempboard3 = boardtemps[boardtempkeys[2]]
-
-            fans = {k:v for (k,v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
-            fankeys=list(fans.keys())
-            if len(fans) > 0:
-                entity.fan1 = fans[fankeys[0]]
-            if len(fans) > 1:
-                entity.fan2 = fans[fankeys[1]]
-            if len(fans) > 2:
-                entity.fan3 = fans[fankeys[2]]
-
-            chains = {k:v for (k,v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
-            chainkeys=list(chains.keys())
-            if len(chains) > 0:
-                entity.boardstatus1 = chains[chainkeys[0]]
-            if len(chains) > 1:
-                entity.boardstatus2 = chains[chainkeys[1]]
-            if len(chains) > 2:
-                entity.boardstatus3 = chains[chainkeys[2]]
-
-            return entity, minerinfo, thecall
+            return entity, minerinfo, thecall, minerpool
     except BaseException as ex:
         print('Failed to call miner stats api: ' + str(ex))
         raise MinerMonitorException(ex)
-    return None, None, None
+    return None, None, None, None
+
+def parse_statistics(entity, jsonstats, status):
+    entity.minercount = int(jsonstats['miner_count'])
+    entity.elapsed = int(jsonstats['Elapsed'])
+    entity.currenthash = int(float(jsonstats['GHS 5s']))
+    entity.frequency = jsonstats['frequency']
+    minertype = status['Type']
+            
+    frequencies = {k:v for (k,v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
+    entity.frequency = str(int(sum(frequencies.values()) / len(frequencies)))
+
+    controllertemps = {k:v for (k,v) in jsonstats.items() if k in ['temp6','temp7','temp8']}
+    entity.controllertemp = max(controllertemps.values())
+    #should be 3
+    #tempcount = jsonstats['temp_num']
+    boardtemps = {k:v for (k,v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
+    boardtempkeys=list(boardtemps.keys())
+    if len(boardtemps) > 0:
+        entity.tempboard1 = boardtemps[boardtempkeys[0]]
+    if len(boardtemps) > 1:
+        entity.tempboard2 = boardtemps[boardtempkeys[1]]
+    if len(boardtemps) > 2:
+        entity.tempboard3 = boardtemps[boardtempkeys[2]]
+
+    fans = {k:v for (k,v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
+    fankeys=list(fans.keys())
+    if len(fans) > 0:
+        entity.fan1 = fans[fankeys[0]]
+    if len(fans) > 1:
+        entity.fan2 = fans[fankeys[1]]
+    if len(fans) > 2:
+        entity.fan3 = fans[fankeys[2]]
+
+    chains = {k:v for (k,v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
+    chainkeys=list(chains.keys())
+    if len(chains) > 0:
+        entity.boardstatus1 = chains[chainkeys[0]]
+    if len(chains) > 1:
+        entity.boardstatus2 = chains[chainkeys[1]]
+    if len(chains) > 2:
+        entity.boardstatus3 = chains[chainkeys[2]]
+
+def parse_minerinfo(status):
+    #build MinerInfo from stats
+    minerid = 'unknown'
+    minertype = 'unknown'
+    if 'Type' in status:
+        minertype = status['Type']
+    else:
+        if toplevelstatus['Description'].startswith('cgminer'):
+            minertype = toplevelstatus['Description']
+    if 'miner_id' in status:
+        minerid = status['miner_id']
+    minerinfo = MinerInfo(minertype, minerid)
+    return minerinfo
 
 def pools(miner: Miner):
     '''Gets the current pool for the miner'''
-    def sort_by_priority(j):
-        return j['Priority']
     try:
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
         jstatuspools = api.pools()
@@ -115,25 +128,31 @@ def pools(miner: Miner):
             if not miner.is_disabled():
                 raise MinerMonitorException(jstatuspools['STATUS'][0]['description'])
         else:
-            jpools = jstatuspools["POOLS"]
-            #sort by priority
-            jpools.sort(key=sort_by_priority)
-            #try to do elegant way, but not working
-            #cPool = namedtuple('Pool', 'POOL, URL, Status,Priority,Quota,Getworks,Accepted,Rejected,Long Poll')
-            #colpools = [cPool(**k) for k in jsonpools["POOLS"]]
-            #for pool in colpools:
-            #    print(pool.POOL)
-            for pool in jpools:
-                if str(pool["Status"]) == "Alive":
-                    currentpool = pool["URL"]
-                    currentworker = pool["User"]
-                    #print("{0} {1} {2} {3} {4} {5}".format(pool["POOL"],pool["Priority"],pool["URL"],pool["User"],pool["Status"],pool["Stratum Active"]))
-                    break
-            minerpool = MinerCurrentPool(miner, currentpool, currentworker, jstatuspools)
-            return minerpool
+            return parse_minerpool(jstatuspools)
     except BaseException as ex:
         print('Failed to call miner pools api: ' + str(ex))
     return None
+
+def parse_minerpool(miner, jstatuspools):
+    def sort_by_priority(j):
+        return j['Priority']
+
+    jpools = jstatuspools["POOLS"]
+    #sort by priority
+    jpools.sort(key=sort_by_priority)
+    #try to do elegant way, but not working
+    #cPool = namedtuple('Pool', 'POOL, URL, Status,Priority,Quota,Getworks,Accepted,Rejected,Long Poll')
+    #colpools = [cPool(**k) for k in jsonpools["POOLS"]]
+    #for pool in colpools:
+    #    print(pool.POOL)
+    for pool in jpools:
+        if str(pool["Status"]) == "Alive":
+            currentpool = pool["URL"]
+            currentworker = pool["User"]
+            #print("{0} {1} {2} {3} {4} {5}".format(pool["POOL"],pool["Priority"],pool["URL"],pool["User"],pool["Status"],pool["Stratum Active"]))
+            break
+    minerpool = MinerCurrentPool(miner, currentpool, currentworker, jstatuspools)
+    return minerpool
 
 def getminerlcd(miner: Miner):
     '''gets a summary (quick display values) for the miner'''
@@ -257,7 +276,7 @@ def waitforonline(miner: Miner):
     minerinfo = None
     while cnt > 0:
         try:
-            minerstats, minerinfo, apicall = stats(miner)
+            minerstats, minerinfo, apicall, minerpool = stats(miner)
             return minerinfo
         except MinerMonitorException as ex:
             if not ex.istimedout() and not ex.isconnectionrefused():

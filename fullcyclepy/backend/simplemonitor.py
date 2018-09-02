@@ -9,7 +9,7 @@ from domain.mining import MinerApiCall
 
 APP = ApplicationService(component='fullcycle')
 APP.print('started app. getting known miners')
-MINERS = APP.knownminers()
+MINERS = APP.allminers()
 APP.print("{0} miners configured".format(len(MINERS)))
 
 POOLS = APP.pools()
@@ -19,17 +19,17 @@ for miner in MINERS:
         savedminer = APP.getminer(miner)
         if not savedminer:
             print('Could not find saved miner {0}'.format(miner.name))
-            continue
+            savedminer = miner
         if not miner.is_manually_disabled():
             minerpool = None
             totalpolling = MinerApiCall(miner)
             totalpolling.start()
-            minerstats, minerinfo, statspolling = antminerhelper.stats(miner)
+            minerstats, minerinfo, statspolling, minerpool = antminerhelper.stats(miner)
             #minerlcd = antminerhelper.getminerlcd(miner)
             if minerstats is None:
                 APP.logerror('{0} Offline? {1}'.format(miner.name, miner.ipaddress))
             else:
-                minerpool = antminerhelper.pools(miner)
+                #minerpool = antminerhelper.pools(miner)
                 totalpolling.stop()
                 poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
                 foundpool = APP.findpool(minerpool)
@@ -48,7 +48,7 @@ for miner in MINERS:
                 if miner.defaultpool:
                     founddefault = next((p for p in POOLS if p.name == miner.defaultpool), None)
                     if founddefault is not None:
-                        minerpool = antminerhelper.pools(miner)
+                        #minerpool = antminerhelper.pools(miner)
                         if minerpool is not None:
                             #find pool number of default pool and switch to it
                             switchtopoolnumber = minerpool.findpoolnumberforpool(founddefault.url, founddefault.user)

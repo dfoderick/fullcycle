@@ -52,9 +52,8 @@ def doprovision(miner):
     minerinfo = None
     minerpool = None
     try:
-        minerstats, minerinfo, apicall = antminerhelper.stats(miner)
+        minerstats, minerinfo, apicall, minerpool = antminerhelper.stats(miner)
         miner.setminerinfo(minerinfo)
-        minerpool = antminerhelper.pools(miner)
         #find the current pool in known pools
         knownpool = PROVISION.app.findpool(minerpool)
         if knownpool is not None:
@@ -105,7 +104,7 @@ def doprovision(miner):
         if miner.defaultpool:
             founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
             if founddefault is not None:
-                switchtopool(miner, founddefault)
+                switchtopool(miner, founddefault, minerpool)
 
         #enforce default pool if it doesnt have one. find highest priority pool
         if not miner.defaultpool:
@@ -115,14 +114,13 @@ def doprovision(miner):
             filtered.sort(key=sort_by_priority)
             #foundpriority = next((p for p in poollist if p.priority == 0), None)
             if filtered:
-                switchtopool(miner, filtered[0])
+                switchtopool(miner, filtered[0], minerpool)
 
         entries.add(QueueName.Q_MONITORMINER, PROVISION.app.messageencode(miner))
     return entries
 
-def switchtopool(miner, pooltoswitch):
+def switchtopool(miner, pooltoswitch, minerpool):
     '''switch pool'''
-    minerpool = antminerhelper.pools(miner)
     if minerpool is not None:
         #find pool number of default pool and switch to it
         switchtopoolnumber = minerpool.findpoolnumberforpool(pooltoswitch.url, pooltoswitch.user)
