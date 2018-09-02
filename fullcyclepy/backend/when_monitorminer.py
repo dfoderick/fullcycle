@@ -7,7 +7,7 @@ from threading import Thread
 from queue import Queue
 from colorama import Fore
 import pika
-from helpers.antminerhelper import MinerMonitorException, getminerinfo, stats, pools
+from helpers.antminerhelper import MinerMonitorException, stats, pools
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import mining
 from fcmapp import Component
@@ -47,22 +47,19 @@ def domonitorminer(miner):
             print('skipped monitoring {0}'.format(miner.name))
             return entries
         mineroriginalstatus = savedminer.status
-        start = time.perf_counter()
-        minerinfo = getminerinfo(savedminer)
-        minerstats = stats(savedminer)
+        #minerinfo = getminerinfo(savedminer)
+        minerstats, minerinfo, apicall = stats(savedminer)
         #minerlcd = antminerhelper.getminerlcd(miner)
         if minerstats is None:
             print('could not monitor {0}'.format(savedminer.name))
         else:
             minerpool = pools(savedminer)
-            end = time.perf_counter()
-            monitorperf = end - start
             #what to do if monitored miner type conflicts with saved miner type???
             #should probably provision?
             foundpool = APPMONITOR.app.findpool(minerpool)
             if foundpool is not None:
                 minerpool.poolname = foundpool.name
-            savedminer.monitored(minerstats, minerpool, minerinfo, monitorperf)
+            savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed)
             if mineroriginalstatus == '':
                 #first time monitoring since bootup
                 print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'first time monitoring')

@@ -7,7 +7,7 @@ import time
 import datetime
 from helpers.minerapi import MinerApi
 from helpers.ssh import Ssh
-from domain.mining import Miner, MinerInfo, MinerStatistics, MinerCurrentPool, MinerAccessLevel
+from domain.mining import Miner, MinerInfo, MinerStatistics, MinerCurrentPool, MinerAccessLevel, MinerApiCall
 
 class MinerMonitorException(Exception):
     """Happens during monitoring of miner"""
@@ -23,36 +23,20 @@ class MinerMonitorException(Exception):
 class MinerCommandException(Exception):
     """Happens during executing miner command"""
 
-def getminerinfo(miner: Miner):
-    minerid = 'unknown'
-    minertype = 'unknown'
+def stats(miner: Miner):
+    '''returns MinerStatistics, MinerInfo, and MinerApiCall'''
     if not miner.can_monitor():
         raise MinerMonitorException('miner {0} cannot be monitored. ip={1} port={2}'.format(miner.name, miner.ipaddress, miner.port))
-    api = MinerApi(host=miner.ipaddress, port=int(miner.port), timeout=1)
-    jstats = api.stats()
-    #if there was an error then the return is STATUS not STATS!
-    toplevelstatus = jstats['STATUS'][0]
-    if toplevelstatus['STATUS'] == 'error':
-        if not miner.is_disabled():
-            raise MinerMonitorException(toplevelstatus['description'])
-    else:
-        status = jstats['STATS'][0]
-        details = jstats['STATS'][1]
-        if 'Type' in status:
-            minertype = status['Type']
-        else:
-            if toplevelstatus['Description'].startswith('cgminer'):
-                minertype = toplevelstatus['Description']
-        if 'miner_id' in details:
-            minerid = details['miner_id']
-    minerinfo = MinerInfo(minertype, minerid)
-    return minerinfo
+    minerid = 'unknown'
+    minertype = 'unknown'
 
-def stats(miner: Miner):
     try:
+        thecall = MinerApiCall(miner)
         entity = MinerStatistics(miner, when=datetime.datetime.utcnow())
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
+        thecall.start()
         jstats = api.stats()
+        thecall.stop()
         entity.rawstats = jstats
         jstatus = jstats['STATUS']
         if jstatus[0]['STATUS'] == 'error':
@@ -61,6 +45,19 @@ def stats(miner: Miner):
         else:
             status = jstats['STATS'][0]
             jsonstats = jstats['STATS'][1]
+            details = jstats['STATS'][1]
+
+            #build MinerInfo from stats
+            if 'Type' in status:
+                minertype = status['Type']
+            else:
+                if toplevelstatus['Description'].startswith('cgminer'):
+                    minertype = toplevelstatus['Description']
+            if 'miner_id' in details:
+                minerid = details['miner_id']
+            minerinfo = MinerInfo(minertype, minerid)
+
+            #build MinerStatistics from stats
             entity.minercount = int(jsonstats['miner_count'])
             entity.elapsed = int(jsonstats['Elapsed'])
             entity.currenthash = int(float(jsonstats['GHS 5s']))
@@ -101,11 +98,11 @@ def stats(miner: Miner):
             if len(chains) > 2:
                 entity.boardstatus3 = chains[chainkeys[2]]
 
-            return entity
+            return entity, minerinfo, thecall
     except BaseException as ex:
         print('Failed to call miner stats api: ' + str(ex))
         raise MinerMonitorException(ex)
-    return None
+    return None, None, None
 
 def pools(miner: Miner):
     '''Gets the current pool for the miner'''
@@ -219,7 +216,6 @@ def miner_shell_command(miner: Miner, login, command, timetorun):
     print_connection_data(connection)
     connection.close_connection()
 
-
 def changesshpassword(miner: Miner, oldlogin, newlogin):
     """ change the factory ssh password """
     if newlogin.username != oldlogin.username:
@@ -261,7 +257,7 @@ def waitforonline(miner: Miner):
     minerinfo = None
     while cnt > 0:
         try:
-            minerinfo = getminerinfo(miner)
+            minerstats, minerinfo, apicall = stats(miner)
             return minerinfo
         except MinerMonitorException as ex:
             if not ex.istimedout() and not ex.isconnectionrefused():
@@ -278,7 +274,6 @@ def waitforonline(miner: Miner):
             print('Waiting for {0}...'.format(miner.name))
             time.sleep(sleeptime)
     return None
-
 
 #The 'poolpriority' command can be used to reset the priority order of multiple
 #pools with a single command - 'switchpool' only sets a single pool to first priority

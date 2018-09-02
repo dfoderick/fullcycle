@@ -31,7 +31,7 @@ def findminers(hosts_list, knownminers):
                     print("{0} {1} {2}".format(host, status, macaddress))
                 miner = mining.Miner(name=host, ipaddress=host, port=MINERPORT, ftpport='', networkid=macaddress)
                 try:
-                    minerinfo = antminerhelper.getminerinfo(miner)
+                    minerstats, minerinfo, apicall = antminerhelper.stats(miner)
                     miner.setminerinfo(minerinfo)
                     if minerinfo.miner_type:
                         minerstotal += 1

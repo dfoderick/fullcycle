@@ -52,8 +52,8 @@ def doprovision(miner):
     minerinfo = None
     minerpool = None
     try:
-        minerinfo = antminerhelper.getminerinfo(miner)
-        miner.minerinfo = minerinfo
+        minerstats, minerinfo, apicall = antminerhelper.stats(miner)
+        miner.setminerinfo(minerinfo)
         minerpool = antminerhelper.pools(miner)
         #find the current pool in known pools
         knownpool = PROVISION.app.findpool(minerpool)

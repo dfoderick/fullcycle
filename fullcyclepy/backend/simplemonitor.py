@@ -3,6 +3,7 @@ import time
 from colorama import Fore
 from helpers import antminerhelper
 from fcmapp import ApplicationService
+from domain.mining import MinerApiCall
 
 # call all the api command of miner
 
@@ -21,21 +22,20 @@ for miner in MINERS:
             continue
         if not miner.is_manually_disabled():
             minerpool = None
-            start = time.perf_counter()
-            minerinfo = antminerhelper.getminerinfo(miner)
-            minerstats = antminerhelper.stats(miner)
+            totalpolling = MinerApiCall(miner)
+            totalpolling.start()
+            minerstats, minerinfo, statspolling = antminerhelper.stats(miner)
             #minerlcd = antminerhelper.getminerlcd(miner)
             if minerstats is None:
                 APP.logerror('{0} Offline? {1}'.format(miner.name, miner.ipaddress))
             else:
                 minerpool = antminerhelper.pools(miner)
-                end = time.perf_counter()
-                monitorperf = end - start
+                totalpolling.stop()
                 poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
                 foundpool = APP.findpool(minerpool)
                 if foundpool is not None:
                     minerpool.poolname = foundpool.name
-                savedminer.monitored(minerstats, minerpool, minerinfo, monitorperf)
+                savedminer.monitored(minerstats, minerpool, minerinfo, totalpolling.elapsed())
                 print('{0} mining at {1}({2})'.format(savedminer.name, minerpool.poolname, poolname))
 
                 print(Fore.CYAN + str(APP.now()), miner.name, miner.status,

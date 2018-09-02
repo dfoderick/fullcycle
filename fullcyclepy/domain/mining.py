@@ -1,4 +1,5 @@
 '''#Full Cycle Mining Domain'''
+import time
 from datetime import datetime, timezone
 
 class MinerStatus:
@@ -319,6 +320,20 @@ class AvailablePool(object):
     def key(self):
         return '{0}|{1}'.format(self.url, self.user)
 
+class MinerApiCall(object):
+    '''info about one call to miner'''
+    def __init__(self, miner: Miner):
+        self.miner = miner
+        self.when = datetime.now()
+        self.start_time = None
+        self.stop_time = None
+
+    def start(self):
+        self.start_time =  time.perf_counter()
+    def stop(self):
+        self.stop_time =  time.perf_counter()
+    def elapsed(self):
+        return self.stop_time - self.start_time
 
 class Pool(object):
     """A configured (Named) Pool.

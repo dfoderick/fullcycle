@@ -3,7 +3,7 @@
 #of a particular type
 '''
 from colorama import Fore
-from helpers.antminerhelper import MinerMonitorException, getminerinfo
+from helpers.antminerhelper import MinerMonitorException, stats
 from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import MinerAccessLevel
 from fcmapp import Component
@@ -29,7 +29,7 @@ def doprovisiondispatch(miner_type=None):
         if miner.is_disabled():
             continue
         try:
-            minerinfo = getminerinfo(miner)
+            minerstats, minerinfo, apicall = stats(miner)
             if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
                 continue
             mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
