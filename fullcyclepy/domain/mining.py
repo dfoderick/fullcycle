@@ -73,7 +73,7 @@ class Miner(object):
     #TODO:MinerStatistics
     minerstats = None
 
-    def __init__(self, name, status='', miner_type=MinerStatus.Online, ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
+    def __init__(self, name, status=MinerStatus.Online, miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
                  lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None):
         self.name = name
         self._status = status

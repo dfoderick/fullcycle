@@ -316,11 +316,13 @@ class ApplicationService:
         try:
             cachelogin = self.getservice(ServiceName.cache)
             self.__cache = Cache(cachelogin)
-            #this is ok until list of miners gets too big
-            self.initminercache()
         except Exception as ex:
             #cache is offline. try to run in degraded mode
             self.logexception(ex)
+
+    def startup(self):
+        self.initminercache()
+        self.initpoolcache()
 
     def initbus(self):
         '''start up message bus'''
@@ -365,12 +367,15 @@ class ApplicationService:
             return value == 'true' or value == 'True'
         return value
 
-    def initminercache(self):
-        '''put known miners into cache'''
+    def initpoolcache(self):
         if self.__cache.get(CacheKeys.pools) is None:
             spools = PoolRepository().readrawfile(self.getconfigfilename('config/pools.conf'))
             self.tryputcache(CacheKeys.pools, spools)
+        for pool in self.pools():
+            self.putpool(pool)
 
+    def initminercache(self):
+        '''put known miners into cache'''
         if self.__cache.get(CacheKeys.miners) is None:
             sminers = MinerRepository().readrawfile(self.getconfigfilename('config/miners.conf'))
             self.tryputcache(CacheKeys.miners, sminers)
@@ -543,7 +548,6 @@ class ApplicationService:
         valu = self.trygetvaluefromcache(miner.name + '.pool')
         if valu is None: return None
         entity = MinerCurrentPool(miner, **self.deserialize(MinerCurrentPoolSchema(), valu))
-        #entity.Miner = miner
         return entity
 
     def add_pool(self, minerpool: MinerPool):
@@ -711,6 +715,12 @@ class ApplicationService:
         #for q in self._queues.values():
         #    print(q.queue_name,str(q._connection))
 
+    def putpool(self, pool: Pool):
+        '''put pool in cache'''
+        if pool and pool.name:
+            valu = self.serialize(pool)
+            self.tryputcache('pool.{0}'.format(pool.name), valu)
+
     def putminer(self, miner: Miner):
         '''put miner in cache'''
         if miner and miner.key():
@@ -860,9 +870,13 @@ class ApplicationService:
         '''serialize any entity
         only need schema, message class not needed
         '''
-        #for now only handle miner, later add other entities
-        schema = MinerSchema()
-        return schema.dumps(entity).data
+        if isinstance(entity, Miner):
+            schema = MinerSchema()
+            return schema.dumps(entity).data
+
+        if isinstance(entity, Pool):
+            schema = PoolSchema()
+            return schema.dumps(entity).data
 
     def serializelist(self, listofentities):
         '''serialize a list of entities'''

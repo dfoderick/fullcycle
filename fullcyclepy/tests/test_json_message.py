@@ -16,6 +16,7 @@ class TestSerialization(unittest.TestCase):
     def test_minerserialization(self):
         sch = MinerSchema()
         miner = Miner('test')
+        miner.status = MinerStatus.Offline
         miner.status = MinerStatus.Online
         miner.minerinfo = MinerInfo('Antminer S9', '123')
         miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={})

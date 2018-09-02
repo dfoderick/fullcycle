@@ -61,15 +61,15 @@ class TestMiner(unittest.TestCase):
     def test_miner_status_set_lastupdate(self):
         miner = Miner('test')
         self.assertTrue(not miner.laststatuschanged)
-        miner.status = MinerStatus.Online
+        miner.status = MinerStatus.Offline
         self.assertTrue(miner.laststatuschanged)
 
     def test_miner_statuschange_keeps_original(self):
         miner = Miner('test')
-        miner.status = MinerStatus.Online
+        miner.status = MinerStatus.Offline
         self.assertTrue(miner.laststatuschanged)
         originalstatuschangetime = miner.laststatuschanged
-        miner.status = MinerStatus.Online
+        miner.status = MinerStatus.Offline
         self.assertTrue(miner.laststatuschanged == originalstatuschangetime)
 
     def test_miner_status_no_you_cant(self):

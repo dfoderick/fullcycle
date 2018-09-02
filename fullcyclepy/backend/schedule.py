@@ -11,6 +11,7 @@ from fcmapp import ApplicationService
 
 #one-time schedule provision when app starts up
 APP = ApplicationService(component='schedule')
+APP.startup()
 APP.send(QueueName.Q_POOLCONFIGURATIONCHANGED, '')
 SLEEP_SECONDS = APP.configuration('schedule.sleep.seconds')
 
