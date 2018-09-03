@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/dfoderick/fullcycle.svg?branch=master)](https://travis-ci.org/dfoderick/fullcycle)
 # Full Cycle Bitcoin Mining Controller
 Monitoring and active management for your Bitcoin mining operation.
 1. Temperature and Hash rate of ASIC miners
