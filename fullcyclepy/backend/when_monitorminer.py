@@ -89,7 +89,7 @@ def domonitorminer(miner):
                                        str(minerstats.tempboard2),
                                        str(minerstats.tempboard3)),
                   savedminer.uptime(minerstats.elapsed),
-                  '{0:0f}ms'.format(savedminer.monitorresponsetime() * 1000))
+                  '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
             msg = APPMONITOR.app.createmessagestats(savedminer, minerstats, minerpool)
             entries.addbroadcast(QueueName.Q_STATISTICSUPDATED, msg)
 

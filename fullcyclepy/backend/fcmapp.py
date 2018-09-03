@@ -272,15 +272,19 @@ class ApplicationService:
     antminer = None
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself=False):
+        if self.component == ComponentName.fullcycle:
+            self.print('Starting FCM Init')
         self.component = component
         self.initargs(option)
         self.startupstuff()
+        if self.component == ComponentName.fullcycle:
+            self.print('Starting FCM Configuration')
         self.setup_configuration()
         self.initlogger()
-        if self.component == ComponentName.fullcycle:
-            self.loginfo('Starting FCM')
         self.initmessaging()
         #this is slow. should be option to opt out of cache?
+        if self.component == ComponentName.fullcycle:
+            self.loginfo('Starting FCM Cache')
         self.initcache()
         self.initbus()
         self.init_application()

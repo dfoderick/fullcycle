@@ -7,6 +7,7 @@ from domain.mining import MinerApiCall
 
 # call all the api command of miner
 
+print('Starting...')
 APP = ApplicationService(component='fullcycle')
 APP.print('started app. getting known miners')
 MINERS = APP.allminers()
@@ -42,7 +43,7 @@ for miner in MINERS:
                       str(minerstats.currenthash), str(minerstats.minercount),
                       'temp=' + str(minerstats.tempboardmax()),
                       savedminer.uptime(minerstats.elapsed),
-                      '{0:0f}ms'.format(savedminer.monitorresponsetime() * 1000))
+                      '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
 
                 #switches miner to default pool
                 if miner.defaultpool:
