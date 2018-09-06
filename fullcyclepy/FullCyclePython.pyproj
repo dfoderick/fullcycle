@@ -211,6 +211,9 @@
     <Compile Include="tests\test_pools.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_pushmonitor.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_rules.py">
       <SubType>Code</SubType>
     </Compile>

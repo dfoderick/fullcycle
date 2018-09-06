@@ -677,9 +677,9 @@ class ApplicationService:
         self.sendqueueitem(item)
         print(logmessage)
 
-    def subscribe(self, name, callback, no_acknowledge=True):
+    def subscribe(self, name, callback, no_acknowledge=True, prefetch=1):
         '''subscribe to a queue'''
-        chan = self.bus.subscribe(name, callback, no_acknowledge=no_acknowledge)
+        chan = self.bus.subscribe(name, callback, no_acknowledge=no_acknowledge, prefetch_count=prefetch)
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(name))
         return chan
 
@@ -816,7 +816,7 @@ class ApplicationService:
         for miner in self.miners():
             yield (self.getminer(miner), self.getstats(miner), self.getpool(miner))
 
-    def messagedecodeminer(self, body):
+    def messagedecodeminer(self, body) -> Miner:
         '''deserialize a miner message'''
         message_envelope = self.deserializemessageenvelope(self.safestring(body))
         schema = MinerMessageSchema()

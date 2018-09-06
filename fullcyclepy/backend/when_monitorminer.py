@@ -13,6 +13,7 @@ from domain import mining
 from fcmapp import Component
 
 APPMONITOR = Component('monitorminer')
+MONITOR_PREFETCH = int(APPMONITOR.app.configuration("monitoring.queue.prefetch"))
 
 def enthread(target, args):
     '''put a method on a queue to be run in background'''
@@ -129,7 +130,7 @@ def main():
             domonitorminer(test_miner)
         APPMONITOR.app.shutdown()
     else:
-        APPMONITOR.listeningqueue = APPMONITOR.app.subscribe(QueueName.Q_MONITORMINER, when_monitorminer)
+        APPMONITOR.listeningqueue = APPMONITOR.app.subscribe(QueueName.Q_MONITORMINER, when_monitorminer, MONITOR_PREFETCH)
         APPMONITOR.listen()
 
 if __name__ == "__main__":
