@@ -218,8 +218,9 @@ class Miner(object):
         return False
 
     def monitored(self, stats, pool=None, info=None, sec=None):
-        self.lastmonitor = datetime.utcnow()
-        self.status = MinerStatus.Online
+        if stats:
+            self.lastmonitor = datetime.utcnow()
+            self.status = MinerStatus.Online
         if sec is not None:
             self.monitorcount += 1
             self.monitortime += sec

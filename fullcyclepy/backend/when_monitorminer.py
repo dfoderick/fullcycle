@@ -59,7 +59,7 @@ def domonitorminer(miner):
             foundpool = APPMONITOR.app.findpool(minerpool)
             if foundpool is not None:
                 minerpool.poolname = foundpool.name
-            savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed)
+            savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed())
             if mineroriginalstatus == '':
                 #first time monitoring since bootup
                 print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'first time monitoring')
