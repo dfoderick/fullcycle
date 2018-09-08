@@ -19,6 +19,15 @@ def when_save(channel, method, properties, body):
 def dosave(msg):
     entries = QueueEntries()
     if msg.entity == 'miner':
+        miner = saveminer(msg)
+        entries.add(QueueName.Q_MONITORMINER, COMPONENTSAVE.app.messageencode(miner))
+        entries.add(QueueName.Q_PROVISION, COMPONENTSAVE.app.messageencode(miner))
+
+    if msg.entity == 'pool':
+        savepool(msg)
+    return entries
+
+def saveminer(msg):
         #add or update miner
         minerid = name = ipaddress = port = None
         for pair in msg.values:
@@ -32,26 +41,25 @@ def dosave(msg):
                 port = pair['port']
         miner = Miner(name,'','',ipaddress,port,'','')
         COMPONENTSAVE.app.save_miner(miner)
-        entries.add(QueueName.Q_MONITORMINER, COMPONENTSAVE.app.messageencode(miner))
-        entries.add(QueueName.Q_PROVISION, COMPONENTSAVE.app.messageencode(miner))
+        return miner
 
-    if msg.entity == 'pool':
-        #save the new named pool
-        pool_type = name = url = user = priority = None
-        for pair in msg.values:
-            if 'pool_type' in pair:
-                pool_type = pair['pool_type']
-            if 'name' in pair:
-                name = pair['name']
-            if 'url' in pair:
-                url = pair['url']
-            if 'user' in pair:
-                user = pair['user']
-            if 'priority' in pair:
-                priority = pair['priority']
-        pool = Pool(pool_type, name, url, user, priority)
-        COMPONENTSAVE.app.save_pool(pool)
-    return entries
+def savepool(msg):
+    #save the new named pool
+    pool_type = name = url = user = priority = None
+    for pair in msg.values:
+        if 'pool_type' in pair:
+            pool_type = pair['pool_type']
+        if 'name' in pair:
+            name = pair['name']
+        if 'url' in pair:
+            url = pair['url']
+        if 'user' in pair:
+            user = pair['user']
+        if 'priority' in pair:
+            priority = pair['priority']
+    pool = Pool(pool_type, name, url, user, priority)
+    COMPONENTSAVE.app.save_pool(pool)
+    return pool
 
 def main():
     COMPONENTSAVE.listeningqueue = COMPONENTSAVE.app.subscribe(QueueName.Q_SAVE, when_save)
