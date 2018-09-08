@@ -32,11 +32,11 @@ def when_restart(channel, method, properties, body):
         qreset = enthread(target=dorestart, args=(minermsg.miner, minermsg.command, ))
         qreset.get()
         COMPONENTACTION.app.bus.acknowledge(COMPONENTACTION.listeningqueue, method.delivery_tag)
-    except json.decoder.JSONDecodeError:
+    except json.decoder.JSONDecodeError as jex:
         COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)
-        COMPONENTACTION.app.logexception(ex)
+        COMPONENTACTION.app.logexception(jex)
         #could be json error so log the message
-        COMPONENTACTION.app.logdebug(COMPONENTACTION.app.exceptionmessage(ex))
+        COMPONENTACTION.app.logdebug(COMPONENTACTION.app.exceptionmessage(jex))
         COMPONENTACTION.app.logdebug(COMPONENTACTION.app.safestring(body))
     except BaseException as ex:
         COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)

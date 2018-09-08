@@ -7,7 +7,9 @@ from fcmapp import ApplicationService
 from domain.mining import MinerApiCall
 from concurrent.futures import ThreadPoolExecutor
 
-# call all the api command of miner
+print('Starting...')
+APP = ApplicationService(component='fullcycle')
+APP.print('started app. getting known miners')
 WORKER_THREADS = 10
 MINER_MULTIPLIER = 10
 
@@ -93,9 +95,6 @@ async def run_tasks(executor, MINERS):
 
 
 if __name__ == '__main__':
-    print('Starting...')
-    APP = ApplicationService(component='fullcycle')
-    APP.print('started app. getting known miners')
     MINERS = APP.miners()
     APP.print("{0} miners configured".format(len(MINERS)))
 

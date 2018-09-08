@@ -112,8 +112,8 @@ def parse_minerinfo(status):
     if 'Type' in status:
         minertype = status['Type']
     else:
-        if toplevelstatus['Description'].startswith('cgminer'):
-            minertype = toplevelstatus['Description']
+        if status['Description'].startswith('cgminer'):
+            minertype = status['Description']
     if 'miner_id' in status:
         minerid = status['miner_id']
     minerinfo = MinerInfo(minertype, minerid)
@@ -145,6 +145,7 @@ def parse_minerpool(miner, jstatuspools):
     #colpools = [cPool(**k) for k in jsonpools["POOLS"]]
     #for pool in colpools:
     #    print(pool.POOL)
+    currentpool = currentworker = ''
     for pool in jpools:
         if str(pool["Status"]) == "Alive":
             currentpool = pool["URL"]
@@ -377,7 +378,7 @@ def load_firmware():
     """
     pass
 
-def load_miner():
+def load_miner(miner, login):
     """
     change the miner software
     """
