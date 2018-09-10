@@ -3,10 +3,9 @@
 #do not remove! needed
 import json #pylint: disable=unused-import
 from helpers.networkhelper import networkmap
-from fcmapp import ApplicationService
-from doflow_handlemessages import dispatchmessages
-
-from when_discover import findminers
+from backend.fcmapp import ApplicationService
+from backend.doflow_handlemessages import dispatchmessages
+from backend.when_discover import findminers
 
 def main():
     mainapp = ApplicationService(component='discover', option='')

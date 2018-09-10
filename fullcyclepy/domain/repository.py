@@ -1,6 +1,6 @@
 '''Repository'''
 import json
-from mining import Miner
+from domain.mining import Miner
 
 class MinerRepository(object):
     """repository for miners"""

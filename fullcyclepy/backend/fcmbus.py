@@ -80,4 +80,3 @@ class Bus:
     def reject(self, channel, delivery_tag):
         '''tell queue that message was not processed'''
         channel.basic_nack(delivery_tag)
-

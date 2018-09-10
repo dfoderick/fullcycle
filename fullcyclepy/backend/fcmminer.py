@@ -33,4 +33,3 @@ class Antminer():
 
     def set_frequency(self, miner, frequency):
         return set_frequency(miner, self.__login, frequency)
-

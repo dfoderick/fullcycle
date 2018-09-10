@@ -1,13 +1,13 @@
 '''handles messages in a loop'''
 from helpers.queuehelper import QueueName
-from when_discovered import dodiscovered
-from when_alert import doalert
-from when_provision import doprovision
-from when_monitorminer import domonitorminer
-from when_runrules import dorules
-from when_offline import dooffline
-from when_online import doonline
-from when_restart import dorestart
+from backend.when_discovered import dodiscovered
+from backend.when_alert import doalert
+from backend.when_provision import doprovision
+from backend.when_monitorminer import domonitorminer
+from backend.when_runrules import dorules
+from backend.when_offline import dooffline
+from backend.when_online import doonline
+from backend.when_restart import dorestart
 
 def dispatchmessages(mainapp, entries):
     '''process the messages'''

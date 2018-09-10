@@ -57,7 +57,7 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(isinstance(resensor.sensor, Sensor))
         self.assertTrue(resensor.sensorid == resensor.sensor.sensorid)
 
-    def test_configuration_serialization(self):
+    def test_config_serialization(self):
         sch = ConfigurationMessageSchema()
         msg = ConfigurationMessage('save', '', 'pool', {"id":"name"}, [{"name":"my pool"}])
         jconfig = sch.dumps(msg).data

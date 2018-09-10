@@ -74,4 +74,3 @@ class CacheKeys:
     pools = 'pools'
     miners = 'miners'
     camera = 'camera'
-

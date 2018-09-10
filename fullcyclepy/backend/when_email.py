@@ -3,7 +3,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from helpers.queuehelper import QueueName
-from fcmapp import Component
+from backend.fcmapp import Component
 
 EMAIL = Component('email')
 

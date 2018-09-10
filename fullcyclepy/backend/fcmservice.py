@@ -20,4 +20,3 @@ class InfrastructureService:
         self.port = port
         self.user = user
         self.password = password
-

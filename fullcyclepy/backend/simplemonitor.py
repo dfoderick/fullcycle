@@ -2,10 +2,9 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from colorama import Fore
-from fcmapp import ApplicationService
+from backend.fcmapp import ApplicationService
 from domain.mining import MinerApiCall
 from helpers import antminerhelper
-from helpers.queuehelper import QueueName
 
 print('Starting...')
 APP = ApplicationService(component='fullcycle')
@@ -82,8 +81,8 @@ async def run_tasks(executor, miners):
     loop = asyncio.get_event_loop()
     tasks = [loop.run_in_executor(executor, getstats, miner) for miner in listofminers]
 
-    for f in asyncio.as_completed(tasks, loop):
-        results = await f
+    for fut in asyncio.as_completed(tasks, loop):
+        results = await fut
         totalpolling += process_result(*results)
 
     calltime.stop()
