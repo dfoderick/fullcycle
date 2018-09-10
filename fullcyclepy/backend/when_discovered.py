@@ -1,6 +1,6 @@
 '''#discovered something that responds to cgminer api'''
 from helpers.queuehelper import QueueName, QueueEntries
-from fcmapp import Component
+from backend.fcmapp import Component
 
 COMPONENTDISCOVERED = Component(componentname='discover', option='')
 

@@ -1,6 +1,7 @@
 '''send command to miner'''
 
-from backend.fcmapp import ApplicationService, ComponentName
+from backend.fcmcomponent import ComponentName
+from backend.fcmapp import ApplicationService
 from helpers.antminerhelper import getminerconfig, print_response
 
 APP = ApplicationService(ComponentName.fullcycle)

@@ -3,7 +3,7 @@ evaluate if this is going to be used or not
 '''
 
 from helpers.queuehelper import QueueName
-from fcmapp import ApplicationService
+from backend.fcmapp import ApplicationService
 
 APP = ApplicationService(component='component')
 

@@ -1,6 +1,6 @@
 '''logs message to terminal. in future may log to database'''
 from helpers.queuehelper import QueueName
-from fcmapp import Component
+from backend.fcmapp import Component
 
 COMPONENTLOG = Component('log')
 

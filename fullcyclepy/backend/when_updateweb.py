@@ -2,7 +2,7 @@
 import json
 import docker
 from helpers.queuehelper import QueueName
-from fcmapp import Component
+from backend.fcmapp import Component
 
 COMPONENTUPDATE = Component('fullcycle')
 

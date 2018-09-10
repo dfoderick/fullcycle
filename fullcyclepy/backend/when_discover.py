@@ -8,7 +8,7 @@ from helpers.networkhelper import networkmap
 from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import mining
-from fcmapp import Component
+from backend.fcmapp import Component
 
 DISCOVER = Component('discover')
 MINERPORT = DISCOVER.app.configuration('discover.minerport')

@@ -4,7 +4,7 @@ import sys
 #import jsonpickle
 from helpers import mydeviceshelper
 from helpers.queuehelper import QueueName, BroadcastListener
-from fcmapp import ApplicationService
+from backend.fcmapp import ApplicationService
 
 APP = ApplicationService(component='sensor')
 

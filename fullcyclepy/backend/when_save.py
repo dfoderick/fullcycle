@@ -1,7 +1,7 @@
 '''save full cycle data'''
 from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import Pool, Miner
-from fcmapp import Component
+from backend.fcmapp import Component
 
 COMPONENTSAVE = Component('fullcycle')
 

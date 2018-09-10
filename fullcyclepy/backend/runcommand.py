@@ -11,7 +11,7 @@ from helpers.queuehelper import QueueName
 #from messaging.messages import *
 from domain.mining import Miner, MinerCommand
 from domain.rep import MinerRepository
-from fcmapp import ApplicationService
+from backend.fcmapp import ApplicationService
 
 APP = ApplicationService()
 

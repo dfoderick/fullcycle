@@ -22,12 +22,12 @@ class BrokenRule(object):
 
 class MinerStatisticsRule(object):
     '''Rule for evaluating miner statistics'''
-    brokenrules = []
 
     def __init__(self, miner: Miner, statistics: MinerStatistics, ruleparameters: RuleParameters):
         self.miner = miner
         self.statistics = statistics
         self.ruleparameters = ruleparameters
+        self.brokenrules = []
 
     def hasreading(self, reading):
         '''True when the reading is not empty'''

@@ -1,6 +1,6 @@
 '''what to do when a sensor reading is broadcast'''
 from helpers.queuehelper import QueueName
-from fcmapp import Component
+from backend.fcmapp import Component
 
 SENSOR = Component('fullcycle')
 

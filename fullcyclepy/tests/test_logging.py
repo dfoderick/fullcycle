@@ -1,5 +1,6 @@
 '''test logging'''
-from backend.fcmapp import ApplicationService, ComponentName
+from backend.fcmcomponent import ComponentName
+from backend.fcmapp import ApplicationService
 
 APP = ApplicationService(ComponentName.fullcycle)
 

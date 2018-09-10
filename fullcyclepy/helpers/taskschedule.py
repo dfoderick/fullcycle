@@ -2,8 +2,8 @@
 import datetime
 
 class TaskSchedule(object):
-    lastrun = None
-    start = None
+    lastrun : datetime.datetime
+    start : datetime.datetime
     pending_run = False
     #default to 0 seconds means disabled
     #interval is in seconds

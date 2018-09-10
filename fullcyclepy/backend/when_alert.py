@@ -1,6 +1,6 @@
 '''what to do when an alert is triggered'''
 from helpers.queuehelper import QueueName
-from fcmapp import Component
+from backend.fcmapp import Component
 
 ALERT = Component('alert')
 

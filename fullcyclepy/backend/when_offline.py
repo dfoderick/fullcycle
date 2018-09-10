@@ -4,7 +4,7 @@
 '''
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import mining
-from fcmapp import Component
+from backend.fcmapp import Component
 
 OFFLINE = Component('offline')
 

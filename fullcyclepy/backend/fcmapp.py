@@ -53,13 +53,13 @@ class ApplicationService:
     _channels = []
     #the startup directory
     homedirectory = None
-    __cache = None
-    __bus = None
+    __cache : Cache
+    __bus : Bus
     __config = {}
     __logger = None
     __logger_debug = None
     __logger_error = None
-    antminer = None
+    antminer : Antminer
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself=False):
         if self.component == ComponentName.fullcycle:

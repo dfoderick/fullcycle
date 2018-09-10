@@ -10,7 +10,7 @@ import pika
 from helpers.antminerhelper import MinerMonitorException, stats, pools
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import mining
-from fcmapp import Component
+from backend.fcmapp import Component
 
 APPMONITOR = Component('monitorminer')
 MONITOR_PREFETCH = int(APPMONITOR.app.configuration("monitoring.queue.prefetch"))

@@ -7,7 +7,7 @@ import datetime
 import time
 from helpers.queuehelper import QueueName, QueueEntry
 from helpers.taskschedule import TaskSchedule
-from fcmapp import ApplicationService
+from backend.fcmapp import ApplicationService
 
 #one-time schedule provision when app starts up
 APP = ApplicationService(component='schedule')

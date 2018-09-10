@@ -2,7 +2,7 @@
 enable, provision and start monitoring
 '''
 from helpers.queuehelper import QueueName, QueueEntries
-from fcmapp import Component
+from backend.fcmapp import Component
 
 ONLINE = Component('online')
 

@@ -6,7 +6,7 @@ from colorama import Fore
 from helpers.antminerhelper import MinerMonitorException, stats
 from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import MinerAccessLevel
-from fcmapp import Component
+from backend.fcmapp import Component
 
 PROVISION_DISPATCH = Component('provision')
 

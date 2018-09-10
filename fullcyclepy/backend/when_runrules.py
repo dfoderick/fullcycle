@@ -10,7 +10,8 @@ from helpers.queuehelper import QueueName, QueueEntries
 from domain.mining import MinerCommand
 from domain.miningrules import MinerStatisticsRule
 from domain.logging import MinerLog
-from fcmapp import ComponentName, Component
+from backend.fcmcomponent import ComponentName
+from backend.fcmapp import Component
 
 class ComponentRunRules(Component):
     '''component for running rules'''

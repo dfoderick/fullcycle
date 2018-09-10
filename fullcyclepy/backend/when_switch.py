@@ -10,7 +10,7 @@ from helpers import antminerhelper
 from helpers.queuehelper import QueueName
 from domain.mining import MinerCommand, MinerAccessLevel
 from domain.logging import MinerLog
-from fcmapp import Component
+from backend.fcmapp import Component
 
 COMPONENTACTION = Component('action')
 

@@ -3,10 +3,10 @@
 #do not remove! needed
 import json #pylint: disable=unused-import
 #from helpers import antminerhelper
-from fcmapp import ApplicationService
-from doflow_handlemessages import dispatchmessages
+from backend.fcmapp import ApplicationService
+from backend.doflow_handlemessages import dispatchmessages
 
-from when_monitor import domonitor
+from backend.when_monitor import domonitor
 
 def main():
     '''main'''

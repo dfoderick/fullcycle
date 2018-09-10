@@ -9,7 +9,7 @@ from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import services
 from domain.mining import MinerAccessLevel, MinerPool
-from fcmapp import Component
+from backend.fcmapp import Component
 
 PROVISION = Component('provision', option='')
 
