@@ -1,4 +1,4 @@
-
+#!/bin/bash
 #sonic-pi comes with erlang already installed but buggy version
 sudo apt-get purge sonic-pi
 sudo apt --fix-broken install

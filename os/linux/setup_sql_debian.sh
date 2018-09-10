@@ -1,4 +1,4 @@
-
+#!/bin/bash
 # install sql server
 sudo apt-get install mariadb-server
 #setup for production

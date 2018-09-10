@@ -1,4 +1,4 @@
-
+#!/bin/bash
 # install full cycle
 #copy the supervisor file
 sudo service supervisord stop

@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo rabbitmqctl add_user fullcycle mining
 sudo rabbitmqctl set_user_tags fullcycle administrator
 sudo rabbitmqctl set_permissions -p / fullcycle ".*" ".*" ".*"
