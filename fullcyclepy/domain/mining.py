@@ -123,7 +123,7 @@ class Miner(object):
         '''cache key for this entity'''
         if self.minerid is not None and self.minerid and self.minerid != 'unknown':
             return self.minerid
-        elif self.networkid is not None and self.networkid and str(self.networkid) != '{}': 
+        elif self.networkid is not None and self.networkid and str(self.networkid) != '{}':
             return str(self.networkid)
         elif self.ipaddress is not None and self.ipaddress:
             return '{0}:{1}'.format(self.ipaddress, self.port)
