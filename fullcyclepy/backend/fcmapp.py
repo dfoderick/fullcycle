@@ -53,18 +53,15 @@ class ApplicationService:
     _channels = []
     #the startup directory
     homedirectory = None
-    __cache : Cache
-    __bus : Bus
     __config = {}
     __logger = None
     __logger_debug = None
     __logger_error = None
-    antminer : Antminer
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself=False):
+        self.component = component
         if self.component == ComponentName.fullcycle:
             self.print('Starting FCM Init')
-        self.component = component
         self.initargs(option)
         self.startupstuff()
         if self.component == ComponentName.fullcycle:

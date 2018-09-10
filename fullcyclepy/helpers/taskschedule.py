@@ -2,16 +2,16 @@
 import datetime
 
 class TaskSchedule(object):
-    lastrun : datetime.datetime
-    start : datetime.datetime
-    pending_run = False
-    #default to 0 seconds means disabled
-    #interval is in seconds
-    interval = 0
     q = None
 
     def __init__(self, run_on_init=False):
+        self.lastrun = None
+        self.start = None
         self.pending_run = run_on_init
+    #default to 0 seconds means disabled
+    #interval is in seconds
+        self.interval = 0
+        self.q = None
 
     def is_disabled(self):
         return self.interval <= 0

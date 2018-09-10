@@ -81,7 +81,7 @@ async def run_tasks(executor, miners):
     loop = asyncio.get_event_loop()
     tasks = [loop.run_in_executor(executor, getstats, miner) for miner in listofminers]
 
-    for fut in asyncio.as_completed(tasks, loop):
+    for fut in asyncio.as_completed(tasks, loop=loop):
         results = await fut
         totalpolling += process_result(*results)
 
