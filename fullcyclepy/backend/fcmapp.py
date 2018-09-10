@@ -21,7 +21,6 @@ from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema, PoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
-from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
 from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
 from backend.fcmcache import Cache, CacheKeys

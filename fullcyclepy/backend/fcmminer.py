@@ -1,3 +1,5 @@
+from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
+
 class Antminer():
     def __init__(self, config, login):
         self.__config = config
