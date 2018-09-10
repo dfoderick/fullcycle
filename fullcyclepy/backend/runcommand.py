@@ -46,8 +46,7 @@ def doit(args):
         cmdparam = ''
         if len(args) > 3:
             cmdparam = args[3]
-        qnames = QueueName()
-        if not qnames.isvalidqname(cmd):
+        if not QueueName.has_value(cmd):
             print('Queue {0} is not valid'.format(cmd))
             sys.exit(1)
 

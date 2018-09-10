@@ -1,11 +1,11 @@
 '''gets stats from a miner and serializes to disk'''
-import time
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from colorama import Fore
-from helpers import antminerhelper
 from fcmapp import ApplicationService
 from domain.mining import MinerApiCall
-from concurrent.futures import ThreadPoolExecutor
+from helpers import antminerhelper
+from helpers.queuehelper import QueueName
 
 print('Starting...')
 APP = ApplicationService(component='fullcycle')
@@ -65,24 +65,24 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
     #APP.updateknownminer(savedminer)
     return statspolling.elapsed() * 1000
 
-def getminers(MINERS):
-    listofminers=[]
+def getminers(miners):
+    listofminers = []
     cnt = MINER_MULTIPLIER
-    while cnt>0:
-        for miner in MINERS:
+    while cnt > 0:
+        for miner in miners:
             listofminers.append(miner)
         cnt -= 1
     return listofminers
 
-async def run_tasks(executor, MINERS):
-    listofminers = getminers(MINERS)
+async def run_tasks(executor, miners):
+    listofminers = getminers(miners)
     calltime = MinerApiCall(None)
     calltime.start()
     totalpolling = 0
     loop = asyncio.get_event_loop()
     tasks = [loop.run_in_executor(executor, getstats, miner) for miner in listofminers]
 
-    for f in asyncio.as_completed(tasks, loop=loop):
+    for f in asyncio.as_completed(tasks, loop):
         results = await f
         totalpolling += process_result(*results)
 

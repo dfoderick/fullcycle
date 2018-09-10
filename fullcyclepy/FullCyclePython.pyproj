@@ -57,6 +57,9 @@
     <Compile Include="backend\doflow_monitor.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\fcmcache.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\purge.py">
       <SubType>Code</SubType>
     </Compile>
@@ -184,6 +187,9 @@
     <Compile Include="tests\test_broadcast.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_bus.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_config.py">
       <SubType>Code</SubType>
     </Compile>
@@ -212,6 +218,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\test_pushmonitor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_queuenames.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests\test_rules.py">

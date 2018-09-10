@@ -15,40 +15,40 @@ def dispatchmessages(mainapp, entries):
         return
     for entry in entries.entries:
 
-        if entry.queuename == QueueName.Q_DISCOVERED:
+        if entry.queuename == QueueName.value(QueueName.Q_DISCOVERED):
             miner = mainapp.messagedecodeminer(entry.message)
             more = dodiscovered(miner)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_ALERT:
+        elif entry.queuename == QueueName.value(QueueName.Q_ALERT):
             doalert(entry.message)
 
-        elif entry.queuename == QueueName.Q_PROVISION:
+        elif entry.queuename == QueueName.value(QueueName.Q_PROVISION):
             miner = mainapp.messagedecodeminer(entry.message)
             more = doprovision(miner)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_MONITORMINER:
+        elif entry.queuename == QueueName.value(QueueName.Q_MONITORMINER):
             miner = mainapp.messagedecodeminer(entry.message)
             more = domonitorminer(miner)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_STATISTICSUPDATED:
+        elif entry.queuename == QueueName.value(QueueName.Q_STATISTICSUPDATED):
             msg = mainapp.messagedecodeminerstats(entry.message)
             more = dorules(msg.miner, msg.minerstats, msg.minerpool)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_OFFLINE:
+        elif entry.queuename == QueueName.value(QueueName.Q_OFFLINE):
             miner = mainapp.messagedecodeminer(entry.message)
             more = dooffline(miner)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_ONLINE:
+        elif entry.queuename == QueueName.value(QueueName.Q_ONLINE):
             miner = mainapp.messagedecodeminer(entry.message)
             more = doonline(miner)
             dispatchmessages(mainapp, more)
 
-        elif entry.queuename == QueueName.Q_RESTART:
+        elif entry.queuename == QueueName.value(QueueName.Q_RESTART):
             minermsg = mainapp.messagedecodeminercommand(entry.message)
             dorestart(minermsg.miner, minermsg.command)
         else:

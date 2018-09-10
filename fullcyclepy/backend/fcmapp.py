@@ -8,7 +8,6 @@ import json
 import base64
 from collections import defaultdict
 from colorama import init, Fore
-import redis
 import pika
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -24,6 +23,7 @@ from helpers.camerahelper import take_picture
 from helpers.antminerhelper import setminertoprivileged, privileged, setprivileged, setrestricted, waitforonline, restartmining, stopmining, restart, set_frequency
 from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
+from backend.fcmcache import Cache, CacheKeys
 
 class ComponentName:
     '''names of components, corresponds to queue login names'''
@@ -64,80 +64,6 @@ class InfrastructureService:
         self.user = user
         self.password = password
 
-class Cache:
-    ''' in memory cache'''
-    __redis = None
-    isonline = False
-    def __init__(self, servicelogin):
-        self.encoding = 'utf-8'
-        self.__redis = redis.Redis(host=servicelogin.host, port=servicelogin.port, password=servicelogin.password)
-        self.isonline = True
-    def iskeyexists(self, key):
-        '''true when key exists in cache'''
-        return self.__redis.exists(key)
-    def get(self, key):
-        '''get value from key'''
-        try:
-            return self.__redis.get(key)
-        except redis.exceptions.ConnectionError as ex:
-            self.isonline = False
-            raise ex
-    def getlist(self, key):
-        '''get a list from key'''
-        return self.__redis.lrange(key, 0, -1)
-
-    def put(self, key, value):
-        '''store a value into key'''
-        self.__redis.set(key, value)
-
-    def putinhashset(self, name, key, value):
-        '''store value into key at name'''
-        if not isinstance(value, str):
-            raise ValueError('hashset value must be a string')
-        self.__redis.hset(name, key, value)
-
-    def getfromhashset(self, name, key):
-        '''get value in hashset'''
-        return self.__redis.hget(name, key)
-
-    def gethashset(self, name):
-        '''this will return keys and values from hashset'''
-        output = {}
-        hashitems = self.__redis.hgetall(name)
-        for key, value in hashitems.items():
-            output[key.decode(self.encoding)] = value.decode(self.encoding)
-        return output
-    def set(self, key, value):
-        '''save value to cache key'''
-        self.__redis.set(key, value)
-
-    def delete(self, key):
-        '''remove key'''
-        self.__redis.delete(key)
-
-    def hdel(self, name, key):
-        '''remove key'''
-        self.__redis.hdel(name, key)
-
-    def purge(self):
-        allkeys = self.__redis.scan_iter()
-        for key in allkeys:
-            self.delete(key)
-            print("deleted key: {}".format(key))
-
-    def close(self):
-        '''close the cache'''
-        self.__redis = None
-
-class CacheKeys:
-    '''all keys stored in cache'''
-    knownminers = 'knownminers'
-    knownpools = 'knownpools'
-    knownsensors = 'knownsensors'
-    #named pools, a big string. obsolete
-    pools = 'pools'
-    miners = 'miners'
-    camera = 'camera'
 
 class Antminer():
     def __init__(self, config, login):
@@ -199,18 +125,24 @@ class Bus:
         if self._connection:
             self._connection.sleep(seconds)
 
+    def get_queue_name(self, queue_name):
+        name_of_q = queue_name
+        if isinstance(queue_name, QueueName):
+            name_of_q = QueueName.value(queue_name)
+        return name_of_q
+
     def publish(self, queue_name, msg, exchange=''):
         """Publishes message on new channel"""
         localchannel = self.connection().channel()
-        localchannel.queue_declare(queue=queue_name, durable=self._durable)
-        localchannel.basic_publish(exchange=exchange, routing_key=queue_name, body=msg)
+        localchannel.queue_declare(queue=self.get_queue_name(queue_name), durable=self._durable)
+        localchannel.basic_publish(exchange=exchange, routing_key=name_of_q, body=msg)
         localchannel.close()
 
     def broadcast(self, exchange_name, msg):
         '''broadcast a message to anyone that is listening'''
         localchannel = self.connection().channel()
-        localchannel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
-        localchannel.basic_publish(exchange=exchange_name, routing_key='', body=msg)
+        localchannel.exchange_declare(exchange=self.get_queue_name(exchange_name), exchange_type='fanout')
+        localchannel.basic_publish(exchange=self.get_queue_name(exchange_name), routing_key='', body=msg)
         localchannel.close()
 
     def subscribe(self, name, callback, no_acknowledge=True, prefetch_count=1):
@@ -218,19 +150,19 @@ class Bus:
         remember to listen to channel to get messages
         """
         localchannel = self.connection().channel()
-        localchannel.queue_declare(queue=name)
+        localchannel.queue_declare(queue=self.get_queue_name(name))
         localchannel.basic_qos(prefetch_count=prefetch_count)
-        localchannel.basic_consume(callback, queue=name, no_ack=no_acknowledge)
+        localchannel.basic_consume(callback, queue=self.get_queue_name(name), no_ack=no_acknowledge)
         return localchannel
 
     def subscribe_broadcast(self, name, callback, no_acknowledge=True, prefetch_count=1):
         """Consumes messages from one queue"""
         localchannel = self.connection().channel()
-        localchannel.exchange_declare(exchange=name, exchange_type='fanout')
+        localchannel.exchange_declare(exchange=self.get_queue_name(name), exchange_type='fanout')
 
         result = localchannel.queue_declare(exclusive=True)
         queue_name = result.method.queue
-        localchannel.queue_bind(exchange=name, queue=queue_name)
+        localchannel.queue_bind(exchange=self.get_queue_name(name), queue=queue_name)
 
         localchannel.basic_qos(prefetch_count=prefetch_count)
         localchannel.basic_consume(callback, queue=queue_name, no_ack=no_acknowledge)
@@ -683,12 +615,7 @@ class ApplicationService:
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(name))
         return chan
 
-    #def makebroadcastlistener(self, broadcast_name):
-    #    broadcast = BroadcastListener(broadcast_name, servicelogin=self.getservice_useroverride(ServiceName.messagebus))
-    #    return broadcast
-
     def listen_to_broadcast(self, broadcast_name, callback, no_acknowledge=True):
-        #thebroadcast = self.makebroadcastlistener(broadcast_name)
         thebroadcast = self.bus.subscribe_broadcast(broadcast_name, callback, no_acknowledge)
         print('Waiting for messages on {0}. To exit press CTRL+C'.format(broadcast_name))
         self.bus.listen(thebroadcast)
@@ -1061,7 +988,6 @@ class ApplicationService:
                 known.user = pool.user
                 #update the known pool (with new key)
                 self.update_pool(oldkey, known)
-
 
 def main():
     full_cycle = ApplicationService()

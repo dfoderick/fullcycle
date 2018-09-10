@@ -1,7 +1,12 @@
 '''messagebug (queue) related functions'''
+from enum import Enum
 import pika
 
-class QueueName:
+#class NoValue(Enum):
+#    def __repr__(self):
+#        return '<%s.%s>' % (self.__class__.__name__, self.name)
+
+class QueueName(Enum):
     """Known standard queue names
     You may be able to define and use other queue names
     but you're on your own
@@ -28,44 +33,16 @@ class QueueName:
     Q_UPDATEWEB = 'updateweb'
     Q_SAVE = 'save'
 
-    def isvalidqname(self, queue_name):
-        #pylint: disable=too-many-return-statements
-        if queue_name == self.Q_COMPONENT:
-            return True
-        if queue_name == self.Q_LOG:
-            return True
-        if queue_name == self.Q_PROVISION:
-            return True
-        if queue_name == self.Q_SWITCH:
-            return True
-        if queue_name == self.Q_RESTART:
-            return True
-        if queue_name == self.Q_ALERT:
-            return True
-        if queue_name == self.Q_DISCOVER:
-            return True
-        if queue_name == self.Q_DISCOVERED:
-            return True
-        if queue_name == self.Q_MONITOR:
-            return True
-        if queue_name == self.Q_MONITORMINER:
-            return True
-        if queue_name == self.Q_SHUTDOWN:
-            return True
-        if queue_name == self.Q_OFFLINE:
-            return True
-        if queue_name == self.Q_ONLINE:
-            return True
-        if queue_name == self.Q_CLOUDPULL:
-            return True
-        if queue_name == self.Q_EMAIL:
-            return True
-        if queue_name == self.Q_SENSOR:
-            return True
-        if queue_name == self.Q_UPDATEWEB:
-            return True
-        return False
+    @classmethod
+    def value(cls, queue_name):
+        return queue_name._name_.lower()[2:]
 
+    @classmethod
+    def has_value(cls, queue_name):
+        return any(queue_name == item.value for item in cls)
+
+    def __str__(self):
+        return "%s" % (self._name_.lower())
 
 class QueueType:
     broadcast = 'broadcast'
