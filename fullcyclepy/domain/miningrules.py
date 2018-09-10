@@ -29,6 +29,7 @@ class MinerStatisticsRule(object):
         self.ruleparameters = ruleparameters
         self.brokenrules = []
 
+    @classmethod
     def hasreading(self, reading):
         '''True when the reading is not empty'''
         if reading is None:
@@ -37,6 +38,7 @@ class MinerStatisticsRule(object):
             return False
         return True
 
+    @classmethod
     def hasreading_num(self, reading):
         '''True when the reading is numeric and not empty'''
         if reading is None:
@@ -66,18 +68,18 @@ class MinerStatisticsRule(object):
         if self.miner.miner_type != self.ruleparameters.minertype:
             return False
 
-        if self.hasreading_num(self.statistics.currenthash):
+        if MinerStatisticsRule.hasreading_num(self.statistics.currenthash):
             if self.statistics.currenthash < self.ruleparameters.hashlimit:
                 self.brokenrules.append(BrokenRule(self.miner, 'alert', 'on {0} low hash {1} below {2}'.format(self.miner.name, self.statistics.currenthash, self.ruleparameters.hashlimit)))
                 if self.statistics.elapsed > self.ruleparameters.restartaftersec:
                     self.addbrokenrule(BrokenRule(self.miner, 'restart', 'restart'))
                     self.addbrokenrule(BrokenRule(self.miner, 'alert', 'restarting {0} '.format(self.miner.name)))
 
-        if self.hasreading_num(self.statistics.controllertemp):
+        if MinerStatisticsRule.hasreading_num(self.statistics.controllertemp):
             if self.statistics.controllertemp and self.statistics.controllertemp > self.ruleparameters.controllertemplimit:
                 self.addbrokenrule(BrokenRule(self.miner, 'alert', 'on {0} controller temp {1} exceeded {2}'.format(self.miner.name, self.statistics.controllertemp, self.ruleparameters.controllertemplimit)))
 
-        if self.hasreading_num(self.statistics.tempboardmax()):
+        if MinerStatisticsRule.hasreading_num(self.statistics.tempboardmax()):
             if self.statistics.tempboardmax() > self.ruleparameters.boardtemplimit:
                 self.addbrokenrule(BrokenRule(self.miner, 'alert', 'on {0} board temp {1} exceeded {2}'.format(self.miner.name, self.statistics.tempboardmax(), self.ruleparameters.boardtemplimit)))
             if self.ruleparameters.maxtempreset and self.statistics.tempboardmax() > self.ruleparameters.maxtempreset:

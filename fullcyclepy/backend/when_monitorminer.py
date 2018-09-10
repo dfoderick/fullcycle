@@ -1,13 +1,12 @@
 '''#David Foderick, Skylake Software Inc.
 #Runs behind firewall
 '''
-import time
 import datetime
 from threading import Thread
 from queue import Queue
 from colorama import Fore
 import pika
-from helpers.antminerhelper import MinerMonitorException, stats, pools
+from helpers.antminerhelper import MinerMonitorException, stats
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import mining
 from backend.fcmapp import Component

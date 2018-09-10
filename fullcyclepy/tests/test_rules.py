@@ -17,17 +17,17 @@ class TestRules(unittest.TestCase):
     def test_int_has_reading(self):
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 40, 55, 60*10)
         rules = MinerStatisticsRule(self.miner, self.minerstats, params)
-        self.assertTrue(rules.hasreading_num(params.controllertemplimit))
+        self.assertTrue(MinerStatisticsRule.hasreading_num(params.controllertemplimit))
 
     def test_float_has_reading(self):
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 49.9, 55, 60*10)
         rules = MinerStatisticsRule(self.miner, self.minerstats, params)
-        self.assertTrue(rules.hasreading_num(params.controllertemplimit))
+        self.assertTrue(MinerStatisticsRule.hasreading_num(params.controllertemplimit))
 
     def test_string_has_reading(self):
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, '', 55, 60*10)
         rules = MinerStatisticsRule(self.miner, self.minerstats, params)
-        self.assertFalse(rules.hasreading_num(params.controllertemplimit))
+        self.assertFalse(MinerStatisticsRule.hasreading_num(params.controllertemplimit))
 
     def test_lowhash(self):
         '''test low hash condition'''
