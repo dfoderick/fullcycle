@@ -7,6 +7,7 @@ import logging
 import json
 import base64
 import redis
+import pika
 from collections import defaultdict
 from colorama import init, Fore
 from sqlalchemy.orm import sessionmaker
@@ -25,11 +26,9 @@ from helpers.temperaturehelper import readtemperature
 from helpers.telegramhelper import sendalert, sendphoto
 from backend.fcmcache import Cache, CacheKeys
 from backend.fcmbus import Bus
-
-class ComponentName:
-    '''names of components, corresponds to queue login names'''
-    fullcycle = 'fullcycle'
-    rules = 'rules'
+from backend.fcmcomponent import ComponentName
+from backend.fcmservice import ServiceName, InfrastructureService
+from backend.fcmminer import Antminer
 
 class Component(object):
     '''A component is a unit of execution of FCM'''
@@ -41,64 +40,6 @@ class Component(object):
     def listen(self):
         if self.listeningqueue:
             self.app.bus.listen(self.listeningqueue)
-
-class ServiceName:
-    '''names of infrastructure services'''
-    messagebus = 'rabbit'
-    cache = 'redis'
-    database = 'mysql'
-    email = 'gmail'
-
-class InfrastructureService:
-    '''configuration for a dependency'''
-    name = ''
-    connection = ''
-    host = ''
-    port = ''
-    user = ''
-    password = ''
-    def __init__(self, name, connection, host, port, user, password):
-        self.name = name
-        self.connection = connection
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-
-
-class Antminer():
-    def __init__(self, config, login):
-        self.__config = config
-        self.__login = login
-
-    def set_privileged(self, miner):
-        setprivileged(miner, self.__login, self.__config['provision.apiallow.privileged'])
-
-    def setminertoprivileged(self, miner):
-        return setminertoprivileged(miner, self.__login, self.__config['provision.apiallow.privileged'])
-
-    def set_restricted(self, miner):
-        setrestricted(miner, self.__login, self.__config['provision.apiallow.restricted'])
-
-    def waitforonline(self, miner):
-        return waitforonline(miner)
-
-    def getaccesslevel(self, miner):
-        return privileged(miner)
-
-    def restart(self, miner):
-        return restart(miner)
-
-    def stopmining(self, miner):
-        '''stop miner through ssh.'''
-        return stopmining(miner, self.__login)
-
-    def restartssh(self, miner):
-        '''restart miner through ssh. start mining again'''
-        return restartmining(miner, self.__login)
-
-    def set_frequency(self, miner, frequency):
-        return set_frequency(miner, self.__login, frequency)
 
 class ApplicationService:
     '''Application Services'''

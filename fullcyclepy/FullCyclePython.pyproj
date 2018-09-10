@@ -63,6 +63,15 @@
     <Compile Include="backend\fcmcache.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\fcmcomponent.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\fcmminer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\fcmservice.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\purge.py">
       <SubType>Code</SubType>
     </Compile>
