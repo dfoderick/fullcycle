@@ -150,11 +150,11 @@ class ConfigurationMessage(object):
     Used to save full cycle configuration values
     example: command = 'save', entity='pool', id={"poolid":"1"}, values = [{"name":"my pool"}]
     """
-    def __init__(self, command=None, parameter=None, entity=None, id=None, values=None):
+    def __init__(self, command=None, parameter=None, entity=None, configuration_message_id=None, values=None):
         self.command = command
         self.parameter = parameter
         self.entity = entity
-        self.id = id
+        self.configuration_message_id = configuration_message_id
         self.values = values
 
 class ConfigurationMessageSchema(Schema):
@@ -162,7 +162,7 @@ class ConfigurationMessageSchema(Schema):
     command = fields.Str()
     parameter = fields.Str()
     entity = fields.Str()
-    id = fields.Dict()
+    configuration_message_id = fields.Dict()
     values = fields.List(fields.Dict())
 
     @post_load
@@ -171,15 +171,15 @@ class ConfigurationMessageSchema(Schema):
         command = None
         parameter = None
         entity = None
-        id = None
+        configuration_message_id = None
         values = None
         command = data['command']
         if 'parameter' in data:
             parameter = data['parameter']
         entity = data['entity']
-        if 'id' in data:
-            id = data['id']
+        if 'configuration_message_id' in data:
+            configuration_message_id = data['configuration_message_id']
         if 'values' in data:
             values = data['values']
-        msg = ConfigurationMessage(command, parameter, entity, id, values)
+        msg = ConfigurationMessage(command, parameter, entity, configuration_message_id, values)
         return msg

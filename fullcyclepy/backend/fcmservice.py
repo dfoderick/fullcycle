@@ -7,12 +7,6 @@ class ServiceName:
 
 class InfrastructureService:
     '''configuration for a dependency'''
-    name = ''
-    connection = ''
-    host = ''
-    port = ''
-    user = ''
-    password = ''
     def __init__(self, name, connection, host, port, user, password):
         self.name = name
         self.connection = connection

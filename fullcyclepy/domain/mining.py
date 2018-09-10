@@ -15,9 +15,7 @@ class MinerAccessLevel:
     Waiting = 'waiting'
 
 class Login(object):
-    """Login"""
-    username = ''
-    password = ''
+    """Login name and password for access to miners"""
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -348,12 +346,6 @@ class Pool(object):
     """A configured (Named) Pool.
     Does not have to be attached to miner yet
     """
-    pool_type = ''
-    name = ''
-    url = ''
-    user = ''
-    priority = 0
-    password = 'x'
 
     def __init__(self, pool_type, name, url, user, priority, password='x'):
         self.pool_type = pool_type

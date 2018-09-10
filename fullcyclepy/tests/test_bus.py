@@ -1,6 +1,6 @@
 import unittest
 from helpers.queuehelper import QueueName
-from backend.fcmapp import InfrastructureService
+#from backend.fcmapp import InfrastructureService
 from backend.fcmbus import Bus
 
 class Test_bus(unittest.TestCase):

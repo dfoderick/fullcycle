@@ -59,13 +59,13 @@ class TestSerialization(unittest.TestCase):
 
     def test_config_serialization(self):
         sch = ConfigurationMessageSchema()
-        msg = ConfigurationMessage('save', '', 'pool', {"id":"name"}, [{"name":"my pool"}])
+        msg = ConfigurationMessage('save', '', 'pool', {"configuration_message_id":"name"}, [{"name":"my pool"}])
         jconfig = sch.dumps(msg).data
         reconfig = sch.loads(jconfig).data
         self.assertTrue(isinstance(reconfig, ConfigurationMessage))
         self.assertTrue(isinstance(reconfig.command, str))
         self.assertTrue(isinstance(reconfig.parameter, str))
-        self.assertTrue(isinstance(reconfig.id, dict))
+        self.assertTrue(isinstance(reconfig.configuration_message_id, dict))
         self.assertTrue(isinstance(reconfig.values, list))
 
 if __name__ == '__main__':
