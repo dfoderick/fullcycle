@@ -1,5 +1,7 @@
 [![Join the chat at https://gitter.im/fullcyclemining/Lobby](https://badges.gitter.im/fullcyclemining/Lobby.svg)](https://gitter.im/fullcyclemining/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
 [![Build Status](https://travis-ci.org/dfoderick/fullcycle.svg?branch=master)](https://travis-ci.org/dfoderick/fullcycle) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dfoderick/fullcycle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dfoderick/fullcycle/?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/dfoderick/fullcycle/badge.svg?branch=master)](https://coveralls.io/github/dfoderick/fullcycle?branch=master)
+
 # Full Cycle Bitcoin Mining Controller
 Monitoring and active management for your Bitcoin mining operation.
 1. Temperature and Hash rate of ASIC miners
