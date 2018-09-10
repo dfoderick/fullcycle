@@ -6,8 +6,8 @@ import datetime
 import logging
 import json
 import base64
-from colorama import init, Fore
 from collections import defaultdict
+from colorama import init, Fore
 import redis
 import pika
 from sqlalchemy.orm import sessionmaker
@@ -170,8 +170,8 @@ class Antminer():
         '''restart miner through ssh. start mining again'''
         return restartmining(miner, self.__login)
 
-    def set_frequency(self, miner):
-        return set_frequency(miner, self.__login)
+    def set_frequency(self, miner, frequency):
+        return set_frequency(miner, self.__login, frequency)
 
 
 class Bus:
@@ -378,7 +378,7 @@ class ApplicationService:
         for pool in self.pools():
             #pool isinstance of Pool
             availablepool = AvailablePool(pool.pool_type, pool, pool.url, pool.user, pool.password, pool.priority)
-            minerpool = MinerPool(miner = None, priority = 0, pool= availablepool)
+            minerpool = MinerPool(miner=None, priority=0, pool=availablepool)
             self.putpool(pool)
             self.add_pool(minerpool)
 
@@ -882,6 +882,7 @@ class ApplicationService:
         if isinstance(entity, Pool):
             schema = PoolSchema()
             return schema.dumps(entity).data
+        return None
 
     def serializelist(self, listofentities):
         '''serialize a list of entities'''

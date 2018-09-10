@@ -22,9 +22,9 @@ class TestSerialization(unittest.TestCase):
         miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={})
         miner.minerpool.poolname = 'unittest'
         miner.minerstats = MinerStatistics(miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
-        miner.minerstats.boardstatus1='o'
-        miner.minerstats.boardstatus2='oo'
-        miner.minerstats.boardstatus3='ooo'
+        miner.minerstats.boardstatus1 = 'o'
+        miner.minerstats.boardstatus2 = 'oo'
+        miner.minerstats.boardstatus3 = 'ooo'
         jminer = sch.dumps(miner).data
 
         #rehydrate miner

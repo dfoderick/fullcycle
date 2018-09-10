@@ -32,7 +32,7 @@ def stats(miner: Miner):
         thecall = MinerApiCall(miner)
         entity = MinerStatistics(miner, when=datetime.datetime.utcnow())
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
-        
+
         thecall.start()
         #jstats = api.stats()
         stats_and_pools = api.command('stats+pools')
@@ -70,16 +70,16 @@ def parse_statistics(entity, jsonstats, status):
     entity.currenthash = int(float(jsonstats['GHS 5s']))
     entity.frequency = jsonstats['frequency']
     minertype = status['Type']
-            
-    frequencies = {k:v for (k,v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
+    
+    frequencies = {k:v for (k, v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
     entity.frequency = str(int(sum(frequencies.values()) / len(frequencies)))
 
-    controllertemps = {k:v for (k,v) in jsonstats.items() if k in ['temp6','temp7','temp8']}
+    controllertemps = {k:v for (k, v) in jsonstats.items() if k in ['temp6', 'temp7', 'temp8']}
     entity.controllertemp = max(controllertemps.values())
     #should be 3
     #tempcount = jsonstats['temp_num']
-    boardtemps = {k:v for (k,v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
-    boardtempkeys=list(boardtemps.keys())
+    boardtemps = {k:v for (k, v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
+    boardtempkeys = list(boardtemps.keys())
     if len(boardtemps) > 0:
         entity.tempboard1 = boardtemps[boardtempkeys[0]]
     if len(boardtemps) > 1:
@@ -87,8 +87,8 @@ def parse_statistics(entity, jsonstats, status):
     if len(boardtemps) > 2:
         entity.tempboard3 = boardtemps[boardtempkeys[2]]
 
-    fans = {k:v for (k,v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
-    fankeys=list(fans.keys())
+    fans = {k:v for (k, v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
+    fankeys = list(fans.keys())
     if len(fans) > 0:
         entity.fan1 = fans[fankeys[0]]
     if len(fans) > 1:
@@ -96,8 +96,8 @@ def parse_statistics(entity, jsonstats, status):
     if len(fans) > 2:
         entity.fan3 = fans[fankeys[2]]
 
-    chains = {k:v for (k,v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
-    chainkeys=list(chains.keys())
+    chains = {k:v for (k, v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
+    chainkeys = list(chains.keys())
     if len(chains) > 0:
         entity.boardstatus1 = chains[chainkeys[0]]
     if len(chains) > 1:
@@ -128,7 +128,7 @@ def pools(miner: Miner):
             if not miner.is_disabled():
                 raise MinerMonitorException(jstatuspools['STATUS'][0]['description'])
         else:
-            return parse_minerpool(jstatuspools)
+            return parse_minerpool(miner, jstatuspools)
     except BaseException as ex:
         print('Failed to call miner pools api: ' + str(ex))
     return None
@@ -392,8 +392,8 @@ def load_miner(miner, login):
 
 def file_upload(miner, login, localfile, remotefile):
     connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
-    connection.put(localfile,remotefile)
+    connection.put(localfile, remotefile)
 
 def file_download(miner, login, localfile, remotefile):
     connection = Ssh(miner.ipaddress, login.username, login.password, port=getportfromminer(miner))
-    connection.get(localfile,remotefile)
+    connection.get(localfile, remotefile)

@@ -1,7 +1,7 @@
 import unittest
 from helpers.taskschedule import TaskSchedule
 
-class Test_test_taskscheduler(unittest.TestCase):
+class TestTaskscheduler(unittest.TestCase):
     def test_task_scheduler_disabled(self):
         task = TaskSchedule()
         task.interval = 0

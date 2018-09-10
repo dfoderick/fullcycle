@@ -59,7 +59,7 @@ class TestRules(unittest.TestCase):
         self.assertTrue(isbroken)
         self.assertTrue(rules.has_reboot_rule())
 
-    def test_controller_high_temp_reset_null(self):
+    def test_high_temp_reset_null(self):
         '''test when controller temp is high on miner. no reset'''
         self.minerstats.controllertemp = 101
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 40, 55, 60*10, maxtempreset=None)

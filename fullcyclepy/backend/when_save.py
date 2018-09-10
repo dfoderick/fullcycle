@@ -28,20 +28,21 @@ def dosave(msg):
     return entries
 
 def saveminer(msg):
-        #add or update miner
-        minerid = name = ipaddress = port = None
-        for pair in msg.values:
-            if 'minerid' in pair:
-                minerid = pair['minerid']
-            if 'name' in pair:
-                name = pair['name']
-            if 'ipaddress' in pair:
-                ipaddress = pair['ipaddress']
-            if 'port' in pair:
-                port = pair['port']
-        miner = Miner(name,'','',ipaddress,port,'','')
-        COMPONENTSAVE.app.save_miner(miner)
-        return miner
+    #add or update miner
+    minerid = name = ipaddress = port = None
+    for pair in msg.values:
+        if 'minerid' in pair:
+            minerid = pair['minerid']
+        if 'name' in pair:
+            name = pair['name']
+        if 'ipaddress' in pair:
+            ipaddress = pair['ipaddress']
+        if 'port' in pair:
+            port = pair['port']
+    miner = Miner(name, '', '', ipaddress, port, '', '')
+    miner.minerid = minerid
+    COMPONENTSAVE.app.save_miner(miner)
+    return miner
 
 def savepool(msg):
     #save the new named pool

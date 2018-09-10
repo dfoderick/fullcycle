@@ -149,12 +149,12 @@ class Miner(object):
     def utc_to_local(self, utc_dt):
         return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
-    def formattime(self, time):
+    def formattime(self, ptime):
         '''format time'''
-        if time is None: return ''
-        if isinstance(time, datetime):
-            return self.utc_to_local(time).strftime('%m-%d %H:%M:%S')
-        stime = time
+        if ptime is None: return ''
+        if isinstance(ptime, datetime):
+            return self.utc_to_local(ptime).strftime('%m-%d %H:%M:%S')
+        stime = ptime
         if '.' in stime:
             stime = stime[0:stime.index('.') - 1]
         try:
@@ -330,9 +330,9 @@ class MinerApiCall(object):
         self.stop_time = None
 
     def start(self):
-        self.start_time =  time.perf_counter()
+        self.start_time = time.perf_counter()
     def stop(self):
-        self.stop_time =  time.perf_counter()
+        self.stop_time = time.perf_counter()
     def elapsed(self):
         return self.stop_time - self.start_time
 
@@ -395,7 +395,7 @@ class MinerStatistics(object):
                  controllertemp=0,
                  tempboard1=0, tempboard2=0, tempboard3=0,
                  elapsed=0,
-                 fan1='', fan2='', fan3='', 
+                 fan1='', fan2='', fan3='',
                  boardstatus1='', boardstatus2='', boardstatus3='',
                  frequency='', rawstats=None):
         self.miner = miner
@@ -425,7 +425,7 @@ class MinerStatistics(object):
         numhours = (seconds % 86400) // 3600
         numminutes = ((seconds % 86400) % 3600) // 60
         numseconds = ((seconds % 86400) % 3600) % 60
-        return '{0}:{1}:{2}:{2}'.format(numdays, numhours, numminutes, numseconds)
+        return '{0}:{1}:{2}:{3}'.format(numdays, numhours, numminutes, numseconds)
 
     def stats_summary(self):
         return '{0} {1}/{2} {3}'.format(self.currenthash, self.controllertemp, self.tempboardmax(), self.format_elapsed())

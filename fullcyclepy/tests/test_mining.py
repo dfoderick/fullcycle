@@ -58,13 +58,13 @@ class TestMiner(unittest.TestCase):
         miner.set_ftp_port('22')
         self.assertTrue(miner.ftpport == '22')
 
-    def test_miner_status_set_lastupdate(self):
+    def test_miner_status_set_last_update(self):
         miner = Miner('test')
         self.assertTrue(not miner.laststatuschanged)
         miner.status = MinerStatus.Offline
         self.assertTrue(miner.laststatuschanged)
 
-    def test_miner_statuschange_keeps_original(self):
+    def test_miner_status_change_keeps_original(self):
         miner = Miner('test')
         miner.status = MinerStatus.Offline
         self.assertTrue(miner.laststatuschanged)
@@ -107,12 +107,12 @@ class TestMiner(unittest.TestCase):
         miner.minerstats = MinerStatistics(miner)
         self.assertTrue(miner.minerstats.format_elapsed() == "0:0:0:0")
 
-    def test_miner_monitored_Nothing_is_None(self):
+    def test_miner_monitored_nothing_none(self):
         miner = Miner('test')
         miner.monitored(None, None, None, None)
         self.assertTrue(miner.lastmonitor is None)
 
-    def test_miner_monitored_Not_Nothing_is_Monitored(self):
+    def test_miner_monitored_not_nothing_ismonitored(self):
         miner = Miner('test')
         stats = MinerStatistics(miner)
         miner.monitored(stats, pool=None, info=None, sec=None)

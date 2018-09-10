@@ -35,7 +35,7 @@ class MinerApi(object):
                 # remove null byte in first character and add missing comma in stats command
                 # fix lcd command
                 # fix alternate miner software that puts \n in Miner Type
-                return json.loads(received[:-1].replace('}{', '},{').replace('[,', '[').replace('\n',''))
+                return json.loads(received[:-1].replace('}{', '},{').replace('[,', '[').replace('\n', ''))
             finally:
                 sock.close()
 

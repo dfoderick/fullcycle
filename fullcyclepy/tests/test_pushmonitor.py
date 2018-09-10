@@ -10,12 +10,11 @@ from backend.fcmapp import ApplicationService, ComponentName
 APP = ApplicationService(ComponentName.fullcycle)
 MINERS = APP.miners()
 
-cnt = 1
-while cnt < 1000:
+CNT = 1
+while CNT < 2000:
     entries = QueueEntries()
     for miner in MINERS:
         entries.add(QueueName.Q_MONITORMINER, APP.messageencode(miner))
     APP.enqueue(entries)
     print('sent {} messages'.format(len(entries.entries)))
-    cnt += 1
-
+    CNT += 1

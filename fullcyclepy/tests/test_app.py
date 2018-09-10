@@ -3,7 +3,7 @@ from backend.fcmapp import ApplicationService
 from domain.mining import AvailablePool
 from messaging.schema import AvailablePoolSchema
 
-class Test_test_app(unittest.TestCase):
+class TestApp(unittest.TestCase):
     def test_app_json_serialize(self):
         app = ApplicationService(component='test')
         pool = AvailablePool('S9', None, 'url', 'user', 'x', 0)

@@ -52,7 +52,7 @@ def domonitorminer(miner):
         minerstats, minerinfo, apicall, minerpool = stats(savedminer)
         #minerlcd = antminerhelper.getminerlcd(miner)
         if minerstats is None:
-            print('could not monitor {0}'.format(savedminer.name))
+            print('could not monitor {0}({1})'.format(savedminer.name, savedminer.ipaddress))
         else:
             #what to do if monitored miner type conflicts with saved miner type???
             #should probably provision?
