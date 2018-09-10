@@ -57,6 +57,9 @@
     <Compile Include="backend\doflow_monitor.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\fcmbus.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\fcmcache.py">
       <SubType>Code</SubType>
     </Compile>
