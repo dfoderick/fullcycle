@@ -109,7 +109,8 @@ class Miner(object):
 
     @property
     def pools_available(self):
-        if self.minerpool is None: return None
+        if self.minerpool is None:
+            return None
         available = []
         if 'POOLS' in self.minerpool.allpools:
             jpools = self.minerpool.allpools['POOLS']
@@ -120,10 +121,14 @@ class Miner(object):
     #@property
     def key(self):
         '''cache key for this entity'''
-        if self.minerid is not None and self.minerid and self.minerid != 'unknown': return self.minerid
-        if self.networkid is not None and self.networkid and str(self.networkid) != '{}': return str(self.networkid)
-        if self.ipaddress is not None and self.ipaddress: return '{0}:{1}'.format(self.ipaddress, self.port)
-        return self.name
+        if self.minerid is not None and self.minerid and self.minerid != 'unknown':
+            return self.minerid
+        elif self.networkid is not None and self.networkid and str(self.networkid) != '{}': 
+            return str(self.networkid)
+        elif self.ipaddress is not None and self.ipaddress:
+            return '{0}:{1}'.format(self.ipaddress, self.port)
+        else:
+            return self.name
 
     def set_ftp_port(self, port):
         if self.ftpport is not None and self.ftpport: return
@@ -135,13 +140,15 @@ class Miner(object):
         return '{0} {1} {2} {3}'.format(self.name, self.hash_or_offline(), self.formattime(self.lastmonitor), self.currentpoolname())
 
     def currentpoolname(self):
-        if self.minerpool is None: return '?'
+        if self.minerpool is None:
+            return '?'
         #todo:look up pools here?
         return self.minerpool.poolname
 
     def hash_or_offline(self):
         '''hash or offline status of miner'''
-        if self.status != MinerStatus.Online: return self.status
+        if self.status != MinerStatus.Online:
+            return self.status
         if self.minerstats is None: return self.status
         return self.minerstats.stats_summary()
 
@@ -151,7 +158,8 @@ class Miner(object):
 
     def formattime(self, ptime):
         '''format time'''
-        if ptime is None: return ''
+        if ptime is None:
+            return ''
         if isinstance(ptime, datetime):
             return self.utc_to_local(ptime).strftime('%m-%d %H:%M:%S')
         stime = ptime

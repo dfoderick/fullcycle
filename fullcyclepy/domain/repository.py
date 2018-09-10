@@ -15,4 +15,5 @@ class MinerRepository(object):
 
     def activeminers(self, file_name):
         for miner in self.readminers(file_name):
-            if miner.is_disabled() is False: yield miner
+            if miner.is_disabled() is False:
+                yield miner

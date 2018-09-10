@@ -17,7 +17,8 @@ class TaskSchedule(object):
         return self.interval <= 0
 
     def is_time_to_run(self):
-        if self.is_disabled(): return False
+        if self.is_disabled():
+            return False
         now = datetime.datetime.now()
         if self.pending_run:
             self.pending_run = False

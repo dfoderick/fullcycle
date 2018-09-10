@@ -208,10 +208,12 @@ def print_response(response):
         print(line)
 
 def getportfromminer(miner: Miner):
-    if isinstance(miner.ftpport, int): return miner.ftpport
+    if isinstance(miner.ftpport, int):
+        return miner.ftpport
     if isinstance(miner.ftpport, str) and miner.ftpport:
         tryport = int(miner.ftpport)
-        if tryport > 0: return tryport
+        if tryport > 0:
+            return tryport
     return 22
 
 def getminerconfig(miner: Miner, login):

@@ -43,7 +43,8 @@ class MinerApi(object):
         fullresponse = ''
         while True:
             more = sock.recv(max_bytes)
-            if not more: break
+            if not more:
+                break
             fullresponse += more.decode(self.encoding)
         return fullresponse
 

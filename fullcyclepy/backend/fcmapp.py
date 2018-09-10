@@ -146,7 +146,8 @@ class ApplicationService:
         self.loglevel = self.configuration('loglevel')
 
     def configuration(self, key):
-        if not key in self.__config: return None
+        if not key in self.__config:
+            return None
         return self.__config[key]
 
     def is_enabled_configuration(self, key):
@@ -287,7 +288,8 @@ class ApplicationService:
         '''show a summary of known miners
         '''
         mode = self.configuration('summary')
-        if not mode: mode = 'auto'
+        if not mode:
+            mode = 'auto'
         knownminers = self.knownminers()
         if len(knownminers) <= max_number:
             return '\n'.join([m.summary() for m in knownminers])
@@ -332,7 +334,8 @@ class ApplicationService:
 
     def findpool(self, minerpool):
         '''find a pool in list'''
-        if minerpool is None: return None
+        if minerpool is None:
+            return None
         for pool in self.pools():
             if minerpool.currentpool == pool.url and minerpool.currentworker.startswith(pool.user):
                 return pool
@@ -341,7 +344,8 @@ class ApplicationService:
     def getpool(self, miner: Miner):
         '''get pool from cache'''
         valu = self.trygetvaluefromcache(miner.name + '.pool')
-        if valu is None: return None
+        if valu is None:
+            return None
         entity = MinerCurrentPool(miner, **self.deserialize(MinerCurrentPoolSchema(), valu))
         return entity
 
@@ -415,7 +419,8 @@ class ApplicationService:
 
     def closequeue(self, thequeue):
         '''close the queue'''
-        if not thequeue: return
+        if not thequeue:
+            return
         try:
             if thequeue is not None:
                 self.logdebug(self.stamp('closing queue {0}'.format(thequeue.queue_name)))
@@ -430,7 +435,8 @@ class ApplicationService:
             self.closequeue(self._queues[k])
 
     def close_channel(self, chan):
-        if not chan: return
+        if not chan:
+            return
         try:
             if chan.name in self._channels:
                 self.logdebug(self.stamp('closing channel {0}'.format(chan.name)))
