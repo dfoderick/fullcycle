@@ -68,9 +68,9 @@ class MinerStatisticsRule(object):
         if self.miner.miner_type != self.ruleparameters.minertype:
             return False
 
-        check_hash()
-        check_temp_controller()
-        check_temp_boards()
+        self.check_hash()
+        self.check_temp_controller()
+        self.check_temp_boards()
 
         return len(self.brokenrules) > 0
 
