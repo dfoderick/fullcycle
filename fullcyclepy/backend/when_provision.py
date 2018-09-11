@@ -76,48 +76,61 @@ def doprovision(miner):
         entries.addalert('could not set {0} to privileged access'.format(miner.name))
         #try a few more times then give up
     else:
-        for pool in addpools or []:
-            print(Fore.YELLOW + "     Add", pool.name, "(addpool|{0},{1},{2})".format(pool.url, pool.user + miner.name, "x"))
-            #this command adds the pool to miner and prints the result
-            result = antminerhelper.addpool(miner, pool)
-            if result.startswith("Access denied"):
-                print(Fore.RED + result)
-            else:
-                print(result)
+        addpoolstominer(miner, addpools)
 
-        namedpools = PROVISION.app.pools()
-        #process the pools found on the miner. This will pick up any pools added manually
-        for pool in miner.pools_available:
-            #check if pools is a named pool...
-            foundnamed = None
-            for namedpool in namedpools:
-                if namedpool.is_same_as(pool):
-                    foundnamed = namedpool
-                    break
-            if foundnamed:
-                #pool should take on the cononical attributes of the named pool
-                pool.named_pool = foundnamed
-                pool.user = foundnamed.user
-            PROVISION.app.add_pool(MinerPool(miner, pool.priority, pool))
+        addminerpools(miner)
 
-        #enforce default pool if miner has one set up
-        if miner.defaultpool:
-            founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
-            if founddefault is not None:
-                switchtopool(miner, founddefault, minerpool)
+        switchtodefaultpool(miner, poollist, minerpool)
 
-        #enforce default pool if it doesnt have one. find highest priority pool
-        if not miner.defaultpool:
-            def sort_by_priority(j):
-                return j.priority
-            filtered = [x for x in poollist if miner.miner_type.startswith(x.pool_type)]
-            filtered.sort(key=sort_by_priority)
-            #foundpriority = next((p for p in poollist if p.priority == 0), None)
-            if filtered:
-                switchtopool(miner, filtered[0], minerpool)
+        enforcedefaultpool(miner, poollist, minerpool)
 
         entries.add(QueueName.Q_MONITORMINER, PROVISION.app.messageencode(miner))
     return entries
+
+def enforcedefaultpool(miner, poollist, minerpool):
+    #enforce default pool if it doesnt have one. find highest priority pool
+    if not miner.defaultpool:
+        def sort_by_priority(j):
+            return j.priority
+        filtered = [x for x in poollist if miner.miner_type.startswith(x.pool_type)]
+        filtered.sort(key=sort_by_priority)
+        #foundpriority = next((p for p in poollist if p.priority == 0), None)
+        if filtered:
+            switchtopool(miner, filtered[0], minerpool)
+
+def switchtodefaultpool(miner, poollist, minerpool):
+    #enforce default pool if miner has one set up
+    if miner.defaultpool:
+        founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
+        if founddefault is not None:
+            switchtopool(miner, founddefault, minerpool)
+
+def addminerpools(miner):
+    namedpools = PROVISION.app.pools()
+    #process the pools found on the miner. This will pick up any pools added manually
+    for pool in miner.pools_available:
+        #check if pools is a named pool...
+        foundnamed = None
+        for namedpool in namedpools:
+            if namedpool.is_same_as(pool):
+                foundnamed = namedpool
+                break
+        if foundnamed:
+            #pool should take on the cononical attributes of the named pool
+            pool.named_pool = foundnamed
+            pool.user = foundnamed.user
+        PROVISION.app.add_pool(MinerPool(miner, pool.priority, pool))
+
+def addpoolstominer(miner, addpools):
+    for pool in addpools or []:
+        print(Fore.YELLOW + "     Add", pool.name, "(addpool|{0},{1},{2})".format(pool.url, pool.user + miner.name, "x"))
+        #this command adds the pool to miner and prints the result
+        result = antminerhelper.addpool(miner, pool)
+        if result.startswith("Access denied"):
+            print(Fore.RED + result)
+        else:
+            print(result)
+
 
 def switchtopool(miner, pooltoswitch, minerpool):
     '''switch pool'''

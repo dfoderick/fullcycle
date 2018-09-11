@@ -12,9 +12,9 @@ MINERS = APP.miners()
 
 CNT = 1
 while CNT < 2000:
-    entries = QueueEntries()
+    ENTRIES = QueueEntries()
     for miner in MINERS:
-        entries.add(QueueName.Q_MONITORMINER, APP.messageencode(miner))
-    APP.enqueue(entries)
-    print('sent {} messages'.format(len(entries.entries)))
+        ENTRIES.add(QueueName.Q_MONITORMINER, APP.messageencode(miner))
+    APP.enqueue(ENTRIES)
+    print('sent {} messages'.format(len(ENTRIES.entries)))
     CNT += 1

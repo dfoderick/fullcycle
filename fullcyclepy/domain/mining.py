@@ -48,7 +48,6 @@ class Miner(object):
     port = ''
     #the following are for mydevices. should move off of entity?
     username = ''
-    password = ''
     #the mydevices clientid for device
     clientid = ''
     #network identifier for miner. usually the macaddress
