@@ -31,7 +31,6 @@ def rules(miner, minerstats, minerpool):
     if miner is None or minerstats is None:
         return entries
     savedminer = RULES.app.getminer(miner)
-    cmd_restart = MinerCommand('restart', '')
     broken = gather_broken_rules(savedminer, minerstats)
     if broken:
         #TODO: could raise broken rule event???
@@ -49,6 +48,7 @@ def gather_broken_rules(savedminer, minerstats):
     return broken
 
 def add_entry_for_rule(entries, rule):
+    cmd_restart = MinerCommand('restart', '')
     if rule.action == 'alert':
         entries.addalert(RULES.addalert(RULES.app.stamp(rule.parameter)))
     elif rule.action == 'restart':
