@@ -52,35 +52,7 @@ def domonitorminer(miner):
         if minerstats is None:
             print('could not monitor {0}({1})'.format(savedminer.name, savedminer.ipaddress))
         else:
-            #what to do if monitored miner type conflicts with saved miner type???
-            #should probably provision?
-            foundpool = APPMONITOR.app.findpool(minerpool)
-            if foundpool is not None:
-                minerpool.poolname = foundpool.name
-            savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed())
-            if mineroriginalstatus == '':
-                #first time monitoring since bootup
-                print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'first time monitoring')
-            elif savedminer.status == mining.MinerStatus.Online and (mineroriginalstatus == mining.MinerStatus.Disabled or mineroriginalstatus == mining.MinerStatus.Offline):
-                #changing status from offline to online so raise event
-                entries.add(QueueName.Q_ONLINE, APPMONITOR.app.messageencode(savedminer))
-                print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'back online!')
-            #TODO: if stats.elapsed < previous.elapsed then raise provision or online events
-
-            APPMONITOR.app.putminerandstats(savedminer, minerstats, minerpool)
-            #show name of current pool instead of worker
-            print('{0} mining at {1}'.format(savedminer.name, getpoolname(minerpool)))
-            check_miner_should_provision(entries, savedminer, minerpool)
-
-            print(Fore.CYAN+str(APPMONITOR.app.now()), savedminer.name, savedminer.status,
-                  'h='+str(minerstats.currenthash), str(minerstats.minercount),
-                  '{0}/{1}/{2}'.format(str(minerstats.tempboard1),
-                                       str(minerstats.tempboard2),
-                                       str(minerstats.tempboard3)),
-                  savedminer.uptime(minerstats.elapsed),
-                  '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
-            msg = APPMONITOR.app.createmessagestats(savedminer, minerstats, minerpool)
-            entries.addbroadcast(QueueName.Q_STATISTICSUPDATED, msg)
+            process_stats(entries, savedminer, mineroriginalstatus, minerstats, minerpool, minerinfo, apicall)
 
     except pika.exceptions.ConnectionClosed as qex:
         #could not enqueue a message
@@ -107,6 +79,37 @@ def domonitorminer(miner):
     APPMONITOR.app.putminer(savedminer)
     APPMONITOR.app.updateknownminer(savedminer)
     return entries
+
+def process_stats(entries, savedminer, mineroriginalstatus, minerstats, minerpool, minerinfo, apicall):
+    #what to do if monitored miner type conflicts with saved miner type???
+    #should probably provision?
+    foundpool = APPMONITOR.app.findpool(minerpool)
+    if foundpool is not None:
+        minerpool.poolname = foundpool.name
+    savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed())
+    if mineroriginalstatus == '':
+        #first time monitoring since bootup
+        print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'first time monitoring')
+    elif savedminer.status == mining.MinerStatus.Online and (mineroriginalstatus == mining.MinerStatus.Disabled or mineroriginalstatus == mining.MinerStatus.Offline):
+        #changing status from offline to online so raise event
+        entries.add(QueueName.Q_ONLINE, APPMONITOR.app.messageencode(savedminer))
+        print(Fore.GREEN + APPMONITOR.app.now(), savedminer.name, 'back online!')
+    #TODO: if stats.elapsed < previous.elapsed then raise provision or online events
+
+    APPMONITOR.app.putminerandstats(savedminer, minerstats, minerpool)
+    #show name of current pool instead of worker
+    print('{0} mining at {1}'.format(savedminer.name, getpoolname(minerpool)))
+    check_miner_should_provision(entries, savedminer, minerpool)
+
+    print(Fore.CYAN+str(APPMONITOR.app.now()), savedminer.name, savedminer.status,
+            'h='+str(minerstats.currenthash), str(minerstats.minercount),
+            '{0}/{1}/{2}'.format(str(minerstats.tempboard1),
+                                str(minerstats.tempboard2),
+                                str(minerstats.tempboard3)),
+            savedminer.uptime(minerstats.elapsed),
+            '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
+    msg = APPMONITOR.app.createmessagestats(savedminer, minerstats, minerpool)
+    entries.addbroadcast(QueueName.Q_STATISTICSUPDATED, msg)
 
 def check_miner_should_provision(entries, savedminer, minerpool):
     #most users won't want to mine solo, so provision the miner
