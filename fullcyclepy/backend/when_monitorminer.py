@@ -12,7 +12,7 @@ from domain import mining
 from backend.fcmapp import Component
 
 APPMONITOR = Component('monitorminer')
-MONITOR_PREFETCH = int(APPMONITOR.app.configuration("monitoring.queue.prefetch"))
+MONITOR_PREFETCH = int(APPMONITOR.app.configuration.get("monitoring.queue.prefetch"))
 
 def enthread(target, args):
     '''put a method on a queue to be run in background'''
@@ -110,8 +110,8 @@ def domonitorminer(miner):
 
 def check_miner_should_provision(entries, savedminer, minerpool):
     #most users won't want to mine solo, so provision the miner
-    if not APPMONITOR.app.configuration('mining.allowsolomining'):
-        if not minerpool.currentpool or minerpool.currentpool.startswith(APPMONITOR.app.configuration('mining.solopool')):
+    if not APPMONITOR.app.configuration.get('mining.allowsolomining'):
+        if not minerpool.currentpool or minerpool.currentpool.startswith(APPMONITOR.app.configuration.get('mining.solopool')):
             entries.add(QueueName.Q_PROVISION, APPMONITOR.app.messageencode(savedminer))
 
 def getpoolname(minerpool):

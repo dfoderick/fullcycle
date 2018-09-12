@@ -13,28 +13,28 @@ from backend.fcmapp import ApplicationService
 APP = ApplicationService(component='schedule')
 APP.startup()
 APP.send(QueueName.Q_POOLCONFIGURATIONCHANGED, '')
-SLEEP_SECONDS = APP.configuration('schedule.sleep.seconds')
+SLEEP_SECONDS = APP.configuration.get('schedule.sleep.seconds')
 
 HEARTBEAT = TaskSchedule(run_on_init=True)
 HEARTBEAT.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
-HEARTBEAT.interval = 60 * APP.configuration('schedule.hearbeat.minutes')
+HEARTBEAT.interval = 60 * APP.configuration.get('schedule.hearbeat.minutes')
 
 MONITOR = TaskSchedule(run_on_init=True)
-MONITOR.interval = APP.configuration('schedule.monitor.seconds')
+MONITOR.interval = APP.configuration.get('schedule.monitor.seconds')
 
 DISCOVER = TaskSchedule(run_on_init=True)
-DISCOVER.interval = 60 * APP.configuration('schedule.discover.minutes')
+DISCOVER.interval = 60 * APP.configuration.get('schedule.discover.minutes')
 
 CAMERA = TaskSchedule(run_on_init=True)
 CAMERA.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
-CAMERA.interval = 60 * APP.configuration('schedule.camera.minutes')
+CAMERA.interval = 60 * APP.configuration.get('schedule.camera.minutes')
 
 TEMPERATURE = TaskSchedule(run_on_init=True)
 TEMPERATURE.start = datetime.datetime.now().replace(microsecond=0, second=0, minute=0) + datetime.timedelta(hours=1)
-TEMPERATURE.interval = 60 * APP.configuration('schedule.temperature.minutes')
+TEMPERATURE.interval = 60 * APP.configuration.get('schedule.temperature.minutes')
 
 UPDATEWEB = TaskSchedule(run_on_init=False)
-UPDATEWEB.interval = 60 * APP.configuration('update.fullcycleweb.interval.minutes')
+UPDATEWEB.interval = 60 * APP.configuration.get('update.fullcycleweb.interval.minutes')
 
 while True:
     try:
@@ -51,16 +51,16 @@ while True:
             DISCOVER.lastrun = datetime.datetime.now()
 
         if CAMERA.is_time_to_run():
-            if APP.configuration('camera.size') is not None:
+            if APP.configuration.get('camera.size') is not None:
                 print("[{0}] sending camera".format(APP.now()))
                 PHOTO_NAME = APP.take_picture()
                 APP.store_picture_cache(PHOTO_NAME)
-                if APP.is_enabled_configuration('telegram'):
+                if APP.configuration.is_enabled('telegram'):
                     APP.sendtelegramphoto(PHOTO_NAME)
             CAMERA.lastrun = datetime.datetime.now()
 
         if TEMPERATURE.is_time_to_run():
-            if APP.is_enabled_configuration('temperature'):
+            if APP.configuration.is_enabled('temperature'):
                 print("[{0}] sending temperature".format(APP.now()))
                 SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
                 if SENSOR_HUMID is not None or SENSOR_TEMP is not None:
@@ -72,7 +72,7 @@ while True:
             print("[{0}] sending heartbeat".format(APP.now()))
             MSG = 'At {0}'.format(APP.now())
             #get summary of known miners. name, hash or offline, pool
-            if APP.is_enabled_configuration('temperature'):
+            if APP.configuration.is_enabled('temperature'):
                 SENSOR_HUMID, SENSOR_TEMP = APP.readtemperature()
                 if SENSOR_HUMID is not None and SENSOR_TEMP is not None:
                     MSG = MSG + 'Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(SENSOR_TEMP, SENSOR_HUMID)

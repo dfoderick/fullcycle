@@ -2,17 +2,17 @@ from helpers.antminerhelper import setminertoprivileged, privileged, setprivileg
 
 class Antminer():
     def __init__(self, config, login):
-        self.__config = config
+        self.__configuration = config
         self.__login = login
 
     def set_privileged(self, miner):
-        setprivileged(miner, self.__login, self.__config['provision.apiallow.privileged'])
+        setprivileged(miner, self.__login, self.__configuration.get('provision.apiallow.privileged'))
 
     def setminertoprivileged(self, miner):
-        return setminertoprivileged(miner, self.__login, self.__config['provision.apiallow.privileged'])
+        return setminertoprivileged(miner, self.__login, self.__configuration.get('provision.apiallow.privileged'))
 
     def set_restricted(self, miner):
-        setrestricted(miner, self.__login, self.__config['provision.apiallow.restricted'])
+        setrestricted(miner, self.__login, self.__configuration.get('provision.apiallow.restricted'))
 
     def waitforonline(self, miner):
         return waitforonline(miner)

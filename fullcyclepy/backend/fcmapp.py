@@ -10,6 +10,7 @@ import redis
 import pika
 import domain.minerstatistics
 import domain.minerpool
+import backend.fcmutils as utils
 from collections import defaultdict
 from colorama import init, Fore
 from sqlalchemy.orm import sessionmaker
@@ -28,7 +29,7 @@ from helpers.telegramhelper import sendalert, sendphoto
 from backend.fcmcache import Cache, CacheKeys
 from backend.fcmbus import Bus
 from backend.fcmcomponent import ComponentName
-from backend.fcmservice import ServiceName, InfrastructureService
+from backend.fcmservice import ServiceName, InfrastructureService, Configuration, Telegram
 from backend.fcmminer import Antminer
 
 class Component(object):
@@ -41,6 +42,7 @@ class Component(object):
     def listen(self):
         if self.listeningqueue:
             self.app.bus.listen(self.listeningqueue)
+
 
 class ApplicationService:
     '''Application Services'''
@@ -55,7 +57,6 @@ class ApplicationService:
     _channels = []
     #the startup directory
     homedirectory = None
-    __config = {}
     __logger = None
     __logger_debug = None
     __logger_error = None
@@ -130,7 +131,8 @@ class ApplicationService:
         self.sensor = Sensor('controller', 'DHT22', 'controller')
 
     def init_application(self):
-        self.antminer = Antminer(self.__config, self.sshlogin())
+        self.antminer = Antminer(self.configuration, self.sshlogin())
+        self.telegram = Telegram(self.configuration, self.getservice(ServiceName.telegram))
 
     @property
     def isdebug(self):
@@ -143,23 +145,11 @@ class ApplicationService:
     def setup_configuration(self):
         '''configuration is loaded once at startup'''
         raw = BaseRepository().readrawfile(self.getconfigfilename('config/fullcycle.conf'))
-        self.__config = json.loads(raw)
-        self.applicationid = self.configuration('applicationid')
-        self.loglevel = self.configuration('loglevel')
+        config = json.loads(raw)
 
-    def configuration(self, key):
-        if not key in self.__config:
-            return None
-        return self.__config[key]
-
-    def is_enabled_configuration(self, key):
-        lookupkey = '{0}.enabled'.format(key)
-        if not lookupkey in self.__config:
-            return False
-        value = self.__config[lookupkey]
-        if isinstance(value, str):
-            return value == 'true' or value == 'True'
-        return value
+        self.configuration = Configuration(config)
+        self.applicationid = self.configuration.get('applicationid')
+        self.loglevel = self.configuration.get('loglevel')
 
     def initpoolcache(self):
         if self.__cache.get(CacheKeys.pools) is None:
@@ -237,11 +227,7 @@ class ApplicationService:
 
     def now(self):
         '''current time formatted as friendly string'''
-        return self.formattime(datetime.datetime.now())
-
-    def formattime(self, time):
-        '''standard format for time'''
-        return time.strftime('%Y-%m-%d %H:%M:%S')
+        return utils.formattime(datetime.datetime.now())
 
     #region lookups
     #todo: move to configurations section
@@ -289,7 +275,7 @@ class ApplicationService:
     def minersummary(self, max_number=10):
         '''show a summary of known miners
         '''
-        mode = self.configuration('summary')
+        mode = self.configuration.get('summary')
         if not mode:
             mode = 'auto'
         knownminers = self.knownminers()
@@ -319,7 +305,7 @@ class ApplicationService:
     def updateknownminer(self, miner):
         '''update known miner in cache'''
         sminer = self.__cache.getfromhashset(CacheKeys.knownminers, miner.key())
-        memminer = self.deserialize(MinerSchema(), self.safestring(sminer))
+        memminer = self.deserialize(MinerSchema(), utils.safestring(sminer))
         if memminer is None:
             memminer = miner
         else:
@@ -530,7 +516,7 @@ class ApplicationService:
         valu = self.trygetvaluefromcache('miner.{0}'.format(miner.key()))
         if valu is None:
             return None
-        minerfromstore = self.deserialize(MinerSchema(), self.safestring(valu))
+        minerfromstore = self.deserialize(MinerSchema(), utils.safestring(valu))
         if not minerfromstore.key():
             #do not allow entry with no key
             return None
@@ -550,7 +536,7 @@ class ApplicationService:
         str_miner = self.__cache.getfromhashset(CacheKeys.knownminers, minername)
         if str_miner is None:
             return None
-        return self.deserialize(MinerSchema(), self.safestring(str_miner))
+        return self.deserialize(MinerSchema(), utils.safestring(str_miner))
 
     def getknownminerbyname(self, minername):
         '''this could be slow if there are lots of miners'''
@@ -595,12 +581,6 @@ class ApplicationService:
         entity = domain.minerstatistics.MinerStatistics(miner, **self.deserialize(MinerStatsSchema(), valu))
         return entity
 
-    def safestring(self, thestring):
-        '''safely convert anything into string'''
-        if thestring is None: return None
-        if isinstance(thestring, str): return thestring
-        return str(thestring, "utf-8")
-
     def getminerstatscached(self):
         '''iterator for cached stats'''
         for miner in self.miners():
@@ -608,7 +588,7 @@ class ApplicationService:
 
     def messagedecodeminer(self, body) -> Miner:
         '''deserialize a miner message'''
-        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -617,7 +597,7 @@ class ApplicationService:
 
     def messagedecodeminerstats(self, body):
         '''deserialize miner stats'''
-        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -625,7 +605,7 @@ class ApplicationService:
 
     def messagedecodeminercommand(self, body):
         '''deserialize  miner command'''
-        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -633,7 +613,7 @@ class ApplicationService:
 
     def messagedecodesensor(self, body):
         '''deserialize sensor value '''
-        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
         schema = SensorValueSchema()
         #minermessage_dict = schema.load(message_envelope.bodyjson()).data
         entity = schema.load(message_envelope.bodyjson()).data
@@ -641,7 +621,7 @@ class ApplicationService:
 
     def messagedecode_configuration(self, body):
         '''deserialize  configuration command'''
-        message_envelope = self.deserializemessageenvelope(self.safestring(body))
+        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
         schema = ConfigurationMessageSchema()
         configurationmessage_dict = schema.load(message_envelope.bodyjson()).data
         configurationmessage_entity = schema.make_configurationmessage(configurationmessage_dict)
@@ -683,7 +663,7 @@ class ApplicationService:
         '''deserialize list of strings into list of miners'''
         results = []
         for item in the_list:
-            miner = self.deserialize(MinerSchema(), self.safestring(item))
+            miner = self.deserialize(MinerSchema(), utils.safestring(item))
             results.append(miner)
         return results
 
@@ -691,7 +671,7 @@ class ApplicationService:
         '''deserialize list of strings into entities'''
         results = []
         for item in the_list:
-            entity = self.deserialize(schema, self.safestring(item))
+            entity = self.deserialize(schema, utils.safestring(item))
             #todo:for pools the entry is a list
             results.append(entity)
         return results
@@ -705,7 +685,7 @@ class ApplicationService:
 
     def deserializemessageenvelope(self, body):
         '''serialize message envelope'''
-        return self._schemamsg.load(json.loads(self.safestring(body))).data
+        return self._schemamsg.load(json.loads(utils.safestring(body))).data
 
     def createmessagestats(self, miner, minerstats, minerpool):
         #always save the miner so the next guy can get latest changes
@@ -764,10 +744,10 @@ class ApplicationService:
 
     def take_picture(self, file_name='fullcycle_camera.png'):
         pic = take_picture(file_name,
-                           self.configuration('camera.size'),
-                           self.configuration('camera.quality'),
-                           self.configuration('camera.brightness'),
-                           self.configuration('camera.contrast'))
+                           self.configuration.get('camera.size'),
+                           self.configuration.get('camera.quality'),
+                           self.configuration.get('camera.brightness'),
+                           self.configuration.get('camera.contrast'))
         return pic
 
     def store_picture_cache(self, file_name):
@@ -803,13 +783,14 @@ class ApplicationService:
         self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
 
     def sendtelegrammessage(self, message):
-        if self.is_enabled_configuration('telegram'):
+        if self.configuration.is_enabled('telegram'):
             sendalert(message, self.getservice('telegram'))
 
     def sendtelegramphoto(self, file_name):
-        if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
-            if self.is_enabled_configuration('telegram'):
-                sendphoto(file_name, self.getservice('telegram'))
+        self.telegram.sendtelegramphoto(file_name)
+        #if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
+        #    if self.is_enabled_configuration('telegram'):
+        #        sendphoto(file_name, self.getservice('telegram'))
 
     def getsession(self):
         service = self.getservice(ServiceName.database)

@@ -72,6 +72,9 @@
     <Compile Include="backend\fcmservice.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\fcmutils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\purge.py">
       <SubType>Code</SubType>
     </Compile>

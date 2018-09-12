@@ -11,9 +11,9 @@ from domain import mining
 from backend.fcmapp import Component
 
 DISCOVER = Component('discover')
-MINERPORT = DISCOVER.app.configuration('discover.minerport')
-SSHPORT = DISCOVER.app.configuration('discover.sshport')
-DNS = DISCOVER.app.configuration('discover.dns')
+MINERPORT = DISCOVER.app.configuration.get('discover.minerport')
+SSHPORT = DISCOVER.app.configuration.get('discover.sshport')
+DNS = DISCOVER.app.configuration.get('discover.dns')
 
 def findminers(hosts_list, knownminers):
     '''find miners on network'''

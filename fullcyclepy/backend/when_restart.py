@@ -55,7 +55,7 @@ def dorestart(miner, command: MinerCommand):
             #if access == MinerAccessLevel.Restricted:
             #    raise Exception('Could not set miner {0} to priviledged'.format(miner.name))
         if command.parameter and command.parameter == 'reboot':
-            miner.set_ftp_port(COMPONENTACTION.app.configuration('discover.sshport'))
+            miner.set_ftp_port(COMPONENTACTION.app.configuration.get('discover.sshport'))
             antminerhelper.reboot(miner, COMPONENTACTION.app.sshlogin())
         else:
             antminerhelper.restart(miner)

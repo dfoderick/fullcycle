@@ -13,9 +13,9 @@ def main():
     mainapp.cacheclear()
 
     #this is the discovery process
-    hosts_list = networkmap(mainapp.configuration('discover.dns'), \
-        mainapp.configuration('discover.minerport'), \
-        mainapp.configuration('discover.sshport'))
+    hosts_list = networkmap(mainapp.configuration.get('discover.dns'), \
+        mainapp.configuration.get('discover.minerport'), \
+        mainapp.configuration.get('discover.sshport'))
     discoveredentries = findminers(hosts_list, mainapp.knownminers())
     dispatchmessages(mainapp, discoveredentries)
     print('done')

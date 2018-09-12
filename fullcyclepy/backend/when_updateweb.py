@@ -17,7 +17,7 @@ def when_updateweb(channel, method, properties, body):
 def doupdateweb(msg):
     '''check if web app should be updated'''
     doupdate = False
-    repository_name = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.repository')
+    repository_name = COMPONENTUPDATE.app.configuration.get('update.fullcycleweb.name.repository')
     client = docker.client.APIClient()
 
     webstatus = client.pull(repository_name)
@@ -30,7 +30,7 @@ def doupdateweb(msg):
 
     if doupdate:
         COMPONENTUPDATE.app.alert('Web application needs update')
-        container_name = COMPONENTUPDATE.app.configuration('update.fullcycleweb.name.container')
+        container_name = COMPONENTUPDATE.app.configuration.get('update.fullcycleweb.name.container')
         try:
             #docker stop
             client.stop(container_name)

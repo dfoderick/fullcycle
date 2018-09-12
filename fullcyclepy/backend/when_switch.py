@@ -45,7 +45,7 @@ def doswitch(miner, command: MinerCommand):
         #check if privileged mode, raise alert if not in privileged mode!
         access = COMPONENTACTION.app.antminer.getaccesslevel(miner)
         if access == MinerAccessLevel.Restricted:
-            miner.set_ftp_port(COMPONENTACTION.app.configuration('discover.sshport'))
+            miner.set_ftp_port(COMPONENTACTION.app.configuration.get('discover.sshport'))
             access = COMPONENTACTION.app.antminer.setminertoprivileged(miner)
             if access == MinerAccessLevel.Restricted:
                 raise Exception('Could not set miner {0} to priviledged'.format(miner.name))
