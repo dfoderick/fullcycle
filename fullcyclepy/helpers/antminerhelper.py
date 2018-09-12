@@ -76,17 +76,21 @@ def parse_statistics(entity, jsonstats, status):
 
     controllertemps = {k:v for (k, v) in jsonstats.items() if k in ['temp6', 'temp7', 'temp8']}
     entity.controllertemp = max(controllertemps.values())
-    #should be 3
-    #tempcount = jsonstats['temp_num']
-    boardtemps = {k:v for (k, v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
-    boardtempkeys = list(boardtemps.keys())
-    if len(boardtemps) > 0:
-        entity.tempboard1 = boardtemps[boardtempkeys[0]]
-    if len(boardtemps) > 1:
-        entity.tempboard2 = boardtemps[boardtempkeys[1]]
-    if len(boardtemps) > 2:
-        entity.tempboard3 = boardtemps[boardtempkeys[2]]
+    parse_board_temps(entity, jsonstats)
+    parse_fans(entity, jsonstats)
+    parse_board_status(entity, jsonstats)
 
+def parse_board_status(entity, jsonstats):
+    chains = {k:v for (k, v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
+    chainkeys = list(chains.keys())
+    if len(chains) > 0:
+        entity.boardstatus1 = chains[chainkeys[0]]
+    if len(chains) > 1:
+        entity.boardstatus2 = chains[chainkeys[1]]
+    if len(chains) > 2:
+        entity.boardstatus3 = chains[chainkeys[2]]
+
+def parse_fans(entity, jsonstats):
     fans = {k:v for (k, v) in jsonstats.items() if k.startswith('fan') and k != 'fan_num' and v != 0}
     fankeys = list(fans.keys())
     if len(fans) > 0:
@@ -96,14 +100,16 @@ def parse_statistics(entity, jsonstats, status):
     if len(fans) > 2:
         entity.fan3 = fans[fankeys[2]]
 
-    chains = {k:v for (k, v) in jsonstats.items() if k.startswith('chain_acs') and v != ''}
-    chainkeys = list(chains.keys())
-    if len(chains) > 0:
-        entity.boardstatus1 = chains[chainkeys[0]]
-    if len(chains) > 1:
-        entity.boardstatus2 = chains[chainkeys[1]]
-    if len(chains) > 2:
-        entity.boardstatus3 = chains[chainkeys[2]]
+def parse_board_temps(entity, jsonstats):
+    #should be 3
+    boardtemps = {k:v for (k, v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
+    boardtempkeys = list(boardtemps.keys())
+    if len(boardtemps) > 0:
+        entity.tempboard1 = boardtemps[boardtempkeys[0]]
+    if len(boardtemps) > 1:
+        entity.tempboard2 = boardtemps[boardtempkeys[1]]
+    if len(boardtemps) > 2:
+        entity.tempboard3 = boardtemps[boardtempkeys[2]]
 
 def parse_minerinfo(status):
     #build MinerInfo from stats
