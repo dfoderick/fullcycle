@@ -15,8 +15,9 @@ def poolstoadd(miner, minerpool, poollist):
     return poolsneeded
 
 def findpool(minerpool, pool):
-            foundpool = None
-            jpools = minerpool.allpools["POOLS"]
-            for existingpool in jpools:
-                if pool.url == existingpool["URL"] and existingpool["User"].startswith(pool.user):
-                    foundpool = existingpool
+    foundpool = None
+    jpools = minerpool.allpools["POOLS"]
+    for existingpool in jpools:
+        if pool.url == existingpool["URL"] and existingpool["User"].startswith(pool.user):
+            foundpool = existingpool
+    return foundpool

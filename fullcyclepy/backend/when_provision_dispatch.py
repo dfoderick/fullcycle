@@ -32,12 +32,7 @@ def doprovisiondispatch(miner_type=None):
             minerstats, minerinfo, apicall, minerpool = stats(miner)
             if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
                 continue
-            mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
-            if mineraccess == MinerAccessLevel.Restricted:
-                print(Fore.RED+"    Log: setting {0} to privileged...".format(miner.name))
-                PROVISION_DISPATCH.app.antminer.set_privileged(miner)
-                PROVISION_DISPATCH.app.antminer.waitforonline(miner)
-                mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
+            mineraccess = get_mineraccess(miner)
             print(Fore.GREEN + "{0} {1} {2}".format(miner.name, minerinfo.miner_type, mineraccess))
             if mineraccess == MinerAccessLevel.Restricted:
                 print("    skipping restricted access")
@@ -49,6 +44,15 @@ def doprovisiondispatch(miner_type=None):
             print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
             print(PROVISION_DISPATCH.app.exceptionmessage(ex))
     return entries
+
+def get_mineraccess(miner):
+    mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
+    if mineraccess == MinerAccessLevel.Restricted:
+        print(Fore.RED+"    Log: setting {0} to privileged...".format(miner.name))
+        PROVISION_DISPATCH.app.antminer.set_privileged(miner)
+        PROVISION_DISPATCH.app.antminer.waitforonline(miner)
+        mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
+    return mineraccess
 
 def main():
     if PROVISION_DISPATCH.app.isrunnow or PROVISION_DISPATCH.app.isdebug:
