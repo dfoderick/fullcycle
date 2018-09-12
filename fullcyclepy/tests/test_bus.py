@@ -3,7 +3,7 @@ from helpers.queuehelper import QueueName
 #from backend.fcmapp import InfrastructureService
 from backend.fcmbus import Bus
 
-class Test_bus(unittest.TestCase):
+class test_bus(unittest.TestCase):
     #@classmethod
     #def make_bus(self):
     #    return Bus(InfrastructureService('', '', '', '', '', ''))

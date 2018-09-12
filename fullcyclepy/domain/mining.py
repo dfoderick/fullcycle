@@ -239,16 +239,16 @@ class Miner(object):
         self.setminerinfo(updatedminer.minerinfo)
 
         #self.minerid = updatedminer.minerid
-        fields = ['lastmonitor','status','ipaddress','port','username','password','clientid']
+        fields = ['lastmonitor', 'status', 'ipaddress', 'port', 'username', 'password', 'clientid']
         fields.append('offlinecount')
         fields.append('defaultpool')
         fields.append('minerpool')
         fields.append('minerstats')
         fields.append('networkid')
         for fld in fields:
-                val = getattr(updatedminer, fld)
-                if val:
-                    setattr(self, fld, val)
+            val = getattr(updatedminer, fld)
+            if val:
+                setattr(self, fld, val)
 
 class AvailablePool(object):
     """A pool available on a miner
@@ -316,4 +316,3 @@ class MinerCurrentPool(object):
             if thisurl == url and thisworker.startswith(worker):
                 return pool["POOL"]
         return None
-

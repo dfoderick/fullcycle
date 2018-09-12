@@ -72,4 +72,3 @@ class MinerStatistics(object):
 
     def stats_summary(self):
         return '{0} {1}/{2} {3}'.format(self.currenthash, self.controllertemp, self.tempboardmax(), self.format_elapsed())
-

@@ -11,7 +11,7 @@ class Bus:
         if self._userlogin is None:
             self._userlogin = 'fullcycle'
     @classmethod
-    def get_queue_name(self, queue_name):
+    def get_queue_name(cls, queue_name):
         name_of_q = queue_name
         if isinstance(queue_name, QueueName):
             name_of_q = QueueName.value(queue_name)
