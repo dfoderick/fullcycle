@@ -32,31 +32,38 @@ def rules(miner, minerstats, minerpool):
         return entries
     savedminer = RULES.app.getminer(miner)
     cmd_restart = MinerCommand('restart', '')
+    broken = gather_broken_rules(savedminer, minerstats)
+    if broken:
+        #TODO: could raise broken rule event???
+        for rule in broken:
+            RULES.app.log_mineractivity(make_log_from_rule(rule))
+            add_entry_for_rule(entries, rule)
+    return entries
+
+def gather_broken_rules(savedminer, minerstats):
     broken = []
     for ruleparms in RULES.app.ruleparameters():
         rule = MinerStatisticsRule(savedminer, minerstats, ruleparms)
         if rule.isbroken():
             broken += rule.brokenrules
+    return broken
 
-    if broken:
-        #TODO: could raise broken rule event???
-        for rule in broken:
-            log = MinerLog()
-            log.createdate = datetime.datetime.utcnow()
-            log.minerid = rule.miner.key()
-            log.minername = rule.miner.name
-            log.action = rule.parameter
-            RULES.app.log_mineractivity(log)
+def add_entry_for_rule(entries, rule):
+    if rule.action == 'alert':
+        entries.addalert(RULES.addalert(RULES.app.stamp(rule.parameter)))
+    elif rule.action == 'restart':
+        entries.add(QueueName.Q_RESTART, RULES.app.createmessagecommand(rule.miner, cmd_restart))
+        entries.addalert(RULES.addalert(RULES.app.stamp('Restarted {0}'.format(rule.miner.name))))
+    else:
+        RULES.app.logerror('did not process broken rule {0}'.format(rule.parameter))
 
-            if rule.action == 'alert':
-                entries.addalert(RULES.addalert(RULES.app.stamp(rule.parameter)))
-            elif rule.action == 'restart':
-                entries.add(QueueName.Q_RESTART, RULES.app.createmessagecommand(rule.miner, cmd_restart))
-                entries.addalert(RULES.addalert(RULES.app.stamp('Restarted {0}'.format(rule.miner.name))))
-            else:
-                RULES.app.logerror('did not process broken rule {0}'.format(rule.parameter))
-
-    return entries
+def make_log_from_rule(rule):
+    log = MinerLog()
+    log.createdate = datetime.datetime.utcnow()
+    log.minerid = rule.miner.key()
+    log.minername = rule.miner.name
+    log.action = rule.parameter
+    return log
 
 def when_statisticsupdated(channel, method, properties, body):
     '''when miner stats are pulled from miner...'''
