@@ -370,8 +370,9 @@ class ApplicationService:
         file_name = self.getconfigfilename('config/services.conf')
         with open(file_name, encoding='utf-8-sig') as config_file:
             content = json.loads(config_file.read())
+        svc = None #dummy initializer to make scrutinize happy
         services = [InfrastructureService(**s) for s in content]
-        return next((s for s in services if s.name == servicename), None)
+        return next((svc for svc in services if svc.name == servicename), None)
 
     def getservice_useroverride(self, servicename):
         service = self.getservice(servicename)

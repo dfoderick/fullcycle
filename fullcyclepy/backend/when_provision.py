@@ -101,8 +101,9 @@ def enforcedefaultpool(miner, poollist, minerpool):
 
 def switchtodefaultpool(miner, poollist, minerpool):
     #enforce default pool if miner has one set up
+    pol = None #dummy variable to make scrutinize happy
     if miner.defaultpool:
-        founddefault = next((p for p in poollist if p.name == miner.defaultpool), None)
+        founddefault = next((pol for pol in poollist if pol.name == miner.defaultpool), None)
         if founddefault is not None:
             switchtopool(miner, founddefault, minerpool)
 

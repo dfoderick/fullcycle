@@ -2,7 +2,6 @@
 
 #do not remove! needed
 import json #pylint: disable=unused-import
-#from helpers import antminerhelper
 from backend.fcmapp import ApplicationService
 from backend.doflow_handlemessages import dispatchmessages
 
