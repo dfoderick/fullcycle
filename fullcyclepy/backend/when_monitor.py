@@ -1,6 +1,5 @@
 '''David Foderick, Skylake Software Inc.
 '''
-#from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
 from backend.fcmapp import Component
 

@@ -47,7 +47,6 @@ def domonitorminer(miner):
             print('skipped monitoring {0}'.format(miner.name))
             return entries
         mineroriginalstatus = savedminer.status
-        #minerinfo = getminerinfo(savedminer)
         minerstats, minerinfo, apicall, minerpool = stats(savedminer)
         #minerlcd = antminerhelper.getminerlcd(miner)
         if minerstats is None:
@@ -69,19 +68,9 @@ def domonitorminer(miner):
             #TODO: if stats.elapsed < previous.elapsed then raise provision or online events
 
             APPMONITOR.app.putminerandstats(savedminer, minerstats, minerpool)
-            #TODO:show name of current pool instead of worker
-            poolname = '?'
-            if minerpool:
-                poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
-            foundpool = APPMONITOR.app.findpool(minerpool)
-            if foundpool is not None:
-                poolname = foundpool.name
-            print('{0} mining at {1}'.format(savedminer.name, poolname))
-
-            #most users won't want to mine solo, so provision the miner
-            if not APPMONITOR.app.configuration('mining.allowsolomining'):
-                if not minerpool.currentpool or minerpool.currentpool.startswith(APPMONITOR.app.configuration('mining.solopool')):
-                    entries.add(QueueName.Q_PROVISION, APPMONITOR.app.messageencode(savedminer))
+            #show name of current pool instead of worker
+            print('{0} mining at {1}'.format(savedminer.name, getpoolname(minerpool)))
+            check_miner_should_provision(entries, savedminer, minerpool)
 
             print(Fore.CYAN+str(APPMONITOR.app.now()), savedminer.name, savedminer.status,
                   'h='+str(minerstats.currenthash), str(minerstats.minercount),
@@ -118,6 +107,21 @@ def domonitorminer(miner):
     APPMONITOR.app.putminer(savedminer)
     APPMONITOR.app.updateknownminer(savedminer)
     return entries
+
+def check_miner_should_provision(entries, savedminer, minerpool):
+    #most users won't want to mine solo, so provision the miner
+    if not APPMONITOR.app.configuration('mining.allowsolomining'):
+        if not minerpool.currentpool or minerpool.currentpool.startswith(APPMONITOR.app.configuration('mining.solopool')):
+            entries.add(QueueName.Q_PROVISION, APPMONITOR.app.messageencode(savedminer))
+
+def getpoolname(minerpool):
+    poolname = '?'
+    if minerpool:
+        poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
+    foundpool = APPMONITOR.app.findpool(minerpool)
+    if foundpool is not None:
+        poolname = foundpool.name
+    return poolname
 
 def main():
     '''main'''
