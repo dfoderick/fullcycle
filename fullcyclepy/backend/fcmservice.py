@@ -1,4 +1,5 @@
 import os
+from helpers.telegramhelper import sendalert, sendphoto
 
 class ServiceName:
     '''names of infrastructure services'''
@@ -41,7 +42,11 @@ class Telegram(object):
         self.configuration = config
         self.service = service
 
-    def sendtelegramphoto(self, file_name):
+    def sendmessage(self, message):
+        if self.configuration.is_enabled('telegram'):
+            sendalert(message, self.service)
+
+    def sendphoto(self, file_name):
         if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
             if self.configuration.is_enabled('telegram'):
                 sendphoto(file_name, self.service)

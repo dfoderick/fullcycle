@@ -14,7 +14,7 @@ def when_alert(channel, method, properties, body):
 
 def doalert(alertmsg):
     '''send the alert'''
-    ALERT.app.sendtelegrammessage(alertmsg)
+    ALERT.app.telegram.sendmessage(alertmsg)
     print("Sent telegram {0}".format(alertmsg))
 
 def main():

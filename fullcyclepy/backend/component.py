@@ -17,7 +17,7 @@ def when_component(channel, method, properties, body):
 
 def docomponent(msg):
     '''do this'''
-    APP.sendtelegrammessage(msg)
+    APP.telegram.sendmessage(msg)
     print("Sent telegram {0}".format(msg))
 
 Q = APP.subscribe(QueueName.Q_COMPONENT, when_component)

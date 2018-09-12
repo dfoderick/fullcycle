@@ -56,7 +56,7 @@ while True:
                 PHOTO_NAME = APP.take_picture()
                 APP.store_picture_cache(PHOTO_NAME)
                 if APP.configuration.is_enabled('telegram'):
-                    APP.sendtelegramphoto(PHOTO_NAME)
+                    APP.telegram.sendphoto(PHOTO_NAME)
             CAMERA.lastrun = datetime.datetime.now()
 
         if TEMPERATURE.is_time_to_run():

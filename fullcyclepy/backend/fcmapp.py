@@ -782,16 +782,6 @@ class ApplicationService:
         sensorjson = message.jsonserialize(SensorValueSchema(), reading)
         self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
 
-    def sendtelegrammessage(self, message):
-        if self.configuration.is_enabled('telegram'):
-            sendalert(message, self.getservice('telegram'))
-
-    def sendtelegramphoto(self, file_name):
-        self.telegram.sendtelegramphoto(file_name)
-        #if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
-        #    if self.is_enabled_configuration('telegram'):
-        #        sendphoto(file_name, self.getservice('telegram'))
-
     def getsession(self):
         service = self.getservice(ServiceName.database)
         engine = create_engine(service.connection, echo=False)
