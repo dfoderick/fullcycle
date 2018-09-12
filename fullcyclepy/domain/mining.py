@@ -36,61 +36,45 @@ class MinerCommand(object):
 
 class Miner(object):
     """Miner"""
-    #friendly name for your miner. keep it unique and non obscene for demos!
-    name = ''
-    #saved or derived from monitoring? status of the miner. online, offline,disabled etc
-    laststatuschanged = None
-    #saved or derived from monitoring? type of miner. Antminer S9, Antminer D3, etc.
-    miner_type = ''
-    #ip address, usuall will be local ip address. example: 192.168.x.y
-    ipaddress = ''
-    #ip port, usually will be 4028
-    port = ''
-    #the following are for mydevices. should move off of entity?
-    username = ''
-    #the mydevices clientid for device
-    clientid = ''
-    #network identifier for miner. usually the macaddress
-    networkid = ''
-    #so far have only seen Antminer S9 have the minerid from STATS command
-    minerid = ''
-    #last time the miner was monitored
-    lastmonitor = None
-    monitorcount = 0
-    monitortime = 0
-    #number of times miner is offline during this session
-    offlinecount = 0
-    #store is where the object was stored. mem is for memcache. should be moved out of domain
-    store = ''
-    #name of the pool that the miner should default to when it is provisioned
-    defaultpool = ''
-    #meta info on the miner. should be assigned during discovery and monitor
-    minerinfo = None
-    #TODO:MinerCurrentPool
-    minerpool = None
-    #TODO:MinerStatistics
-    minerstats = None
 
     def __init__(self, name, status=MinerStatus.Online, miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
                  lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None):
+        #friendly name for your miner
         self.name = name
         self._status = status
+        #saved or derived from monitoring? type of miner. Antminer S9, Antminer D3, etc.
         self.miner_type = miner_type
+        #ip address, usuall will be local ip address. example: 192.168.x.y
         self.ipaddress = ipaddress
+        #ip port, usually will be 4028
         self.port = port
         self.ftpport = ftpport
         self.username = username
         self.password = password
+        #the mydevices clientid for device
         self.clientid = clientid
+        #network identifier for miner. usually the macaddress
         self.networkid = networkid
+        #so far have only seen Antminer S9 have the minerid from STATS command
         self.minerid = minerid
+        #last time the miner was monitored
         self.lastmonitor = lastmonitor
+        self.monitorcount = 0
+        self.monitortime = 0
+        #number of times miner is offline during this session
         self.offlinecount = offlinecount
+        #name of the pool that the miner should default to when it is provisioned
         self.defaultpool = defaultpool
+        #meta info on the miner. should be assigned during discovery and monitor
         self.minerinfo = minerinfo
+        #MinerCurrentPool
         self.minerpool = minerpool
+        #MinerStatistics
         self.minerstats = minerstats
+        #status of the miner. online, offline,disabled etc
         self.laststatuschanged = laststatuschanged
+        #store is where the object was stored. mem is for memcache.
+        self.store = ''
 
     @property
     def status(self):
