@@ -2,13 +2,14 @@
 # runs behind firewall
 # Listens for Discovered event
 '''
+import domain.minerpool
 from threading import Thread
 from queue import Queue
 from colorama import Fore
 from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
 from domain import services
-from domain.mining import MinerAccessLevel, MinerPool
+from domain.mining import MinerAccessLevel
 from backend.fcmapp import Component
 
 PROVISION = Component('provision', option='')
@@ -119,7 +120,7 @@ def addminerpools(miner):
             #pool should take on the cononical attributes of the named pool
             pool.named_pool = foundnamed
             pool.user = foundnamed.user
-        PROVISION.app.add_pool(MinerPool(miner, pool.priority, pool))
+        PROVISION.app.add_pool(domain.minerpool.MinerPool(miner, pool.priority, pool))
 
 def addpoolstominer(miner, addpools):
     for pool in addpools or []:

@@ -1,5 +1,6 @@
 '''Mining Rules'''
-from domain.mining import Miner, MinerStatistics
+import domain.minerstatistics
+from domain.mining import Miner
 
 class RuleParameters(object):
     '''configurable parameters for rules'''
@@ -23,7 +24,7 @@ class BrokenRule(object):
 class MinerStatisticsRule(object):
     '''Rule for evaluating miner statistics'''
 
-    def __init__(self, miner: Miner, statistics: MinerStatistics, ruleparameters: RuleParameters):
+    def __init__(self, miner: Miner, statistics: domain.minerstatistics.MinerStatistics, ruleparameters: RuleParameters):
         self.miner = miner
         self.statistics = statistics
         self.ruleparameters = ruleparameters

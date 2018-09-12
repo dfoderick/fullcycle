@@ -7,7 +7,8 @@
 '''
 import unittest
 import datetime
-from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool, MinerStatistics
+import domain.minerstatistics
+from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool
 from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
@@ -21,7 +22,7 @@ class TestSerialization(unittest.TestCase):
         miner.minerinfo = MinerInfo('Antminer S9', '123')
         miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={})
         miner.minerpool.poolname = 'unittest'
-        miner.minerstats = MinerStatistics(miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
         miner.minerstats.boardstatus1 = 'o'
         miner.minerstats.boardstatus2 = 'oo'
         miner.minerstats.boardstatus3 = 'ooo'
@@ -32,7 +33,7 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(isinstance(reminer.minerinfo, MinerInfo))
         self.assertTrue(isinstance(reminer.minerpool, MinerCurrentPool))
         self.assertTrue(reminer.minerpool.poolname == 'unittest')
-        self.assertTrue(isinstance(reminer.minerstats, MinerStatistics))
+        self.assertTrue(isinstance(reminer.minerstats, domain.minerstatistics.MinerStatistics))
         self.assertTrue(reminer.laststatuschanged)
         self.assertTrue(reminer.minerstats.boardstatus1 == 'o')
         self.assertTrue(reminer.minerstats.boardstatus2 == 'oo')

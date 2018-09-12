@@ -1,6 +1,7 @@
 '''serialization schema'''
+import domain.minerstatistics
 from marshmallow import Schema, fields, post_load
-from domain.mining import MinerInfo, MinerCurrentPool, MinerStatistics, Miner, Pool, MinerCommand, AvailablePool
+from domain.mining import MinerInfo, MinerCurrentPool, Miner, Pool, MinerCommand, AvailablePool
 
 class MinerInfoSchema(Schema):
     '''schema for miner information'''
@@ -48,7 +49,7 @@ class MinerStatsSchema(Schema):
 
     @post_load
     def make(self, data):
-        return MinerStatistics(miner=None, **data)
+        return domain.minerstatistics.MinerStatistics(miner=None, **data)
 
 class MinerSchema(Schema):
     '''schema for a miner'''

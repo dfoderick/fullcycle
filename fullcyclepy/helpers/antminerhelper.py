@@ -5,9 +5,10 @@
 '''
 import time
 import datetime
+import domain.minerstatistics
 from helpers.minerapi import MinerApi
 from helpers.ssh import Ssh
-from domain.mining import Miner, MinerInfo, MinerStatistics, MinerCurrentPool, MinerAccessLevel, MinerApiCall
+from domain.mining import Miner, MinerInfo, MinerCurrentPool, MinerAccessLevel, MinerApiCall
 
 class MinerMonitorException(Exception):
     """Happens during monitoring of miner"""
@@ -30,7 +31,7 @@ def stats(miner: Miner):
 
     try:
         thecall = MinerApiCall(miner)
-        entity = MinerStatistics(miner, when=datetime.datetime.utcnow())
+        entity = domain.minerstatistics.MinerStatistics(miner, when=datetime.datetime.utcnow())
         api = MinerApi(host=miner.ipaddress, port=int(miner.port))
 
         thecall.start()

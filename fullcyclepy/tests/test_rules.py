@@ -1,7 +1,8 @@
 '''test rules'''
 import unittest
 import datetime
-from domain.mining import Miner, MinerInfo, MinerStatistics
+import domain.minerstatistics
+from domain.mining import Miner, MinerInfo
 from domain.miningrules import RuleParameters, MinerStatisticsRule, BrokenRule
 
 class TestRules(unittest.TestCase):
@@ -11,7 +12,7 @@ class TestRules(unittest.TestCase):
         self.miner = Miner('Test', 'Online', 'Antminer S9', '', '', '', '', '', '', '',
                            lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=self.minerinfo)
 
-        self.minerstats = MinerStatistics(self.miner, datetime.datetime.utcnow(), 3, currenthash=9999,
+        self.minerstats = domain.minerstatistics.MinerStatistics(self.miner, datetime.datetime.utcnow(), 3, currenthash=9999,
                                           controllertemp=0, tempboard1=0, tempboard2=0, tempboard3=0)
 
     def test_int_has_reading(self):

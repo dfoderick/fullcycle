@@ -139,6 +139,12 @@
     <Compile Include="domain\loggingrepository.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="domain\minerpool.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domain\minerstatistics.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="domain\miningrules.py">
       <SubType>Code</SubType>
     </Compile>

@@ -8,11 +8,13 @@ import json
 import base64
 import redis
 import pika
+import domain.minerstatistics
+import domain.minerpool
 from collections import defaultdict
 from colorama import init, Fore
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from domain.mining import Miner, Pool, MinerPool, AvailablePool, MinerCurrentPool, MinerStatistics, MinerStatus
+from domain.mining import Miner, Pool, AvailablePool, MinerCurrentPool, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from domain.sensors import Sensor, SensorValue
@@ -166,7 +168,7 @@ class ApplicationService:
         for pool in self.pools():
             #pool isinstance of Pool
             availablepool = AvailablePool(pool.pool_type, pool, pool.url, pool.user, pool.password, pool.priority)
-            minerpool = MinerPool(miner=None, priority=0, pool=availablepool)
+            minerpool = domain.minerpool.MinerPool(miner=None, priority=0, pool=availablepool)
             self.putpool(pool)
             self.add_pool(minerpool)
 
@@ -349,7 +351,7 @@ class ApplicationService:
         entity = MinerCurrentPool(miner, **self.deserialize(MinerCurrentPoolSchema(), valu))
         return entity
 
-    def add_pool(self, minerpool: MinerPool):
+    def add_pool(self, minerpool: domain.minerpool.MinerPool):
         '''see if pool is known or not, then add it'''
         knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, minerpool.pool.key)
         if not knownpool:
@@ -590,7 +592,7 @@ class ApplicationService:
         '''get stats entity'''
         valu = self.trygetvaluefromcache(miner.name + '.stats')
         if valu is None: return None
-        entity = MinerStatistics(miner, **self.deserialize(MinerStatsSchema(), valu))
+        entity = domain.minerstatistics.MinerStatistics(miner, **self.deserialize(MinerStatsSchema(), valu))
         return entity
 
     def safestring(self, thestring):

@@ -1,7 +1,8 @@
 '''test mining domain'''
 import unittest
 import datetime
-from domain.mining import Miner, MinerStatus, MinerInfo, MinerStatistics, MinerApiCall
+import domain.minerstatistics
+from domain.mining import Miner, MinerStatus, MinerInfo, MinerApiCall
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -104,7 +105,7 @@ class TestMiner(unittest.TestCase):
 
     def test_miner_elapsed_format(self):
         miner = Miner('test')
-        miner.minerstats = MinerStatistics(miner)
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
         self.assertTrue(miner.minerstats.format_elapsed() == "0:0:0:0")
 
     def test_miner_monitored_nothing_none(self):
@@ -114,13 +115,13 @@ class TestMiner(unittest.TestCase):
 
     def test_miner_monitored_not_nothing_ismonitored(self):
         miner = Miner('test')
-        stats = MinerStatistics(miner)
+        stats = domain.minerstatistics.MinerStatistics(miner)
         miner.monitored(stats, pool=None, info=None, sec=None)
         self.assertFalse(miner.lastmonitor is None)
 
     def test_miner_monitored_timer(self):
         miner = Miner('test')
-        stats = MinerStatistics(miner)
+        stats = domain.minerstatistics.MinerStatistics(miner)
         apicall = MinerApiCall(miner)
         apicall.start()
         apicall.stop()
