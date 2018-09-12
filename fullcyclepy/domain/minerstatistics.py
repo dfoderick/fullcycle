@@ -1,4 +1,35 @@
 
+#"Pool Stale%": 0,
+#"Discarded": 86497,
+#"Diff": "65.5K",
+#"Rejected": 15,
+#"Proxy Type": "",
+#"Getworks": 3311,
+#"Last Share Time": "0:00:20",
+#"Pool Rejected%": 0.1838,
+#"Accepted": 8148,
+#"Last Share Difficulty": 65536,
+#"Difficulty Accepted": 533987328,
+#"Has Stratum": true,
+#"Priority": 1,
+#"Stale": 3,
+#"Long Poll": "N",
+#"Quota": 1,
+#"URL": "stratum+tcp://solo.antpool.com:3333",
+#"Proxy": "",
+#"Get Failures": 1,
+#"Diff1 Shares": 0,
+#"Best Share": 255598083,
+#"Stratum Active": true,
+#"POOL": 0,
+#"Has GBT": false,
+#"User": "antminer_1",
+#"Status": "Alive",
+#"Stratum URL": "solo.antpool.com",
+#"Remote Failures": 1,
+#"Difficulty Rejected": 983040,
+#"Difficulty Stale": 0
+
 class MinerStatistics(object):
     '''Statistics for a miner
     temperature and hash

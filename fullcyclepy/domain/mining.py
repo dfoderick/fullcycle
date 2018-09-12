@@ -237,62 +237,19 @@ class Miner(object):
         if self.minerid == updatedminer.minerid and self.name != updatedminer.name:
             self.name = updatedminer.name
         self.setminerinfo(updatedminer.minerinfo)
-        if updatedminer.lastmonitor:
-            self.lastmonitor = updatedminer.lastmonitor
-        if updatedminer.status:
-            self.status = updatedminer.status
-        if updatedminer.ipaddress:
-            self.ipaddress = updatedminer.ipaddress
-        if updatedminer.port:
-            self.port = updatedminer.port
-        if updatedminer.username:
-            self.username = updatedminer.username
-        if updatedminer.password:
-            self.password = updatedminer.password
-        if updatedminer.clientid:
-            self.clientid = updatedminer.clientid
-        if updatedminer.networkid:
-            self.networkid = updatedminer.networkid
-        #self.minerid = updatedminer.minerid
-        if updatedminer.offlinecount:
-            self.offlinecount = updatedminer.offlinecount
-        if updatedminer.defaultpool:
-            self.defaultpool = updatedminer.defaultpool
-        if updatedminer.minerpool is not None:
-            self.minerpool = updatedminer.minerpool
-        if updatedminer.minerstats is not None:
-            self.minerstats = updatedminer.minerstats
 
-          #"Pool Stale%": 0,
-          #"Discarded": 86497,
-          #"Diff": "65.5K",
-          #"Rejected": 15,
-          #"Proxy Type": "",
-          #"Getworks": 3311,
-          #"Last Share Time": "0:00:20",
-          #"Pool Rejected%": 0.1838,
-          #"Accepted": 8148,
-          #"Last Share Difficulty": 65536,
-          #"Difficulty Accepted": 533987328,
-          #"Has Stratum": true,
-          #"Priority": 1,
-          #"Stale": 3,
-          #"Long Poll": "N",
-          #"Quota": 1,
-          #"URL": "stratum+tcp://solo.antpool.com:3333",
-          #"Proxy": "",
-          #"Get Failures": 1,
-          #"Diff1 Shares": 0,
-          #"Best Share": 255598083,
-          #"Stratum Active": true,
-          #"POOL": 0,
-          #"Has GBT": false,
-          #"User": "antminer_1",
-          #"Status": "Alive",
-          #"Stratum URL": "solo.antpool.com",
-          #"Remote Failures": 1,
-          #"Difficulty Rejected": 983040,
-          #"Difficulty Stale": 0
+        #self.minerid = updatedminer.minerid
+        fields = ['lastmonitor','status','ipaddress','port','username','password','clientid']
+        fields.append('offlinecount')
+        fields.append('defaultpool')
+        fields.append('minerpool')
+        fields.append('minerstats')
+        fields.append('networkid')
+        for fld in fields:
+                val = getattr(updatedminer, fld)
+                if val:
+                    setattr(self, fld, val)
+
 class AvailablePool(object):
     """A pool available on a miner
     pool_type is the miner type (e.g. Antminer S9)

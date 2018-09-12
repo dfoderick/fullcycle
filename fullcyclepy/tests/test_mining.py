@@ -128,5 +128,29 @@ class TestMiner(unittest.TestCase):
         miner.monitored(stats, pool=None, info=None, sec=apicall.elapsed())
         self.assertFalse(miner.lastmonitor is None)
 
+    def test_miner_update(self):
+        miner = Miner('test')
+        miner.ipaddress = 'ip1'
+        minerupdate = Miner('test')
+        minerupdate.ipaddress = 'ip2'
+        miner.updatefrom(minerupdate)
+        self.assertTrue(miner.ipaddress == minerupdate.ipaddress)
+
+    def test_miner_no_update(self):
+        miner = Miner('test')
+        miner.ipaddress = 'ip1'
+        minerupdate = Miner('test')
+        minerupdate.ipaddress = None
+        miner.updatefrom(minerupdate)
+        self.assertTrue(miner.ipaddress != minerupdate.ipaddress)
+
+    def test_miner_update_port(self):
+        miner = Miner('test')
+        miner.port = 'port1'
+        minerupdate = Miner('test')
+        minerupdate.port = 'port2'
+        miner.updatefrom(minerupdate)
+        self.assertTrue(miner.port == minerupdate.port)
+
 if __name__ == '__main__':
     unittest.main()
