@@ -1,7 +1,11 @@
 import os
 from helpers.telegramhelper import sendalert, sendphoto
-from domain.mining import Miner, Pool
-from messaging.schema import MinerSchema, PoolSchema
+from messaging.schema import MinerSchema, PoolSchema, AvailablePoolSchema, MinerCurrentPoolSchema
+from domain.mining import Miner, Pool, MinerCurrentPool, AvailablePool
+from domain.rep import PoolRepository
+import domain.minerpool
+from backend.fcmcache import CacheKeys
+import backend.fcmutils as utils
 
 class ServiceName:
     '''names of infrastructure services'''

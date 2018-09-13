@@ -14,13 +14,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import domain.minerstatistics
 import domain.minerpool
-from domain.mining import Miner, Pool, AvailablePool, MinerCurrentPool, MinerStatus
+from domain.mining import Miner, AvailablePool, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
 from domain.sensors import Sensor, SensorValue
 from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
-from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema, AvailablePoolSchema, PoolSchema
+from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
 from helpers.temperaturehelper import readtemperature
@@ -236,7 +236,7 @@ class ApplicationService(BaseService):
         dknownminers = self.__cache.gethashset(CacheKeys.knownminers)
         if dknownminers is not None and dknownminers:
             #get list of miners from cache
-            return utils.deserializelistofstrings(list(dknownminers.values(), MinerSchema()))
+            return utils.deserializelistofstrings(list(dknownminers.values()), MinerSchema())
         knownminers = self.miners()
         return knownminers
 
