@@ -10,6 +10,7 @@ from helpers import antminerhelper
 from helpers.queuehelper import QueueName
 from domain.mining import MinerCommand
 from domain.logging import MinerLog
+import backend.fcmutils as utils
 from backend.fcmapp import Component
 
 COMPONENTACTION = Component('action')
@@ -37,7 +38,7 @@ def when_restart(channel, method, properties, body):
         COMPONENTACTION.app.logexception(jex)
         #could be json error so log the message
         COMPONENTACTION.app.logdebug(COMPONENTACTION.app.exceptionmessage(jex))
-        COMPONENTACTION.app.logdebug(COMPONENTACTION.app.safestring(body))
+        COMPONENTACTION.app.logdebug(utils.safestring(body))
     except BaseException as ex:
         COMPONENTACTION.app.bus.reject(COMPONENTACTION.listeningqueue, method.delivery_tag)
         COMPONENTACTION.app.logexception(ex)

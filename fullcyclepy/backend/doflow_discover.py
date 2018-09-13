@@ -10,7 +10,7 @@ from backend.when_discover import findminers
 def main():
     mainapp = ApplicationService(component='discover', option='')
 
-    mainapp.cacheclear()
+    mainapp.cache.purge()
 
     #this is the discovery process
     hosts_list = networkmap(mainapp.configuration.get('discover.dns'), \

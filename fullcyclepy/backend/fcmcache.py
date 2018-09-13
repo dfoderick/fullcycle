@@ -65,6 +65,17 @@ class Cache:
         '''close the cache'''
         self.__redis = None
 
+    def trygetvaluefromcache(self, key):
+        '''get value from cache
+            similar to get but does not raise exception
+        '''
+        try:
+            return self.get(key)
+        except Exception:
+            pass
+        return None
+
+
 class CacheKeys:
     '''all keys stored in cache'''
     knownminers = 'knownminers'

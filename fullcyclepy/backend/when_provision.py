@@ -2,12 +2,12 @@
 # runs behind firewall
 # Listens for Discovered event
 '''
-import domain.minerpool
 from threading import Thread
 from queue import Queue
 from colorama import Fore
 from helpers import antminerhelper
 from helpers.queuehelper import QueueName, QueueEntries
+import domain.minerpool
 from domain import services
 from domain.mining import MinerAccessLevel
 from backend.fcmapp import Component
@@ -45,7 +45,7 @@ def when_provision(channel, method, properties, body):
 def doprovision(miner):
     '''provision/configure a miner'''
     entries = QueueEntries()
-    poollist = PROVISION.app.pools()
+    poollist = PROVISION.app.pools.get_all_pools()
     print("{0} pools configured".format(len(poollist)))
     print('{0} {1}'.format(miner.name, miner.ipaddress))
     mineraccess = ''
@@ -56,7 +56,7 @@ def doprovision(miner):
         minerstats, minerinfo, apicall, minerpool = antminerhelper.stats(miner)
         miner.setminerinfo(minerinfo)
         #find the current pool in known pools
-        knownpool = PROVISION.app.findpool(minerpool)
+        knownpool = PROVISION.app.pools.findpool(minerpool)
         if knownpool is not None:
             minerpool.poolname = knownpool.name
         miner.minerpool = minerpool
@@ -108,7 +108,7 @@ def switchtodefaultpool(miner, poollist, minerpool):
             switchtopool(miner, founddefault, minerpool)
 
 def addminerpools(miner):
-    namedpools = PROVISION.app.pools()
+    namedpools = PROVISION.app.pools.get_all_pools()
     #process the pools found on the miner. This will pick up any pools added manually
     for pool in miner.pools_available:
         #check if pools is a named pool...
@@ -121,7 +121,7 @@ def addminerpools(miner):
             #pool should take on the cononical attributes of the named pool
             pool.named_pool = foundnamed
             pool.user = foundnamed.user
-        PROVISION.app.add_pool(domain.minerpool.MinerPool(miner, pool.priority, pool))
+        PROVISION.app.pools.add_pool(domain.minerpool.MinerPool(miner, pool.priority, pool))
 
 def addpoolstominer(miner, addpools):
     for pool in addpools or []:

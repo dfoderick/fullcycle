@@ -75,11 +75,11 @@ def when_statisticsupdated(channel, method, properties, body):
     except json.decoder.JSONDecodeError as jex:
         RULES.app.logexception(jex)
         RULES.app.logdebug(RULES.app.exceptionmessage(jex))
-        RULES.app.logdebug(RULES.app.safestring(body))
+        RULES.app.logdebug(utils.safestring(body))
     except BaseException as ex:
         RULES.app.logexception(ex)
         RULES.app.logdebug(RULES.app.exceptionmessage(ex))
-        RULES.app.logdebug(RULES.app.safestring(body))
+        RULES.app.logdebug(utils.safestring(body))
 
 def dorules(miner, minerstats, minerpool):
     '''run the rules on them'''

@@ -1,5 +1,7 @@
 import os
 from helpers.telegramhelper import sendalert, sendphoto
+from domain.mining import Miner, Pool
+from messaging.schema import MinerSchema, PoolSchema
 
 class ServiceName:
     '''names of infrastructure services'''
@@ -18,6 +20,27 @@ class InfrastructureService:
         self.port = port
         self.user = user
         self.password = password
+
+class BaseService():
+    def __init__(self):
+        self.homedirectory = os.path.dirname(__file__)
+
+    def getconfigfilename(self, configfilename):
+        '''get the contents of a config file'''
+        return os.path.join(self.homedirectory, configfilename)
+    def serialize(self, entity):
+        '''serialize any entity
+        only need schema, message class not needed
+        '''
+        if isinstance(entity, Miner):
+            schema = MinerSchema()
+            return schema.dumps(entity).data
+
+        if isinstance(entity, Pool):
+            schema = PoolSchema()
+            return schema.dumps(entity).data
+        return None
+
 
 class Configuration(object):
     def __init__(self, config):
@@ -50,4 +73,3 @@ class Telegram(object):
         if os.path.isfile(file_name) and os.path.getsize(file_name) > 0:
             if self.configuration.is_enabled('telegram'):
                 sendphoto(file_name, self.service)
-

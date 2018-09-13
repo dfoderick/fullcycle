@@ -11,7 +11,7 @@ APP = ApplicationService()
 print('started', APP.component)
 
 APP.tryputcache(key='test', value='value')
-CACHE_VALUE = utils.safestring(APP.trygetvaluefromcache('test'))
+CACHE_VALUE = utils.safestring(APP.cache.trygetvaluefromcache('test'))
 if CACHE_VALUE == 'value':
     print(Fore.GREEN+'cache is working')
 else:

@@ -83,7 +83,7 @@ def domonitorminer(miner):
 def process_stats(entries, savedminer, mineroriginalstatus, minerstats, minerpool, minerinfo, apicall):
     #what to do if monitored miner type conflicts with saved miner type???
     #should probably provision?
-    foundpool = APPMONITOR.app.findpool(minerpool)
+    foundpool = APPMONITOR.app.pools.findpool(minerpool)
     if foundpool is not None:
         minerpool.poolname = foundpool.name
     savedminer.monitored(minerstats, minerpool, minerinfo, apicall.elapsed())
@@ -121,7 +121,7 @@ def getpoolname(minerpool):
     poolname = '?'
     if minerpool:
         poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
-    foundpool = APPMONITOR.app.findpool(minerpool)
+    foundpool = APPMONITOR.app.pools.findpool(minerpool)
     if foundpool is not None:
         poolname = foundpool.name
     return poolname

@@ -28,10 +28,10 @@ def doprovisiondispatch(miner_type=None):
     for miner in miners:
         if miner.is_disabled():
             continue
-        process_miner(miner, entries)
+        process_miner(miner, entries, miner_type)
     return entries
 
-def process_miner(miner, entries):
+def process_miner(miner, entries, miner_type):
     try:
         minerstats, minerinfo, apicall, minerpool = stats(miner)
         if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:

@@ -6,6 +6,6 @@ APP = ApplicationService()
 print('started', APP.component)
 
 #purge cache
-APP.cacheclear()
+APP.cache.purge()
 #purge rabbit
 APP.shutdown()

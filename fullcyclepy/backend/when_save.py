@@ -59,7 +59,7 @@ def savepool(msg):
         if 'priority' in pair:
             priority = pair['priority']
     pool = Pool(pool_type, name, url, user, priority)
-    COMPONENTSAVE.app.save_pool(pool)
+    COMPONENTSAVE.app.pools.save_pool(pool)
     return pool
 
 def main():

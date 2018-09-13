@@ -36,7 +36,7 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
             print('Could not find saved miner {0}'.format(miner.name))
             savedminer = miner
         poolname = '{0} {1}'.format(minerpool.currentpool, minerpool.currentworker)
-        foundpool = APP.findpool(minerpool)
+        foundpool = APP.pools.findpool(minerpool)
         if foundpool is not None:
             minerpool.poolname = foundpool.name
         savedminer.monitored(minerstats, minerpool, minerinfo, statspolling.elapsed())
