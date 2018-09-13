@@ -10,7 +10,7 @@ else:
     print('telegram is not enabled in configuration')
 
 if APP.configuration.is_enabled('camera'):
-    FILEOUT = APP.take_picture('fullcycle_camera.png')
+    FILEOUT = APP.camera.take_picture('fullcycle_camera.png')
     APP.telegram.sendphoto(FILEOUT)
 else:
     print('camera is not enabled in configuration')

@@ -53,8 +53,8 @@ while True:
         if CAMERA.is_time_to_run():
             if APP.configuration.get('camera.size') is not None:
                 print("[{0}] sending camera".format(APP.now()))
-                PHOTO_NAME = APP.take_picture()
-                APP.store_picture_cache(PHOTO_NAME)
+                PHOTO_NAME = APP.camera.take_picture()
+                APP.camera.store_picture_cache(PHOTO_NAME)
                 if APP.configuration.is_enabled('telegram'):
                     APP.telegram.sendphoto(PHOTO_NAME)
             CAMERA.lastrun = datetime.datetime.now()

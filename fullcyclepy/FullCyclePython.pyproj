@@ -63,10 +63,16 @@
     <Compile Include="backend\fcmcache.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="backend\fcmcamera.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="backend\fcmcomponent.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="backend\fcmminer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="backend\fcmsensors.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="backend\fcmservice.py">

@@ -16,19 +16,20 @@ import domain.minerpool
 from domain.mining import Miner, AvailablePool, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
-from domain.sensors import Sensor, SensorValue
 from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
-from helpers.camerahelper import take_picture
 from helpers.temperaturehelper import readtemperature
 import backend.fcmutils as utils
+#import backend.fcmcamera
+from backend.fcmcamera import CameraService
 from backend.fcmcache import Cache, CacheKeys
 from backend.fcmbus import Bus
 from backend.fcmcomponent import ComponentName
 from backend.fcmservice import BaseService, PoolService, ServiceName, InfrastructureService, Configuration, Telegram
 from backend.fcmminer import Antminer
+from backend.fcmsensors import SensorService
 
 class Component(object):
     '''A component is a unit of execution of FCM'''
@@ -58,7 +59,13 @@ class ApplicationService(BaseService):
     __logger_error = None
 
     def __init__(self, component=ComponentName.fullcycle, option=None, announceyourself=False):
-        super(ApplicationService, self).__init__()
+        #TODO: call the one in parent before this
+        self.homedirectory = os.path.dirname(__file__)
+        self.initcache()
+        self.setup_configuration()
+        super().__init__(self.configuration, self.__cache)
+        #for some reason super fails
+
         self.component = component
         if self.component == ComponentName.fullcycle:
             self.print('Starting FCM Init')
@@ -66,13 +73,11 @@ class ApplicationService(BaseService):
         self.startupstuff()
         if self.component == ComponentName.fullcycle:
             self.print('Starting FCM Configuration')
-        self.setup_configuration()
         self.initlogger()
         self.initmessaging()
         #this is slow. should be option to opt out of cache?
         if self.component == ComponentName.fullcycle:
             self.loginfo('Starting FCM Cache')
-        self.initcache()
         self.initbus()
         self.init_application()
         self.init_sensors()
@@ -96,10 +101,6 @@ class ApplicationService(BaseService):
         #used with colorama on windows
         init(autoreset=True)
 
-    def initmessaging(self):
-        '''start up messaging'''
-        self._schemamsg = MessageSchema()
-
     def initcache(self):
         '''start up cache'''
         try:
@@ -118,21 +119,22 @@ class ApplicationService(BaseService):
         login = self.getservice(ServiceName.messagebus)
         self.__bus = Bus(login)
 
-    @property
-    def bus(self):
-        return self.__bus
-
-    @property
-    def cache(self):
-        return self.__cache
-
     def init_sensors(self):
-        self.sensor = Sensor('controller', 'DHT22', 'controller')
+        self.sensors = SensorService(self.configuration, self.__cache)
 
     def init_application(self):
         self.antminer = Antminer(self.configuration, self.sshlogin())
         self.telegram = Telegram(self.configuration, self.getservice(ServiceName.telegram))
-        self.pools = PoolService(self.cache)
+        self.pools = PoolService(self.configuration, self.__cache)
+        self.camera = CameraService(self.configuration, self.__cache)
+
+    @property
+    def bus(self):
+        return self.__bus
+
+    #@property
+    #def cache(self):
+    #    return self.__cache
 
     @property
     def isdebug(self):
@@ -247,16 +249,6 @@ class ApplicationService(BaseService):
             if not foundminer:
                 allminers.append(miner)
         return allminers
-
-    def knownsensors(self):
-        dknownsensors = self.__cache.gethashset(CacheKeys.knownsensors)
-        if dknownsensors is not None and dknownsensors:
-            return utils.deserializelist_withschema(SensorValueSchema(), list(dknownsensors.values()))
-        return None
-
-    def addknownsensor(self, sensorvalue):
-        val = utils.jsonserialize(SensorValueSchema(), sensorvalue)
-        self.__cache.putinhashset(CacheKeys.knownsensors, sensorvalue.sensorid, val)
 
     def minersummary(self, max_number=10):
         '''show a summary of known miners
@@ -513,7 +505,7 @@ class ApplicationService(BaseService):
 
     def messagedecodeminer(self, body) -> Miner:
         '''deserialize a miner message'''
-        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
+        message_envelope = super().deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -522,7 +514,7 @@ class ApplicationService(BaseService):
 
     def messagedecodeminerstats(self, body):
         '''deserialize miner stats'''
-        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
+        message_envelope = super().deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -530,7 +522,7 @@ class ApplicationService(BaseService):
 
     def messagedecodeminercommand(self, body):
         '''deserialize  miner command'''
-        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
+        message_envelope = super().deserializemessageenvelope(utils.safestring(body))
         schema = MinerMessageSchema()
         minermessage_dict = schema.load(message_envelope.bodyjson()).data
         minermessage_entity = schema.make_minermessage(minermessage_dict)
@@ -538,7 +530,7 @@ class ApplicationService(BaseService):
 
     def messagedecodesensor(self, body):
         '''deserialize sensor value '''
-        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
+        message_envelope = super().deserializemessageenvelope(utils.safestring(body))
         schema = SensorValueSchema()
         #minermessage_dict = schema.load(message_envelope.bodyjson()).data
         entity = schema.load(message_envelope.bodyjson()).data
@@ -546,47 +538,35 @@ class ApplicationService(BaseService):
 
     def messagedecode_configuration(self, body):
         '''deserialize  configuration command'''
-        message_envelope = self.deserializemessageenvelope(utils.safestring(body))
+        message_envelope = super().deserializemessageenvelope(utils.safestring(body))
         schema = ConfigurationMessageSchema()
         configurationmessage_dict = schema.load(message_envelope.bodyjson()).data
         configurationmessage_entity = schema.make_configurationmessage(configurationmessage_dict)
         return configurationmessage_entity
-
-    def createmessageenvelope(self):
-        '''create message envelope'''
-        return Message(timestamp=datetime.datetime.utcnow(), sender=self.component)
-
-    def serializemessageenvelope(self, msg):
-        '''serialize message envelope'''
-        return self._schemamsg.dumps(msg).data
-
-    def deserializemessageenvelope(self, body):
-        '''serialize message envelope'''
-        return self._schemamsg.load(json.loads(utils.safestring(body))).data
 
     def createmessagestats(self, miner, minerstats, minerpool):
         #always save the miner so the next guy can get latest changes
         #only put in cache if it came from cache
         if miner.store == 'mem':
             self.putminer(miner)
-        message = self.createmessageenvelope()
+        message = super().createmessageenvelope()
         message = message.make_minerstats(miner, minerstats, minerpool)
-        return self.serializemessageenvelope(message)
+        return super().serializemessageenvelope(message)
 
     def createmessagecommand(self, miner, command):
         '''create message command'''
         if miner.store == 'mem':
             self.putminer(miner)
-        message = self.createmessageenvelope()
+        message = super().createmessageenvelope()
         message = message.make_minercommand(miner, command)
-        return self.serializemessageenvelope(message)
+        return super().serializemessageenvelope(message)
 
     def messageencode(self, miner: Miner):
         '''command is optional, however should convert this call into minercommand'''
         #always save the miner so the next guy can get latest changes
         if miner.store == 'mem':
             self.putminer(miner)
-        message = self.createmessageenvelope()
+        message = super().createmessageenvelope()
         message = message.make_minerstats(miner, minerstats=None, minerpool=None)
         return self._schemamsg.dumps(message).data
 
@@ -619,25 +599,6 @@ class ApplicationService(BaseService):
             return send_result
         return self.send(entry.queuename, entry.message)
 
-    def take_picture(self, file_name='fullcycle_camera.png'):
-        pic = take_picture(file_name,
-                           self.configuration.get('camera.size'),
-                           self.configuration.get('camera.quality'),
-                           self.configuration.get('camera.brightness'),
-                           self.configuration.get('camera.contrast'))
-        return pic
-
-    def store_picture_cache(self, file_name):
-        if os.path.isfile(file_name):
-            with open(file_name, 'rb') as photofile:
-                picdata = photofile.read()
-            reading = SensorValue('fullcyclecamera', base64.b64encode(picdata), 'camera')
-            #reading.sensor = self.sensor
-            #self.sendsensor(reading)
-            message = self.createmessageenvelope()
-            sensorjson = message.jsonserialize(SensorValueSchema(), reading)
-            self.__cache.tryputcache(CacheKeys.camera, sensorjson)
-
     def readtemperature(self):
         try:
             sensor_humid, sensor_temp = readtemperature()
@@ -655,9 +616,9 @@ class ApplicationService(BaseService):
         return None, None
 
     def sendsensor(self, reading):
-        message = self.createmessageenvelope()
+        message = super().createmessageenvelope()
         sensorjson = message.jsonserialize(SensorValueSchema(), reading)
-        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, self.serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
+        self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, super().serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
 
     def getsession(self):
         service = self.getservice(ServiceName.database)

@@ -34,7 +34,10 @@ def deserializelist_withschema(schema, the_list):
         results.append(entity)
     return results
 
-def serializelist(self, listofentities):
+def serialize(entity, schema):
+    return schema.dumps(entity).data
+
+def serializelist(listofentities):
     '''serialize a list of entities'''
     json_list = json.dumps([e.__dict__ for e in listofentities])
     return json_list

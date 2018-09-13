@@ -6,7 +6,6 @@ from messaging.schema import AvailablePoolSchema
 
 class TestApp(unittest.TestCase):
     def test_app_json_serialize(self):
-        app = ApplicationService(component='test')
         pool = AvailablePool('S9', None, 'url', 'user', 'x', 0)
         strpool = utils.jsonserialize(AvailablePoolSchema(), pool)
         self.assertTrue(isinstance(strpool, str))

@@ -15,7 +15,7 @@ def when_sensor(channel, method, properties, body):
 
 def dosensor(message, sensorvalue):
     '''put the sensor in cache'''
-    SENSOR.app.addknownsensor(sensorvalue)
+    SENSOR.app.sensors.addknownsensor(sensorvalue)
 
 def main():
     SENSOR.listeningqueue = SENSOR.app.listen_to_broadcast(QueueName.Q_SENSOR, when_sensor)
