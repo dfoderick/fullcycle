@@ -28,7 +28,7 @@ import backend.fcmutils as utils
 from backend.fcmcache import Cache, CacheKeys
 from backend.fcmbus import Bus
 from backend.fcmcomponent import ComponentName
-from backend.fcmservice import BaseService, ServiceName, InfrastructureService, Configuration, Telegram
+from backend.fcmservice import BaseService, PoolService, ServiceName, InfrastructureService, Configuration, Telegram
 from backend.fcmminer import Antminer
 
 class Component(object):
@@ -41,75 +41,6 @@ class Component(object):
     def listen(self):
         if self.listeningqueue:
             self.app.bus.listen(self.listeningqueue)
-
-
-class PoolService(BaseService):
-    def __init__(self, cache):
-        super(PoolService, self).__init__()
-        self.__cache = cache
-
-    def get_all_pools(self):
-        '''configured pools'''
-        pools = PoolRepository().readpools(self.getconfigfilename('config/pools.conf'))
-        return pools
-
-    def findpool(self, minerpool):
-        '''find a pool in list'''
-        if minerpool is None:
-            return None
-        for pool in self.get_all_pools():
-            if minerpool.currentpool == pool.url and minerpool.currentworker.startswith(pool.user):
-                return pool
-        return None
-
-    def knownpools(self):
-        dknownpools = self.__cache.gethashset(CacheKeys.knownpools)
-        if dknownpools:
-            return utils.deserializelist_withschema(AvailablePoolSchema(), list(dknownpools.values()))
-        return None
-
-    def getpool(self, miner: Miner):
-        '''get pool from cache'''
-        valu = self.__cache.trygetvaluefromcache(miner.name + '.pool')
-        if valu is None:
-            return None
-        entity = MinerCurrentPool(miner, **utils.deserialize(MinerCurrentPoolSchema(), valu))
-        return entity
-
-    def add_pool(self, minerpool: domain.minerpool.MinerPool):
-        '''see if pool is known or not, then add it'''
-        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, minerpool.pool.key)
-        if not knownpool:
-            val = utils.jsonserialize(AvailablePoolSchema(), minerpool.pool)
-            self.__cache.putinhashset(CacheKeys.knownpools, minerpool.pool.key, val)
-
-    def putpool(self, pool: Pool):
-        '''put pool in cache'''
-        if pool and pool.name:
-            valu = self.serialize(pool)
-            self.__cache.tryputcache('pool.{0}'.format(pool.name), valu)
-
-    def update_pool(self, key, pool: AvailablePool):
-        self.__cache.hdel(CacheKeys.knownpools, key)
-        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, pool.key)
-        if not knownpool:
-            val = utils.jsonserialize(AvailablePoolSchema(), pool)
-            self.__cache.putinhashset(CacheKeys.knownpools, pool.key, val)
-
-    def save_pool(self, pool: Pool):
-        sch = PoolSchema()
-        pools = PoolRepository()
-        pools.add(pool, self.getconfigfilename('config/pools.conf'), sch)
-
-        #update the known pools
-        for known in self.knownpools():
-            if pool.is_same_as(known):
-                oldkey = known.key
-                known.named_pool = pool
-                #this changes the pool key!
-                known.user = pool.user
-                #update the known pool (with new key)
-                self.update_pool(oldkey, known)
 
 class ApplicationService(BaseService):
     '''Application Services'''
@@ -305,7 +236,7 @@ class ApplicationService(BaseService):
         dknownminers = self.__cache.gethashset(CacheKeys.knownminers)
         if dknownminers is not None and dknownminers:
             #get list of miners from cache
-            return self.deserializelistofstrings(list(dknownminers.values()))
+            return utils.deserializelistofstrings(list(dknownminers.values(), MinerSchema()))
         knownminers = self.miners()
         return knownminers
 
@@ -369,11 +300,6 @@ class ApplicationService(BaseService):
             memminer.updatefrom(miner)
         val = self.serialize(memminer)
         self.__cache.putinhashset(CacheKeys.knownminers, miner.key(), val)
-
-    #region Pools
-
-
-    #endregion
 
     def sshlogin(self):
         '''return contents of login file'''
@@ -643,19 +569,6 @@ class ApplicationService(BaseService):
     def serializemessageenvelope(self, msg):
         '''serialize message envelope'''
         return self._schemamsg.dumps(msg).data
-
-    def serializelist(self, listofentities):
-        '''serialize a list of entities'''
-        json_list = json.dumps([e.__dict__ for e in listofentities])
-        return json_list
-
-    def deserializelistofstrings(self, the_list):
-        '''deserialize list of strings into list of miners'''
-        results = []
-        for item in the_list:
-            miner = utils.deserialize(MinerSchema(), utils.safestring(item))
-            results.append(miner)
-        return results
 
     def deserializemessageenvelope(self, body):
         '''serialize message envelope'''

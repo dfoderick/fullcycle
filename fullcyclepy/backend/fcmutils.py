@@ -33,3 +33,16 @@ def deserializelist_withschema(schema, the_list):
         #todo:for pools the entry is a list
         results.append(entity)
     return results
+
+def serializelist(self, listofentities):
+    '''serialize a list of entities'''
+    json_list = json.dumps([e.__dict__ for e in listofentities])
+    return json_list
+
+def deserializelistofstrings(the_list, sch):
+    '''deserialize list of strings into list of miners'''
+    results = []
+    for item in the_list:
+        miner = deserialize(sch, safestring(item))
+        results.append(miner)
+    return results
