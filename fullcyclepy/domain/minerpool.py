@@ -9,4 +9,3 @@ class MinerPool(object):
         self.miner = miner
         self.priority = priority
         self.pool = pool
-

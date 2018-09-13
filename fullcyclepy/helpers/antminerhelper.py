@@ -5,9 +5,9 @@
 '''
 import time
 import datetime
-import domain.minerstatistics
 from helpers.minerapi import MinerApi
 from helpers.ssh import Ssh
+import domain.minerstatistics
 from domain.mining import Miner, MinerInfo, MinerCurrentPool, MinerAccessLevel, MinerApiCall
 
 class MinerMonitorException(Exception):

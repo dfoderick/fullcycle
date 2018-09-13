@@ -35,6 +35,8 @@ class BaseService():
         self.initmessaging()
         self.configuration = config
         self.cache = cache
+        #subclass needs to override
+        self.component = ''
 
     def initmessaging(self):
         '''start up messaging'''
@@ -133,7 +135,7 @@ class PoolService(BaseService):
 
     def update_pool(self, key, pool: AvailablePool):
         self.cache.hdel(CacheKeys.knownpools, key)
-        knownpool = self.__cache.getfromhashset(CacheKeys.knownpools, pool.key)
+        knownpool = self.cache.getfromhashset(CacheKeys.knownpools, pool.key)
         if not knownpool:
             val = utils.jsonserialize(AvailablePoolSchema(), pool)
             self.cache.putinhashset(CacheKeys.knownpools, pool.key, val)

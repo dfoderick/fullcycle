@@ -1,6 +1,6 @@
 '''serialization schema'''
-import domain.minerstatistics
 from marshmallow import Schema, fields, post_load
+import domain.minerstatistics
 from domain.mining import MinerInfo, MinerCurrentPool, Miner, Pool, MinerCommand, AvailablePool
 
 class MinerInfoSchema(Schema):

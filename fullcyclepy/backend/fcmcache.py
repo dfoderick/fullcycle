@@ -73,7 +73,9 @@ class Cache:
             if self.__redis is not None:
                 self.put(key, value)
         except redis.exceptions.ConnectionError as ex:
-            self.logexception(ex)
+            #self.logexception(ex)
+            #todo: reenable
+            pass
 
     def trygetvaluefromcache(self, key):
         '''get value from cache

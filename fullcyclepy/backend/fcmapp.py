@@ -5,7 +5,6 @@ import os
 import datetime
 import logging
 import json
-import base64
 from collections import defaultdict
 import pika
 from colorama import init, Fore
@@ -16,11 +15,10 @@ import domain.minerpool
 from domain.mining import Miner, AvailablePool, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
-from messaging.messages import Message, MessageSchema, MinerMessageSchema, ConfigurationMessageSchema
+from messaging.messages import MinerMessageSchema, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
 from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSchema
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
-from helpers.temperaturehelper import readtemperature
 import backend.fcmutils as utils
 #import backend.fcmcamera
 from backend.fcmcamera import CameraService
@@ -600,22 +598,14 @@ class ApplicationService(BaseService):
         return self.send(entry.queuename, entry.message)
 
     def readtemperature(self):
-        try:
-            sensor_humid, sensor_temp = readtemperature()
-            if sensor_temp is not None:
-                reading = SensorValue('fullcycletemp', sensor_temp, 'temperature')
-                reading.sensor = self.sensor
-                self.sendsensor(reading)
-            if sensor_humid is not None:
-                reading = SensorValue('fullcyclehumid', sensor_humid, 'humidity')
-                reading.sensor = self.sensor
-                self.sendsensor(reading)
-            return sensor_humid, sensor_temp
-        except BaseException as ex:
-            self.logexception(ex)
-        return None, None
+        temp, humid = self.sensors.readtemperature()
+        self.sendsensor(temp)
+        self.sendsensor(humid)
+        return temp, humid
 
     def sendsensor(self, reading):
+        if not reading:
+            return
         message = super().createmessageenvelope()
         sensorjson = message.jsonserialize(SensorValueSchema(), reading)
         self.sendqueueitem(QueueEntry(QueueName.Q_SENSOR, super().serializemessageenvelope(message.make_any('sensorvalue', sensorjson)), QueueType.broadcast))
