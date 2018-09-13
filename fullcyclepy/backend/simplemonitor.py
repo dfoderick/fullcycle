@@ -73,15 +73,15 @@ def getminers(miners):
         cnt -= 1
     return listofminers
 
-async def run_tasks(executor, miners):
+async def run_tasks(cutor, miners):
     listofminers = getminers(miners)
     calltime = MinerApiCall(None)
     calltime.start()
     totalpolling = 0
-    loop = asyncio.get_event_loop()
-    tasks = [loop.run_in_executor(executor, getstats, miner) for miner in listofminers]
+    lop = asyncio.get_event_loop()
+    tasks = [lop.run_in_executor(cutor, getstats, miner) for miner in listofminers]
 
-    for fut in asyncio.as_completed(tasks, loop=loop):
+    for fut in asyncio.as_completed(tasks, loop=lop):
         results = await fut
         totalpolling += process_result(*results)
 
@@ -97,9 +97,9 @@ if __name__ == '__main__':
     MINERS = APP.miners()
     APP.print("{0} miners configured".format(len(MINERS)))
 
-    executor = ThreadPoolExecutor(max_workers=WORKER_THREADS)
+    cutor = ThreadPoolExecutor(max_workers=WORKER_THREADS)
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_tasks(executor, MINERS))
+    loop.run_until_complete(run_tasks(cutor, MINERS))
     loop.close()
     APP.shutdown()
     WHATISAID = input('done')

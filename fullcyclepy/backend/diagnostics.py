@@ -1,6 +1,7 @@
 '''Full Cycle Mining Systems Check'''
 import datetime
 from colorama import Fore
+import backend.fcmutils as utils
 from backend.fcmapp import ApplicationService
 from domain.loggingrepository import getminerlog
 from domain.logging import MinerLog
@@ -10,7 +11,7 @@ APP = ApplicationService()
 print('started', APP.component)
 
 APP.tryputcache(key='test', value='value')
-CACHE_VALUE = APP.safestring(APP.trygetvaluefromcache('test'))
+CACHE_VALUE = utils.safestring(APP.trygetvaluefromcache('test'))
 if CACHE_VALUE == 'value':
     print(Fore.GREEN+'cache is working')
 else:

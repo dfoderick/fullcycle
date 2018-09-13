@@ -6,15 +6,14 @@ import datetime
 import logging
 import json
 import base64
+from collections import defaultdict
 import redis
 import pika
-import domain.minerstatistics
-import domain.minerpool
-import backend.fcmutils as utils
-from collections import defaultdict
 from colorama import init, Fore
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+import domain.minerstatistics
+import domain.minerpool
 from domain.mining import Miner, Pool, AvailablePool, MinerCurrentPool, MinerStatus
 from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository, BaseRepository
 #from domain.miningrules import RuleParameters
@@ -25,7 +24,7 @@ from messaging.schema import MinerSchema, MinerStatsSchema, MinerCurrentPoolSche
 from helpers.queuehelper import QueueName, Queue, QueueEntry, QueueType
 from helpers.camerahelper import take_picture
 from helpers.temperaturehelper import readtemperature
-from helpers.telegramhelper import sendalert, sendphoto
+import backend.fcmutils as utils
 from backend.fcmcache import Cache, CacheKeys
 from backend.fcmbus import Bus
 from backend.fcmcomponent import ComponentName

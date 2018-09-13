@@ -103,11 +103,11 @@ class Miner(object):
     def key(self):
         '''cache key for this entity'''
         thekey = self.name
-        if isvalid_minerid():
+        if self.isvalid_minerid():
             thekey = self.minerid
-        elif isvalid_networkid():
+        elif self.isvalid_networkid():
             thekey = str(self.networkid)
-        elif isvalid_ipaddress:
+        elif self.isvalid_ipaddress:
             thekey = '{0}:{1}'().format(self.ipaddress, self.port)
         return thekey
 
@@ -115,10 +115,10 @@ class Miner(object):
         return self.minerid is not None and self.minerid and self.minerid != 'unknown'
 
     def isvalid_networkid(self):
-        self.networkid is not None and self.networkid and str(self.networkid) != '{}'
+        return self.networkid is not None and self.networkid and str(self.networkid) != '{}'
 
     def isvalid_ipaddress(self):
-        self.ipaddress is not None and self.ipaddress
+        return self.ipaddress is not None and self.ipaddress
 
     def set_ftp_port(self, port):
         if self.ftpport is not None and self.ftpport: return
