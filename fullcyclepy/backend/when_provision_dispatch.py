@@ -28,22 +28,25 @@ def doprovisiondispatch(miner_type=None):
     for miner in miners:
         if miner.is_disabled():
             continue
-        try:
-            minerstats, minerinfo, apicall, minerpool = stats(miner)
-            if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
-                continue
-            mineraccess = get_mineraccess(miner)
-            print(Fore.GREEN + "{0} {1} {2}".format(miner.name, minerinfo.miner_type, mineraccess))
-            if mineraccess == MinerAccessLevel.Restricted:
-                print("    skipping restricted access")
-            else:
-                entries.add(QueueName.Q_PROVISION, PROVISION_DISPATCH.app.messageencode(miner))
-        except MinerMonitorException as minerex:
-            print(minerex)
-        except BaseException as ex:
-            print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
-            print(PROVISION_DISPATCH.app.exceptionmessage(ex))
+        process_miner(miner, entries)
     return entries
+
+def process_miner(miner, entries):
+    try:
+        minerstats, minerinfo, apicall, minerpool = stats(miner)
+        if miner_type is not None and miner_type != '' and minerinfo.miner_type != miner_type:
+            return
+        mineraccess = get_mineraccess(miner)
+        print(Fore.GREEN + "{0} {1} {2}".format(miner.name, minerinfo.miner_type, mineraccess))
+        if mineraccess == MinerAccessLevel.Restricted:
+            print("    skipping restricted access")
+        else:
+            entries.add(QueueName.Q_PROVISION, PROVISION_DISPATCH.app.messageencode(miner))
+    except MinerMonitorException as minerex:
+        print(minerex)
+    except BaseException as ex:
+        print('while provisioning {0} ({1})'.format(miner.ipaddress, miner.key()))
+        print(PROVISION_DISPATCH.app.exceptionmessage(ex))
 
 def get_mineraccess(miner):
     mineraccess = PROVISION_DISPATCH.app.antminer.getaccesslevel(miner)
