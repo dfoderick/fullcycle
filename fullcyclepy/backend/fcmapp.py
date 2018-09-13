@@ -7,7 +7,6 @@ import logging
 import json
 import base64
 from collections import defaultdict
-import redis
 import pika
 from colorama import init, Fore
 from sqlalchemy.orm import sessionmaker
@@ -151,7 +150,7 @@ class ApplicationService(BaseService):
     def initpoolcache(self):
         if self.__cache.get(CacheKeys.pools) is None:
             spools = PoolRepository().readrawfile(self.getconfigfilename('config/pools.conf'))
-            self.tryputcache(CacheKeys.pools, spools)
+            self.__cache.tryputcache(CacheKeys.pools, spools)
         for pool in self.pools.get_all_pools():
             #pool isinstance of Pool
             availablepool = AvailablePool(pool.pool_type, pool, pool.url, pool.user, pool.password, pool.priority)
@@ -163,7 +162,7 @@ class ApplicationService(BaseService):
         '''put known miners into cache'''
         if self.__cache.get(CacheKeys.miners) is None:
             sminers = MinerRepository().readrawfile(self.getconfigfilename('config/miners.conf'))
-            self.tryputcache(CacheKeys.miners, sminers)
+            self.__cache.tryputcache(CacheKeys.miners, sminers)
 
         for miner in self.miners():
             #status is not persisted yet so init from name
@@ -450,7 +449,7 @@ class ApplicationService(BaseService):
         '''put miner in cache'''
         if miner and miner.key():
             valu = self.serialize(miner)
-            self.tryputcache('miner.{0}'.format(miner.key()), valu)
+            self.__cache.tryputcache('miner.{0}'.format(miner.key()), valu)
 
     def getminer(self, miner: Miner) -> Miner:
         '''strategies for getting miner from cache
@@ -490,24 +489,15 @@ class ApplicationService(BaseService):
                 return miner
         return None
 
-    def tryputcache(self, key, value):
-        '''put value in cache key'''
-        if value is None: return
-        try:
-            if self.__cache is not None:
-                self.__cache.set(key, value)
-        except redis.exceptions.ConnectionError as ex:
-            self.logexception(ex)
-
     def putminerandstats(self, miner: Miner, minerstats, minerpool):
         '''put miner and status in cache'''
         self.putminer(miner)
         schema = MinerStatsSchema()
         valstats = schema.dumps(minerstats).data
-        self.tryputcache(miner.key() + '.stats', valstats)
+        self.__cache.tryputcache(miner.key() + '.stats', valstats)
         schema = MinerCurrentPoolSchema()
         valpool = schema.dumps(minerpool).data
-        self.tryputcache(miner.key() + '.pool', valpool)
+        self.__cache.tryputcache(miner.key() + '.pool', valpool)
 
     def getstats(self, miner: Miner):
         '''get stats entity'''
@@ -646,7 +636,7 @@ class ApplicationService(BaseService):
             #self.sendsensor(reading)
             message = self.createmessageenvelope()
             sensorjson = message.jsonserialize(SensorValueSchema(), reading)
-            self.tryputcache(CacheKeys.camera, sensorjson)
+            self.__cache.tryputcache(CacheKeys.camera, sensorjson)
 
     def readtemperature(self):
         try:

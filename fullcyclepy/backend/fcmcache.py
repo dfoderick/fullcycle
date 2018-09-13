@@ -43,6 +43,7 @@ class Cache:
         for key, value in hashitems.items():
             output[key.decode(self.encoding)] = value.decode(self.encoding)
         return output
+
     def set(self, key, value):
         '''save value to cache key'''
         self.__redis.set(key, value)
@@ -64,6 +65,15 @@ class Cache:
     def close(self):
         '''close the cache'''
         self.__redis = None
+
+    def tryputcache(self, key, value):
+        '''put value in cache key'''
+        if value is None: return
+        try:
+            if self.__redis is not None:
+                self.put(key, value)
+        except redis.exceptions.ConnectionError as ex:
+            self.logexception(ex)
 
     def trygetvaluefromcache(self, key):
         '''get value from cache
