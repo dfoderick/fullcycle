@@ -107,8 +107,8 @@ class Miner(object):
             thekey = self.minerid
         elif self.isvalid_networkid():
             thekey = str(self.networkid)
-        elif self.isvalid_ipaddress:
-            thekey = '{0}:{1}'().format(self.ipaddress, self.port)
+        elif self.isvalid_ipaddress():
+            thekey = '{0}:{1}'.format(self.ipaddress, self.port)
         return thekey
 
     def isvalid_minerid(self):
