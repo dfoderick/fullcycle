@@ -12,6 +12,7 @@ from domain.miningrules import MinerStatisticsRule
 from domain.logging import MinerLog
 from backend.fcmcomponent import ComponentName
 from backend.fcmapp import Component
+import backend.fcmutils as utils
 
 class ComponentRunRules(Component):
     '''component for running rules'''
