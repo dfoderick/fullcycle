@@ -261,6 +261,8 @@ class Miner(object):
         fields.append('minerpool')
         fields.append('minerstats')
         fields.append('networkid')
+        fields.append('location')
+        fields.append('in_service_date')
         for fld in fields:
             val = getattr(updatedminer, fld)
             if val:

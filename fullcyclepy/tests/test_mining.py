@@ -131,10 +131,16 @@ class TestMiner(unittest.TestCase):
     def test_miner_update(self):
         miner = Miner('test')
         miner.ipaddress = 'ip1'
+        miner.location = 'location1'
+        miner.in_service_date = datetime.datetime.now().replace(second=0, microsecond=0)
         minerupdate = Miner('test')
         minerupdate.ipaddress = 'ip2'
+        minerupdate.location = 'location2'
+        minerupdate.in_service_date = datetime.datetime.now()
         miner.updatefrom(minerupdate)
         self.assertTrue(miner.ipaddress == minerupdate.ipaddress)
+        self.assertTrue(miner.location == minerupdate.location)
+        self.assertTrue(miner.in_service_date == minerupdate.in_service_date)
 
     def test_miner_no_update(self):
         miner = Miner('test')
