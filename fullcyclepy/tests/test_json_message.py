@@ -26,6 +26,8 @@ class TestSerialization(unittest.TestCase):
         miner.minerstats.boardstatus1 = 'o'
         miner.minerstats.boardstatus2 = 'oo'
         miner.minerstats.boardstatus3 = 'ooo'
+        miner.location = 'unittest'
+        miner.in_service_date = datetime.datetime.today().replace(microsecond=0)
         jminer = sch.dumps(miner).data
 
         #rehydrate miner
@@ -38,6 +40,8 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(reminer.minerstats.boardstatus1 == 'o')
         self.assertTrue(reminer.minerstats.boardstatus2 == 'oo')
         self.assertTrue(reminer.minerstats.boardstatus3 == 'ooo')
+        self.assertTrue(reminer.location == miner.location)
+        self.assertTrue(reminer.in_service_date == miner.in_service_date)
 
     def test_sensorvalue_serialization(self):
         '''on windows the deserialization seems to lose the fractions of seconds

@@ -37,8 +37,11 @@ class MinerCommand(object):
 class Miner(object):
     """Miner"""
 
-    def __init__(self, name, status=MinerStatus.Online, miner_type='', ipaddress='', port='', ftpport='', username='', password='', clientid='', networkid='', minerid='',
-                 lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None, minerpool=None, minerstats=None, laststatuschanged=None):
+    def __init__(self, name, status=MinerStatus.Online, miner_type='', ipaddress='',
+                 port='', ftpport='', username='', password='', clientid='', networkid='',
+                 minerid='', lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None,
+                 minerpool=None, minerstats=None, laststatuschanged=None,
+                 in_service_date=None, location=None):
         #friendly name for your miner
         self.name = name
         self._status = status
@@ -75,6 +78,10 @@ class Miner(object):
         self.laststatuschanged = laststatuschanged
         #store is where the object was stored. mem is for memcache.
         self.store = ''
+        # the date that the miner was put into service or first discovered
+        self.in_service_date = in_service_date
+        # location of miner. could be name of facility or rack
+        self.location = location
 
     @property
     def status(self):
