@@ -70,7 +70,7 @@ class MinerSchema(Schema):
     minerinfo = fields.Nested(MinerInfoSchema, allow_none=True)
     minerpool = fields.Nested(MinerCurrentPoolSchema, allow_none=True)
     minerstats = fields.Nested(MinerStatsSchema, allow_none=True)
-    location = fields.Str()
+    location = fields.Str(allow_none=True)
     in_service_date = fields.DateTime(allow_none=True)
 
     @post_load
