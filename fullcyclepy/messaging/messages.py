@@ -168,6 +168,8 @@ class ConfigurationMessageSchema(Schema):
     @post_load
     def make_configurationmessage(self, data):
         '''reconstitute a configurationmessage'''
+        if isinstance(data, ConfigurationMessage):
+            return data
         command = None
         parameter = None
         entity = None

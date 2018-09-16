@@ -12,6 +12,7 @@ from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool
 from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
+from backend.fcmapp import ApplicationService
 
 class TestSerialization(unittest.TestCase):
     def test_minerserialization(self):
@@ -72,6 +73,15 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(isinstance(reconfig.parameter, str))
         self.assertTrue(isinstance(reconfig.configuration_message_id, dict))
         self.assertTrue(isinstance(reconfig.values, list))
+
+    def test_message_inapp(self):
+        app = ApplicationService(component='test')
+        values = '{"version":"1.1","sender":"fullcyclereact","type":"configuration","timestamp":"2018-09-16T07:18:34.431Z","body":"{\\"command\\":\\"save\\",\\"parameter\\":\\"\\",\\"id\\":\\"unknown\\",\\"entity\\":\\"miner\\",\\"values\\":[{\\"name\\":\\"S9102\\"},{\\"ipaddress\\":\\"test.com\\"},{\\"port\\":\\"4102\\"},{\\"location\\":\\"222\\"},{\\"in_service_date\\":null}]}"}'
+        msg = app.messagedecode_configuration(values)
+        self.assertTrue(isinstance(msg, ConfigurationMessage))
+        self.assertTrue(msg.entity == 'miner')
+        miner = Miner.create(msg.values)
+        self.assertTrue(miner.name == "S9102")
 
 if __name__ == '__main__':
     unittest.main()
