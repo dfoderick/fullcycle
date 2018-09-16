@@ -83,6 +83,26 @@ class Miner(object):
         # location of miner. could be name of facility or rack
         self.location = location
 
+    @classmethod
+    def create(cls, values):
+        '''create entity from values dict'''
+        miner = Miner('', '', '', '', '', '', '')
+        #todo: find pythonic way to do this
+        for pair in values:
+            if 'minerid' in pair:
+                miner.minerid = pair['minerid']
+            if 'name' in pair:
+                miner.name = pair['name']
+            if 'ipaddress' in pair:
+                miner.ipaddress = pair['ipaddress']
+            if 'port' in pair:
+                miner.port = pair['port']
+            if 'location' in pair:
+                miner.location = pair['location']
+            if 'in_service_date' in pair:
+                miner.in_service_date = pair['in_service_date']
+        return miner
+
     @property
     def status(self):
         return self._status
@@ -312,6 +332,27 @@ class Pool(object):
         self.user = user
         self.priority = priority
         self.password = password
+
+    @classmethod
+    def create(cls, values):
+        '''create entity from values dict'''
+        entity = Pool('', '', '', '', '')
+        #todo: find pythonic way to do this
+        for pair in values:
+            if 'pool_type' in pair:
+                entity.pool_type = pair['pool_type']
+            if 'name' in pair:
+                entity.name = pair['name']
+            if 'url' in pair:
+                entity.url = pair['url']
+            if 'user' in pair:
+                entity.user = pair['user']
+            if 'priority' in pair:
+                entity.priority = pair['priority']
+            if 'password' in pair:
+                entity.password = pair['password']
+        return entity
+
 
     def is_same_as(self, available_pool: AvailablePool):
         return available_pool.url == self.url and available_pool.user.startswith(self.user)

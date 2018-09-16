@@ -158,5 +158,21 @@ class TestMiner(unittest.TestCase):
         miner.updatefrom(minerupdate)
         self.assertTrue(miner.port == minerupdate.port)
 
+    def test_miner_create(self):
+        values = []
+        values.append({"name":"UnitTest"})
+        values.append({"minerid": "1"})
+        values.append({"ipaddress": "123.123.123.123"})
+        values.append({"port": "987"})
+        values.append({"location": "rack"})
+        values.append({"in_service_date": datetime.date(2018,1, 1)})
+        miner = Miner.create(values)
+        self.assertTrue(miner.name == "UnitTest")
+        self.assertTrue(miner.minerid == "1")
+        self.assertTrue(miner.ipaddress == "123.123.123.123")
+        self.assertTrue(miner.port == "987")
+        self.assertTrue(miner.location == "rack")
+        self.assertTrue(miner.in_service_date == datetime.date(2018,1, 1) )
+
 if __name__ == '__main__':
     unittest.main()
