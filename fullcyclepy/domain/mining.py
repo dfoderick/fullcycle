@@ -138,8 +138,12 @@ class Miner(object):
             thekey = '{0}:{1}'.format(self.ipaddress, self.port)
         return thekey
 
+    @property
+    def is_unknown(self):
+        return self.minerid == 'unknown'
+
     def isvalid_minerid(self):
-        return self.minerid is not None and self.minerid and self.minerid != 'unknown'
+        return self.minerid is not None and self.minerid and not self.is_unknown
 
     def isvalid_networkid(self):
         return self.networkid is not None and self.networkid and str(self.networkid) != '{}'

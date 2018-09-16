@@ -429,15 +429,9 @@ class ApplicationService(BaseService):
             self.logerror('Error broadcasting to {0} {1}'.format(exchange_name, self.exceptionmessage(conxex)))
             return False
 
-    def queuestatus(self):
-        """TODO:print queue status"""
-        pass
-        #for q in self._queues.values():
-        #    print(q.queue_name,str(q._connection))
-
     def putminer(self, miner: Miner):
         '''put miner in cache'''
-        if miner and miner.key():
+        if miner and miner.key() and not miner.is_unknown:
             valu = self.serialize(miner)
             self.__cache.tryputcache('miner.{0}'.format(miner.key()), valu)
 

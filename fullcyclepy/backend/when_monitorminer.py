@@ -26,7 +26,6 @@ def enthread(target, args):
 def when_monitorminer(channel, method, properties, body):
     try:
         print("[{0}] Received monitorminer command".format(APPMONITOR.app.now()))
-        APPMONITOR.app.queuestatus()
         minermsg = APPMONITOR.app.messagedecodeminer(body)
         #monitor in background so pika socket doesnt get messed up
         qmon = enthread(target=domonitorminer, args=(minermsg, ))

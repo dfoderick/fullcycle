@@ -142,6 +142,16 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.location == minerupdate.location)
         self.assertTrue(miner.in_service_date == minerupdate.in_service_date)
 
+    def test_miner_is_unknown(self):
+        miner = Miner('test')
+        miner.minerid = "unknown"
+        self.assertTrue(miner.is_unknown)
+
+    def test_miner_is_known(self):
+        miner = Miner('test')
+        miner.minerid = "123.123.123.123"
+        self.assertFalse(miner.is_unknown)
+
     def test_miner_no_update(self):
         miner = Miner('test')
         miner.ipaddress = 'ip1'
