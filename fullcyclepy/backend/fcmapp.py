@@ -280,6 +280,8 @@ class ApplicationService(BaseService):
 
     def updateknownminer(self, miner):
         '''update known miner in cache'''
+        if miner.is_key_updated:
+            self.__cache.hdel(CacheKeys.knownminers, miner.key_original)
         sminer = self.__cache.getfromhashset(CacheKeys.knownminers, miner.key())
         memminer = utils.deserialize(MinerSchema(), utils.safestring(sminer))
         if memminer is None:

@@ -13,6 +13,7 @@ from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
 from messaging.sensormessages import SensorValueSchema
 from backend.fcmapp import ApplicationService
+import backend.fcmutils as utils
 
 class TestSerialization(unittest.TestCase):
     def test_minerserialization(self):
@@ -43,6 +44,12 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(reminer.minerstats.boardstatus3 == 'ooo')
         self.assertTrue(reminer.location == miner.location)
         self.assertTrue(reminer.in_service_date == miner.in_service_date)
+
+    def test_miner_deserialize(self):
+        miner = Miner("unittest", None, "", "unitip", "unitport", "", "")
+        jminer = utils.serialize(miner, MinerSchema())
+        reminer = utils.deserialize(MinerSchema(),jminer) #().loads(jminer).data
+        self.assertTrue(isinstance(reminer, Miner),"object from MinerSchema should be a miner")
 
     def test_sensorvalue_serialization(self):
         '''on windows the deserialization seems to lose the fractions of seconds

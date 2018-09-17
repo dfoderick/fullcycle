@@ -184,5 +184,10 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.location == "rack")
         self.assertTrue(miner.in_service_date == datetime.date(2018,1, 1) )
 
+    def test_miner_key_original(self):
+        miner = Miner('test')
+        miner.minerid = "unittest"
+        self.assertTrue(miner.is_key_updated)
+
 if __name__ == '__main__':
     unittest.main()

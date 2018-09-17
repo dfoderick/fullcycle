@@ -82,6 +82,8 @@ class Miner(object):
         self.in_service_date = in_service_date
         # location of miner. could be name of facility or rack
         self.location = location
+        #save a copy of the original key so we can detect if it changed
+        self.key_original = self.key()
 
     @classmethod
     def create(cls, values):
@@ -102,6 +104,10 @@ class Miner(object):
             if 'in_service_date' in pair:
                 miner.in_service_date = pair['in_service_date']
         return miner
+
+    @property
+    def is_key_updated(self):
+        return self.key_original != self.key()
 
     @property
     def status(self):
