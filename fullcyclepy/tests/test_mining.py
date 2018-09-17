@@ -175,14 +175,14 @@ class TestMiner(unittest.TestCase):
         values.append({"ipaddress": "123.123.123.123"})
         values.append({"port": "987"})
         values.append({"location": "rack"})
-        values.append({"in_service_date": datetime.date(2018,1, 1)})
+        values.append({"in_service_date": "2018-01-01T08:00:00.000Z"})
         miner = Miner.create(values)
         self.assertTrue(miner.name == "UnitTest")
         self.assertTrue(miner.minerid == "1")
         self.assertTrue(miner.ipaddress == "123.123.123.123")
         self.assertTrue(miner.port == "987")
         self.assertTrue(miner.location == "rack")
-        self.assertTrue(miner.in_service_date == datetime.date(2018,1, 1) )
+        self.assertTrue(miner.in_service_date.date() == datetime.date(2018,1, 1) )
 
     def test_miner_key_original(self):
         miner = Miner('test')

@@ -102,8 +102,18 @@ class Miner(object):
             if 'location' in pair:
                 miner.location = pair['location']
             if 'in_service_date' in pair:
-                miner.in_service_date = pair['in_service_date']
+                miner.in_service_date = Miner.to_date(pair['in_service_date'])
         return miner
+
+    @classmethod
+    def to_date(cls, dt):
+        if dt is None:
+            return dt
+        if isinstance(dt, datetime):
+            return dt
+        #ISO8601 from javascript
+        parsedtime = datetime.strptime(dt, '%Y-%m-%dT%H:%M:%S.%fZ')
+        return Miner.utc_to_local(parsedtime)
 
     @property
     def is_key_updated(self):
@@ -179,8 +189,9 @@ class Miner(object):
         if self.minerstats is None: return self.status
         return self.minerstats.stats_summary()
 
-    #todo: move to appservice
-    def utc_to_local(self, utc_dt):
+    @classmethod
+    def utc_to_local(cls, utc_dt):
+        '''#todo: move to appservice'''
         return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
     def formattime(self, ptime):
@@ -188,13 +199,13 @@ class Miner(object):
         if ptime is None:
             return ''
         if isinstance(ptime, datetime):
-            return self.utc_to_local(ptime).strftime('%m-%d %H:%M:%S')
+            return Miner.utc_to_local(ptime).strftime('%m-%d %H:%M:%S')
         stime = ptime
         if '.' in stime:
             stime = stime[0:stime.index('.') - 1]
         try:
             parsedtime = datetime.strptime(stime, '%Y-%m-%dT%H:%M:%S')
-            return self.utc_to_local(parsedtime).strftime('%m-%d %H:%M:%S')
+            return Miner.utc_to_local(parsedtime).strftime('%m-%d %H:%M:%S')
         except ValueError:
             return stime
 

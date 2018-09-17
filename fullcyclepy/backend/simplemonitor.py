@@ -62,6 +62,8 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
 
     #APP.putminerandstats(savedminer, minerstats, minerpool)
     #APP.updateknownminer(savedminer)
+    if not statspolling:
+        return 0
     return statspolling.elapsed() * 1000
 
 def getminers(miners):
@@ -94,7 +96,7 @@ async def run_tasks(cutor, miners):
 
 
 if __name__ == '__main__':
-    MINERS = APP.miners()
+    MINERS = APP.knownminers()
     APP.print("{0} miners configured".format(len(MINERS)))
 
     cutor = ThreadPoolExecutor(max_workers=WORKER_THREADS)
