@@ -281,6 +281,7 @@ class ApplicationService(BaseService):
     def updateknownminer(self, miner):
         '''update known miner in cache'''
         if miner.is_key_updated:
+            self.logdebug('delete cache: {0}'.format(miner.key_original))
             self.__cache.hdel(CacheKeys.knownminers, miner.key_original)
         sminer = self.__cache.getfromhashset(CacheKeys.knownminers, miner.key())
         memminer = utils.deserialize(MinerSchema(), utils.safestring(sminer))
@@ -290,6 +291,7 @@ class ApplicationService(BaseService):
             #merge new values
             memminer.updatefrom(miner)
         val = self.serialize(memminer)
+        self.logdebug('put cache: {0}'.format(miner.key()))
         self.__cache.putinhashset(CacheKeys.knownminers, miner.key(), val)
 
     def sshlogin(self):
