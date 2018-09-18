@@ -12,6 +12,6 @@ install:
   - pip install -r fullcyclepy/requirements.txt
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)/fullcyclepy/
-  - nosetests
+  - nosetests --with-coverage --cover-tests
 after_success:
     - coveralls
