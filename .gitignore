@@ -270,3 +270,6 @@ fcm.bug
 
 # seems to be associated with telegram
 *.session
+
+.coverage
+fullcycle_camera.png
