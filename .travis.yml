@@ -6,20 +6,12 @@ python:
 cache: pip
 before_install:
     - pip install pytest pytest-cov
-    - pip install coveralls
+    - pip install python-coveralls
+    - pip install nose
 install:
   - pip install -r fullcyclepy/requirements.txt
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)/fullcyclepy/
-  - cd fullcyclepy/tests
-  - coverage erase
-  - coverage run -a test_mining.py
-  - coverage run -a test_rules.py
-  - coverage run -a test_bus.py
-  - coverage run -a test_json_message.py
-  - coverage run -a test_minerapi.py
-  - coverage run -a test_pools.py
-  - coverage run -a test_queuenames.py
-  - coverage run -a test_taskscheduler.py
+  - nosetests
 after_success:
     - coveralls
