@@ -12,6 +12,6 @@ install:
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)/fullcyclepy/
   - pytest
-  - py.test --cov
+  - py.test --cov=fullcycle --cov-config .coveragerc
 after_success:
     - coveralls
