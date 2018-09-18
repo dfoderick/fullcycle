@@ -108,6 +108,12 @@ class TestMiner(unittest.TestCase):
         miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
         self.assertTrue(miner.minerstats.format_elapsed() == "0:0:0:0")
 
+    def test_miner_stats_summary(self):
+        miner = Miner('test')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
+        summary = miner.minerstats.stats_summary()
+        self.assertTrue(summary == '0 0/0 0:0:0:0')
+
     def test_miner_monitored_nothing_none(self):
         miner = Miner('test')
         miner.monitored(None, None, None, None)

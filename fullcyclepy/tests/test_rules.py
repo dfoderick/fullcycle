@@ -27,6 +27,12 @@ class TestRules(unittest.TestCase):
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, '', 55, 60*10)
         self.assertFalse(MinerStatisticsRule.hasreading_num(params.controllertemplimit))
 
+    def test_incompatable_minertype(self):
+        params = RuleParameters('notthesameminertype', 10000, 40, 55, 60*10)
+        rules = MinerStatisticsRule(self.miner, self.minerstats, params)
+        isbroken = rules.isbroken()
+        self.assertFalse(isbroken)
+
     def test_lowhash(self):
         '''test low hash condition'''
         params = RuleParameters(self.miner.minerinfo.miner_type, 10000, 40, 55, 60*10)
@@ -67,6 +73,15 @@ class TestRules(unittest.TestCase):
         self.assertTrue(isbroken)
         self.assertFalse(rules.has_reboot_rule())
 
+    def test_brokenrule(self):
+        rule = BrokenRule(self.miner, '', '')
+        self.assertTrue(str(rule) == 'broke Test: ')
+
+    def test_hasreading(self):
+        self.assertFalse(MinerStatisticsRule.hasreading(None))
+        self.assertTrue(MinerStatisticsRule.hasreading(1))
+        self.assertFalse(MinerStatisticsRule.hasreading(0))
+        self.assertFalse(MinerStatisticsRule.hasreading_num(None))
 
     def test_only_one_reset(self):
         rules = MinerStatisticsRule(self.miner, None, None)

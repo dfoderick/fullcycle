@@ -1,6 +1,7 @@
 '''unit tests for pools'''
 import unittest
 from domain.mining import Pool, AvailablePool
+from domain.minerpool import MinerPool
 
 class TestPools(unittest.TestCase):
     def p_same_as_partial_match(self):
@@ -39,6 +40,10 @@ class TestPools(unittest.TestCase):
         self.assertTrue(pool.user == "test")
         self.assertTrue(pool.priority == "priority")
         self.assertTrue(pool.password == "secret")
+
+    def test_minerpool(self):
+        pool = MinerPool(None, 1, None)
+        self.assertTrue(pool.priority == 1)
 
 if __name__ == '__main__':
     unittest.main()

@@ -18,6 +18,7 @@ class BrokenRule(object):
         self.miner = miner
         self.action = action
         self.parameter = parameter
+
     def __str__(self):
         return 'broke {0}:{1} {2}'.format(self.miner.name, self.action, self.parameter)
 
@@ -36,8 +37,8 @@ class MinerStatisticsRule(object):
         if reading is None:
             return False
         if reading:
-            return False
-        return True
+            return True
+        return False
 
     @classmethod
     def hasreading_num(cls, reading):
