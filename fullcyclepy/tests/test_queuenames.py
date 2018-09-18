@@ -1,5 +1,5 @@
 import unittest
-from helpers.queuehelper import QueueName
+from helpers.queuehelper import QueueName, QueueType
 
 class TestQueuenames(unittest.TestCase):
     def test_queue_valid_name(self):
@@ -13,6 +13,10 @@ class TestQueuenames(unittest.TestCase):
 
     def test_queue_value(self):
         self.assertTrue(QueueName.value(QueueName.Q_ALERT) == 'alert')
+
+    def test_queue_type(self):
+        self.assertTrue(QueueType.broadcast == 'broadcast')
+        self.assertTrue(QueueType.publish == 'publish')
 
 if __name__ == '__main__':
     unittest.main()
