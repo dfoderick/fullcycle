@@ -2,7 +2,7 @@
 import unittest
 import datetime
 import domain.minerstatistics
-from domain.mining import Miner, MinerStatus, MinerInfo, MinerApiCall
+from domain.mining import Miner, MinerStatus, MinerInfo, MinerApiCall, MinerCommand, MinerCurrentPool
 
 class TestMiner(unittest.TestCase):
     def test_miner_is_not_disabled(self):
@@ -194,6 +194,103 @@ class TestMiner(unittest.TestCase):
         miner = Miner('test')
         miner.minerid = "unittest"
         self.assertTrue(miner.is_key_updated)
+
+    def test_miner_command(self):
+        command = MinerCommand()
+        self.assertTrue(command.command == '')
+        self.assertTrue(command.parameter == '')
+
+    def test_miner_todate(self):
+        dt = Miner.to_date(datetime.datetime.now())
+        self.assertTrue(isinstance(dt, datetime.datetime))
+
+    def test_miner_currentpoolname(self):
+        miner = Miner('test')
+        self.assertTrue(miner.currentpoolname() == '?')
+        miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={}, poolname = 'unit test')
+        self.assertTrue(miner.currentpoolname() == 'unit test')
+        self.assertFalse(miner.minerpool.findpoolnumberforpool('test pool', 'test worker'))
+
+    def test_miner_pools_available(self):
+        miner = Miner('test')
+        self.assertTrue(miner.pools_available is None)
+        miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={})
+        self.assertTrue(len(miner.pools_available) == 0)
+        miner.minerpool.allpools = {
+      "POOLS": [
+        {
+          "Pool Stale%": 0,
+          "Accepted": 421743,
+          "Difficulty Stale": 0,
+          "Stratum URL": "test",
+          "Rejected": 85,
+          "Difficulty Accepted": 6587318272,
+          "Best Share": 4019408192,
+          "User": "test",
+          "Stratum Active": True,
+          "Difficulty Rejected": 1343488,
+          "Diff": "16.4K",
+          "Remote Failures": 3,
+          "Discarded": 1094132,
+          "Long Poll": "N",
+          "Proxy": "",
+          "Priority": 0,
+          "Has GBT": False,
+          "Pool Rejected%": 0.0204,
+          "Stale": 63,
+          "Last Share Difficulty": 16384,
+          "Diff1 Shares": 0,
+          "Has Stratum": True,
+          "Status": "Alive",
+          "URL": "test",
+          "Quota": 1,
+          "Last Share Time": "0:00:05",
+          "Getworks": 70163,
+          "Get Failures": 3,
+          "POOL": 3,
+          "Proxy Type": ""
+        }]}
+        self.assertTrue(len(miner.pools_available) > 0)
+        self.assertTrue(miner.minerpool.findpoolnumberforpool('test', 'test'))
+
+    def test_miner_summary(self):
+        miner = Miner("test", '', '', '', '', '', '', '', '')
+        self.assertTrue(miner.summary() is not None)
+        miner.status = MinerStatus.Online
+        self.assertTrue(miner.summary() is not None)
+        miner.minerstats = None
+        self.assertTrue(miner.summary() is not None)
+
+    def test_miner_todate(self):
+        dt = Miner.to_date(datetime.datetime.now())
+        self.assertTrue(isinstance(dt, datetime.datetime))
+
+    def test_miner_uptime(self):
+        miner = Miner("test", '', '', '', '', '', '', '', '')
+        self.assertTrue(miner.uptime(1))
+
+    def test_miner_monitorresponsetime(self):
+        miner = Miner("test", '', '', '', '', '', '', '', '')
+        self.assertTrue(miner.monitorresponsetime() == 0)
+        miner.monitored(domain.minerstatistics.MinerStatistics(miner), None, None, 1)
+        self.assertTrue(miner.monitorresponsetime() > 0)
+
+    def test_miner_can_monitor(self):
+        miner = Miner("test", '', '', '', '', '', '', '', '')
+        self.assertFalse(miner.can_monitor())
+        miner.ipaddress = '123.123.123.123'
+        self.assertFalse(miner.can_monitor())
+        miner.port = '4028'
+        self.assertTrue(miner.can_monitor())
+
+    def test_miner_should_monitor(self):
+        miner = Miner("#test", '', '', '', '', '', '', '', '')
+        self.assertTrue(miner.should_monitor())
+        miner.monitored(domain.minerstatistics.MinerStatistics(miner), None, None, None)
+        self.assertFalse(miner.should_monitor())
+        miner.name="test"
+        self.assertTrue(miner.should_monitor())
+        #self.assertFalse(miner.should_monitor())
 
 if __name__ == '__main__':
     unittest.main()

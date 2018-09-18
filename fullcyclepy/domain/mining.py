@@ -186,7 +186,8 @@ class Miner(object):
         '''hash or offline status of miner'''
         if self.status != MinerStatus.Online:
             return self.status
-        if self.minerstats is None: return self.status
+        if self.minerstats is None:
+            return self.status
         return self.minerstats.stats_summary()
 
     @classmethod
@@ -277,7 +278,8 @@ class Miner(object):
         self.minerstats = stats
 
     def monitorresponsetime(self):
-        if self.monitorcount == 0: return 0
+        if self.monitorcount == 0:
+            return 0
         return self.monitortime/self.monitorcount
 
     def setminerinfo(self, info):
@@ -380,15 +382,17 @@ class Pool(object):
 
 class MinerCurrentPool(object):
     '''The current pool where a miner is mining'''
-    def __init__(self, miner, currentpool=None, currentworker=None, allpools=None):
+    def __init__(self, miner, currentpool=None, currentworker=None, allpools=None, poolname='?'):
         self.miner = miner
-        self.poolname = '?'
+        self.poolname = poolname
         self.currentpool = currentpool
         self.currentworker = currentworker
         #allpools is a json object
         self.allpools = allpools
 
     def findpoolnumberforpool(self, url, worker):
+        if not 'POOLS' in self.allpools:
+            return None
         jpools = self.allpools["POOLS"]
         for pool in jpools:
             thisurl = pool["URL"]
