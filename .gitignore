@@ -271,5 +271,8 @@ fcm.bug
 # seems to be associated with telegram
 *.session
 
+.pytest_cache
+*.pyperf
+
 .coverage
 fullcycle_camera.png
