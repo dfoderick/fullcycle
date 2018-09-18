@@ -17,10 +17,12 @@ MINER_MULTIPLIER = 10
 #    return minerstats, minerinfo, statspolling, minerpool
 
 def getstats(miner):
+    '''poll miner'''
     minerstats, minerinfo, statspolling, minerpool = antminerhelper.stats(miner)
     return miner, minerstats, minerinfo, statspolling, minerpool
 
 def process_results(results):
+    '''process all results'''
     totaltime = 0
     for miner, minerstats, minerinfo, statspolling, minerpool in results:
         totaltime += statspolling.elapsed() * 1000
@@ -28,6 +30,7 @@ def process_results(results):
     return totaltime
 
 def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
+    '''process results from one polling'''
     if minerstats is None:
         APP.logerror('{0} Offline? {1}'.format(miner.name, miner.ipaddress))
     else:
@@ -42,11 +45,11 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
         savedminer.monitored(minerstats, minerpool, minerinfo, statspolling.elapsed())
         print('{0} mining at {1}({2})'.format(savedminer.name, minerpool.poolname, poolname))
 
-        print(Fore.CYAN + str(APP.now()), miner.name, miner.status,
-                str(minerstats.currenthash), str(minerstats.minercount),
-                'temp=' + str(minerstats.tempboardmax()),
-                savedminer.uptime(minerstats.elapsed),
-                '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
+        print(Fore.CYAN + str(APP.now()), miner.name, miner.status, \
+            str(minerstats.currenthash), str(minerstats.minercount), \
+            'temp=' + str(minerstats.tempboardmax()), \
+            savedminer.uptime(minerstats.elapsed), \
+            '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
 
         ##switches miner to default pool
         #if miner.defaultpool:
@@ -55,10 +58,12 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
         #        #minerpool = antminerhelper.pools(miner)
         #        if minerpool is not None:
         #            #find pool number of default pool and switch to it
-        #            switchtopoolnumber = minerpool.findpoolnumberforpool(founddefault.url, founddefault.user)
+        #            switchtopoolnumber = minerpool.findpoolnumberforpool(founddefault.url,
+        #founddefault.user)
         #            if switchtopoolnumber is not None and switchtopoolnumber > 0:
         #                antminerhelper.switch(miner, switchtopoolnumber)
-        #                print(Fore.YELLOW + str(APP.now()), miner.name, 'switched to', miner.defaultpool)
+        #                print(Fore.YELLOW + str(APP.now()), miner.name, 'switched to',
+        #miner.defaultpool)
 
     #APP.putminerandstats(savedminer, minerstats, minerpool)
     #APP.updateknownminer(savedminer)
@@ -67,6 +72,7 @@ def process_result(miner, minerstats, minerinfo, statspolling, minerpool):
     return statspolling.elapsed() * 1000
 
 def getminers(miners):
+    '''get list of miners to poll'''
     listofminers = []
     cnt = MINER_MULTIPLIER
     while cnt > 0:
@@ -76,6 +82,7 @@ def getminers(miners):
     return listofminers
 
 async def run_tasks(cutor, miners):
+    '''poll miners concurrently'''
     listofminers = getminers(miners)
     calltime = MinerApiCall(None)
     calltime.start()
@@ -90,18 +97,20 @@ async def run_tasks(cutor, miners):
     calltime.stop()
 
     totalms = int(calltime.elapsed()*1000)
-    print('{0} api calls in {1}ms. Avg={2}ms'.format(len(listofminers), totalms, totalms/len(listofminers)))
+    print('{0} api calls in {1}ms. Avg={2}ms' \
+        .format(len(listofminers), totalms, totalms/len(listofminers)))
     timesavings = totalpolling - totalms
-    print('Concurrency saved {}ms - {}ms = {}ms ({}%)'.format(totalpolling, totalms, timesavings, int(timesavings/totalpolling*100)))
+    print('Concurrency saved {}ms - {}ms = {}ms ({}%)' \
+        .format(totalpolling, totalms, timesavings, int(timesavings/totalpolling*100)))
 
 
 if __name__ == '__main__':
     MINERS = APP.knownminers()
     APP.print("{0} miners configured".format(len(MINERS)))
 
-    cutor = ThreadPoolExecutor(max_workers=WORKER_THREADS)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_tasks(cutor, MINERS))
-    loop.close()
+    CUTOR = ThreadPoolExecutor(max_workers=WORKER_THREADS)
+    LOOP = asyncio.get_event_loop()
+    LOOP.run_until_complete(run_tasks(CUTOR, MINERS))
+    LOOP.close()
     APP.shutdown()
-    WHATISAID = input('done')
+    #WHATISAID = input('done')

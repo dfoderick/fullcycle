@@ -29,4 +29,4 @@ print('privileged', ACCESS_PRIVILEGED)
 #APP.antminer.waitforonline(MINER)
 
 ACCESS_AFTERRESET = APP.antminer.getaccesslevel(MINER)
-input('press any key...')
+#input('press any key...')

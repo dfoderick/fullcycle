@@ -20,4 +20,4 @@ JSON_POOLS = [SCH.dump(k).data for k in SAVEDPOOLS]
 
 FORMATTED_JSON = json.dumps(JSON_POOLS, sort_keys=True, indent=4, ensure_ascii=False)
 pprint(FORMATTED_JSON)
-input('any key')
+#input('func_config: any key')
