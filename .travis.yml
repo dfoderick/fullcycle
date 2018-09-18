@@ -15,5 +15,11 @@ script:
   - coverage erase
   - coverage run -a test_mining.py
   - coverage run -a test_rules.py
+  - coverage run -a test_bus.py
+  - coverage run -a test_json_message.py
+  - coverage run -a test_minerapi.py
+  - coverage run -a test_pools.py
+  - coverage run -a test_queuenames.py
+  - coverage run -a test_taskschedule.py
 after_success:
     - coveralls
