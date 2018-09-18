@@ -47,6 +47,11 @@ class TestMiner(unittest.TestCase):
         miner.lastmonitor = '2018-04-11T01:28:45+00:00'
         self.assertTrue(miner.formattime(miner.lastmonitor))
 
+    def test_miner_formattime_with_fraction(self):
+        miner = Miner('test')
+        miner.lastmonitor = '2018-04-11T01:28:45.3821739+00:00'
+        self.assertTrue(miner.formattime(miner.lastmonitor))
+
     def test_miner_uses_custom(self):
         miner = Miner('test')
         miner.ftpport = '99'
@@ -125,6 +130,12 @@ class TestMiner(unittest.TestCase):
         miner.monitored(stats, pool=None, info=None, sec=None)
         self.assertFalse(miner.lastmonitor is None)
 
+    def test_miner_monitored_pool(self):
+        miner = Miner('test')
+        stats = domain.minerstatistics.MinerStatistics(miner)
+        miner.monitored(stats, pool=MinerCurrentPool(miner), info=None, sec=None)
+        self.assertTrue(miner.minerpool)
+
     def test_miner_monitored_timer(self):
         miner = Miner('test')
         stats = domain.minerstatistics.MinerStatistics(miner)
@@ -136,13 +147,18 @@ class TestMiner(unittest.TestCase):
 
     def test_miner_update(self):
         miner = Miner('test')
+        miner.minerid='test'
         miner.ipaddress = 'ip1'
         miner.location = 'location1'
         miner.in_service_date = datetime.datetime.now().replace(second=0, microsecond=0)
-        minerupdate = Miner('test')
+        minerupdate = Miner('test1')
+        minerupdate.minerid='test1'
         minerupdate.ipaddress = 'ip2'
         minerupdate.location = 'location2'
         minerupdate.in_service_date = datetime.datetime.now()
+        miner.updatefrom(minerupdate)
+        self.assertFalse(miner.ipaddress == minerupdate.ipaddress)
+        minerupdate.minerid = miner.minerid
         miner.updatefrom(minerupdate)
         self.assertTrue(miner.ipaddress == minerupdate.ipaddress)
         self.assertTrue(miner.location == minerupdate.location)
@@ -252,6 +268,7 @@ class TestMiner(unittest.TestCase):
         }]}
         self.assertTrue(len(miner.pools_available) > 0)
         self.assertTrue(miner.minerpool.findpoolnumberforpool('test', 'test'))
+        self.assertFalse(miner.minerpool.findpoolnumberforpool('not', 'found'))
 
     def test_miner_summary(self):
         miner = Miner("test", '', '', '', '', '', '', '', '')
@@ -260,7 +277,9 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.summary() is not None)
         miner.minerstats = None
         self.assertTrue(miner.summary() is not None)
-
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
+        self.assertTrue(miner.summary() is not None)
+ 
     def test_miner_todate(self):
         dt = Miner.to_date(datetime.datetime.now())
         self.assertTrue(isinstance(dt, datetime.datetime))
@@ -290,7 +309,8 @@ class TestMiner(unittest.TestCase):
         self.assertFalse(miner.should_monitor())
         miner.name="test"
         self.assertTrue(miner.should_monitor())
-        #self.assertFalse(miner.should_monitor())
+        miner.status = MinerStatus.Disabled
+        self.assertTrue(miner.should_monitor())
 
 if __name__ == '__main__':
     unittest.main()

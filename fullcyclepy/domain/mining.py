@@ -291,10 +291,11 @@ class Miner(object):
                 self.minerid = info.minerid
 
     def updatefrom(self, updatedminer):
+        #update the name before the next test
+        if updatedminer.isvalid_minerid() and self.minerid == updatedminer.minerid and self.name != updatedminer.name:
+            self.name = updatedminer.name
         if self.minerid != updatedminer.minerid and self.name != updatedminer.name:
             return
-        if self.minerid == updatedminer.minerid and self.name != updatedminer.name:
-            self.name = updatedminer.name
         self.setminerinfo(updatedminer.minerinfo)
 
         #self.minerid = updatedminer.minerid
@@ -376,9 +377,8 @@ class Pool(object):
                 entity.password = pair['password']
         return entity
 
-
     def is_same_as(self, available_pool: AvailablePool):
-        return available_pool.url == self.url and available_pool.user.startswith(self.user)
+        return available_pool.url.casefold() == self.url.casefold() and available_pool.user.casefold().startswith(self.user.casefold())
 
 class MinerCurrentPool(object):
     '''The current pool where a miner is mining'''

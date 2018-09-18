@@ -4,26 +4,30 @@ from domain.mining import Pool, AvailablePool
 from domain.minerpool import MinerPool
 
 class TestPools(unittest.TestCase):
-    def p_same_as_partial_match(self):
+    def test_availablepool_key(self):
+        available_pool = AvailablePool('S9', None, 'url', 'user', 'x', 0)
+        self.assertTrue(available_pool.key == 'url|user')
+
+    def test_same_as_partial_match(self):
         namedpool = Pool('S9', 'CoolPool', 'tcp://stratum.pool.com', 'workername.', 0)
         available_pool = AvailablePool('S9', None, namedpool.url, 'workername.MinerName', 'x', 0)
         is_same = namedpool.is_same_as(available_pool)
         self.assertTrue(is_same)
 
-    def p_same_as_partial_match_case(self):
+    def test_same_as_partial_match_case(self):
         '''test'''
         namedpool = Pool('S9', 'CoolPool', 'tcp://stratum.pool.com', 'workername.', 0)
         available_pool = AvailablePool('S9', None, \
-            'tcp://STRATUM.POOL.COM', 'workername.MinerName', 'x', 0)
+            namedpool.url.upper(), 'workername.MinerName', 'x', 0)
         is_same = namedpool.is_same_as(available_pool)
         self.assertTrue(is_same)
 
-    def p_same_as_partial_not_match(self):
+    def test_same_as_partial_not_match(self):
         '''test'''
         namedpool = Pool('S9', 'CoolPool', 'tcp://stratum.pool.com', 'workername.', 0)
         available_pool = AvailablePool('S9', None, namedpool.url, 'notyours.MinerName', 'x', 0)
         is_same = namedpool.is_same_as(available_pool)
-        self.assertTrue(is_same)
+        self.assertFalse(is_same)
 
     def test_pool_create(self):
         values = []
