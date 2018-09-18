@@ -20,6 +20,6 @@ script:
   - coverage run -a test_minerapi.py
   - coverage run -a test_pools.py
   - coverage run -a test_queuenames.py
-  - coverage run -a test_taskschedule.py
+  - coverage run -a test_taskscheduler.py
 after_success:
     - coveralls
