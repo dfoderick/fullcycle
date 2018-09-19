@@ -26,10 +26,10 @@ class TaskSchedule(object):
             return self.kick_it_off(True)
         elif self.start is not None and self.lastrun is None:
             #never run before and after start time
-            return self.kick_it_off(now > self.start)
+            return self.kick_it_off(now >= self.start)
         else:
             sincelast = now - self.lastrun
-            if sincelast.total_seconds() > self.interval:
+            if sincelast.total_seconds() >= self.interval:
                 return self.kick_it_off(True)
         return False
 

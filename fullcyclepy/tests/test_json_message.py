@@ -10,7 +10,7 @@ import datetime
 import domain.minerstatistics
 from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool, MinerCommand, Pool, AvailablePool
 from domain.sensors import SensorValue, Sensor
-from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
+import messaging.messages
 import messaging.sensormessages
 import messaging.schema
 from messaging.sensormessages import SensorValueSchema
@@ -24,12 +24,25 @@ class TestSerialization(unittest.TestCase):
         msg = messaging.sensormessages.SensorMessage('','','')
         self.assertTrue(msg)
 
+    def test_messages(self):
+        msg = messaging.messages.MinerCommandMessage()
+
     def test_minercommand(self):
         sch = messaging.schema.MinerCommandSchema()
         cmd = MinerCommand()
         j = sch.dumps(cmd).data
         recommand = sch.loads(j).data
         self.assertTrue(isinstance(recommand, MinerCommand))
+
+    def test_minermessage(self):
+        sch = messaging.messages.MinerMessageSchema()
+        entity = messaging.messages.MinerMessage(Miner('test'))
+        entity.command = MinerCommand('test','test')
+        entity.minerpool = MinerCurrentPool(entity.miner, 'test pool', 'test worker', allpools={})
+        entity.minerstats = domain.minerstatistics.MinerStatistics(entity.miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
+        j = sch.dumps(entity).data
+        reentity = sch.loads(j).data
+        self.assertTrue(isinstance(reentity, messaging.messages.MinerMessage))
 
     def test_pool(self):
         sch = messaging.schema.PoolSchema()
@@ -46,7 +59,7 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(isinstance(reentity, AvailablePool))
 
     def test_minerserialization(self):
-        sch = MinerSchema()
+        sch = messaging.messages.MinerSchema()
         miner = Miner('test')
         miner.status = MinerStatus.Offline
         miner.status = MinerStatus.Online
@@ -62,7 +75,7 @@ class TestSerialization(unittest.TestCase):
         jminer = sch.dumps(miner).data
 
         #rehydrate miner
-        reminer = MinerSchema().loads(jminer).data
+        reminer = messaging.messages.MinerSchema().loads(jminer).data
         self.assertTrue(isinstance(reminer.minerinfo, MinerInfo))
         self.assertTrue(isinstance(reminer.minerpool, MinerCurrentPool))
         self.assertTrue(reminer.minerpool.poolname == 'unittest')
@@ -76,8 +89,8 @@ class TestSerialization(unittest.TestCase):
 
     def test_miner_deserialize(self):
         miner = Miner("unittest", None, "", "unitip", "unitport", "", "")
-        jminer = utils.serialize(miner, MinerSchema())
-        reminer = utils.deserialize(MinerSchema(),jminer) #().loads(jminer).data
+        jminer = utils.serialize(miner, messaging.messages.MinerSchema())
+        reminer = utils.deserialize(messaging.messages.MinerSchema(),jminer) #().loads(jminer).data
         self.assertTrue(isinstance(reminer, Miner),"object from MinerSchema should be a miner")
 
     def test_sensorvalue_serialization(self):
@@ -100,11 +113,11 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(resensor.sensorid == resensor.sensor.sensorid)
 
     def test_config_serialization(self):
-        sch = ConfigurationMessageSchema()
-        msg = ConfigurationMessage('save', '', 'pool', {"configuration_message_id":"name"}, [{"name":"my pool"}])
+        sch = messaging.messages.ConfigurationMessageSchema()
+        msg = messaging.messages.ConfigurationMessage('save', '', 'pool', {"configuration_message_id":"name"}, [{"name":"my pool"}])
         jconfig = sch.dumps(msg).data
         reconfig = sch.loads(jconfig).data
-        self.assertTrue(isinstance(reconfig, ConfigurationMessage))
+        self.assertTrue(isinstance(reconfig, messaging.messages.ConfigurationMessage))
         self.assertTrue(isinstance(reconfig.command, str))
         self.assertTrue(isinstance(reconfig.parameter, str))
         self.assertTrue(isinstance(reconfig.configuration_message_id, dict))
@@ -114,7 +127,7 @@ class TestSerialization(unittest.TestCase):
         app = ApplicationService(component='test')
         values = '{"version":"1.1","sender":"fullcyclereact","type":"configuration","timestamp":"2018-09-16T07:18:34.431Z","body":"{\\"command\\":\\"save\\",\\"parameter\\":\\"\\",\\"id\\":\\"unknown\\",\\"entity\\":\\"miner\\",\\"values\\":[{\\"name\\":\\"S9102\\"},{\\"ipaddress\\":\\"test.com\\"},{\\"port\\":\\"4102\\"},{\\"location\\":\\"222\\"},{\\"in_service_date\\":null}]}"}'
         msg = app.messagedecode_configuration(values)
-        self.assertTrue(isinstance(msg, ConfigurationMessage))
+        self.assertTrue(isinstance(msg, messaging.messages.ConfigurationMessage))
         self.assertTrue(msg.entity == 'miner')
         miner = Miner.create(msg.values)
         self.assertTrue(miner.name == "S9102")
