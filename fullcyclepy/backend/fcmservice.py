@@ -86,7 +86,7 @@ class Configuration(object):
         value = self.__config[lookupkey]
         if isinstance(value, str):
             return value == 'true' or value == 'True'
-        return value
+        return False
 
 class PoolService(BaseService):
     #def __init__(self, configuration, cache):
