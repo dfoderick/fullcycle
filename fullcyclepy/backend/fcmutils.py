@@ -37,10 +37,10 @@ def deserializelist_withschema(schema, the_list):
 def serialize(entity, schema):
     return schema.dumps(entity).data
 
-def serializelist(listofentities):
-    '''serialize a list of entities'''
-    json_list = json.dumps([e.__dict__ for e in listofentities])
-    return json_list
+#def serializelist(listofentities):
+#    '''serialize a list of entities'''
+#    json_list = json.dumps([e.__dict__ for e in listofentities])
+#    return json_list
 
 def deserializelistofstrings(the_list, sch):
     '''deserialize list of strings into list of miners'''

@@ -266,6 +266,9 @@
     <Compile Include="tests\func_temperature.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_utils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\__init__.py" />
     <Compile Include="backend\when_updateweb.py">
       <SubType>Code</SubType>
