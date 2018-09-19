@@ -8,14 +8,43 @@
 import unittest
 import datetime
 import domain.minerstatistics
-from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool
+from domain.mining import Miner, MinerStatus, MinerInfo, MinerCurrentPool, MinerCommand, Pool, AvailablePool
 from domain.sensors import SensorValue, Sensor
 from messaging.messages import MinerSchema, ConfigurationMessage, ConfigurationMessageSchema
+import messaging.sensormessages
+import messaging.schema
 from messaging.sensormessages import SensorValueSchema
 from backend.fcmapp import ApplicationService
 import backend.fcmutils as utils
 
 class TestSerialization(unittest.TestCase):
+    def test_sensors(self):
+        msg = messaging.sensormessages.SensorValueMessage('','','')
+        self.assertTrue(msg)
+        msg = messaging.sensormessages.SensorMessage('','','')
+        self.assertTrue(msg)
+
+    def test_minercommand(self):
+        sch = messaging.schema.MinerCommandSchema()
+        cmd = MinerCommand()
+        j = sch.dumps(cmd).data
+        recommand = sch.loads(j).data
+        self.assertTrue(isinstance(recommand, MinerCommand))
+
+    def test_pool(self):
+        sch = messaging.schema.PoolSchema()
+        entity = Pool('','','','',1,'')
+        j = sch.dumps(entity).data
+        reentity = sch.loads(j).data
+        self.assertTrue(isinstance(reentity, Pool))
+
+    def test_availablepool(self):
+        sch = messaging.schema.AvailablePoolSchema()
+        entity = AvailablePool('type')
+        j = sch.dumps(entity).data
+        reentity = sch.loads(j).data
+        self.assertTrue(isinstance(reentity, AvailablePool))
+
     def test_minerserialization(self):
         sch = MinerSchema()
         miner = Miner('test')

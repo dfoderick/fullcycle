@@ -108,10 +108,10 @@ class AvailablePoolSchema(Schema):
     '''schema for available pool'''
     pool_type = fields.Str()
     named_pool = fields.Nested(PoolSchema, allow_none=True)
-    url = fields.Str()
-    user = fields.Str()
+    url = fields.Str(allow_none=True)
+    user = fields.Str(allow_none=True)
     password = fields.Str(required=False)
-    priority = fields.Int()
+    priority = fields.Int(allow_none=True)
 
     @post_load
     def make(self, data):

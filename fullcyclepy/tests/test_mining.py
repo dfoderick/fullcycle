@@ -216,10 +216,6 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(command.command == '')
         self.assertTrue(command.parameter == '')
 
-    def test_miner_todate(self):
-        dt = Miner.to_date(datetime.datetime.now())
-        self.assertTrue(isinstance(dt, datetime.datetime))
-
     def test_miner_currentpoolname(self):
         miner = Miner('test')
         self.assertTrue(miner.currentpoolname() == '?')

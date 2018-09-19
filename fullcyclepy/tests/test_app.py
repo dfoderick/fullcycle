@@ -1,7 +1,9 @@
+import os
 import unittest
 import backend.fcmutils as utils
 #from backend.fcmapp import ApplicationService
 from domain.mining import AvailablePool
+from domain.rep import MinerRepository, PoolRepository, LoginRepository, RuleParametersRepository
 from messaging.schema import AvailablePoolSchema
 
 class TestApp(unittest.TestCase):
@@ -10,6 +12,39 @@ class TestApp(unittest.TestCase):
         strpool = utils.jsonserialize(AvailablePoolSchema(), pool)
         self.assertTrue(isinstance(strpool, str))
         self.assertFalse(strpool.startswith('['))
+
+    def test_rep_miner_repository(self):
+        homedirectory = os.path.dirname(__file__)
+        config = os.path.join(homedirectory, '../backend/config/miners.conf')
+        rep = MinerRepository()
+        miners = rep.readminers(config)
+        self.assertTrue(miners)
+        miner = rep.getminerbyname(miners[0].name, config)
+        self.assertTrue(miner)
+
+    def test_rep_pool_repository(self):
+        homedirectory = os.path.dirname(__file__)
+        config = os.path.join(homedirectory, '../backend/config/pools.conf')
+        rep = PoolRepository()
+        pools = rep.readpools(config)
+        self.assertTrue(pools)
+        #todo: rep.add
+
+    def test_rep_login_repository(self):
+        homedirectory = os.path.dirname(__file__)
+        config = os.path.join(homedirectory, '../backend/config/ftp.conf')
+        rep = LoginRepository()
+        login = rep.readlogins(config)
+        self.assertTrue(login)
+
+
+    def test_rep_rules_repository(self):
+        homedirectory = os.path.dirname(__file__)
+        config = os.path.join(homedirectory, '../backend/config/rules.conf')
+        rep = RuleParametersRepository()
+        rules = rep.readrules(config)
+        self.assertTrue(rules)
+
 
     #def test_app_knownpools(self):
     #    app = ApplicationService(component='test')
