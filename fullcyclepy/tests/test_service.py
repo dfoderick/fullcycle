@@ -1,8 +1,17 @@
 import unittest
 import backend.fcmservice as service
+import backend.fcmcache as cache
 import domain.mining as mining
 
 class TestService(unittest.TestCase):
+    def getconfig(self):
+        config = service.Configuration({'true.enabled':'true','false.enabled':'false'})
+        return config
+
+    def getcache(self):
+        c = cache.Cache(service.InfrastructureService('', '', '', 80, '', ''))
+        return c
+
     def test_pool_service(self):
         svc = service.PoolService(None, None)
         miner = mining.Miner('test')
@@ -27,14 +36,24 @@ class TestService(unittest.TestCase):
         self.assertTrue(env)
 
     def test_pool_2(self):
-        svc = service.PoolService(None, None)
+        svc = service.PoolService(self.getconfig(), self.getcache())
         env = svc.createmessageenvelope()
         self.assertTrue(svc.serializemessageenvelope(env))
 
     def test_pool_3(self):
-        svc = service.PoolService(None, None)
+        svc = service.PoolService(self.getconfig(), self.getcache())
         env = svc.createmessageenvelope()
         self.assertTrue(svc.deserializemessageenvelope(svc.serializemessageenvelope(env)))
+
+    #def test_pool_knownpools(self):
+    #redis not mocked yet
+    #    svc = service.PoolService(self.getconfig(), self.getcache())
+    #    self.assertFalse(svc.knownpools())
+
+    def test_pool_getpool(self):
+        svc = service.PoolService(self.getconfig(), self.getcache())
+        miner = mining.Miner('test')
+        self.assertFalse(svc.getpool(miner))
 
     def test_configuration(self):
         config = service.Configuration({'a':'b'})

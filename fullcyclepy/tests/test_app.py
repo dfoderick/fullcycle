@@ -45,6 +45,7 @@ class TestApp(unittest.TestCase):
         rules = rep.readrules(config)
         self.assertTrue(rules)
 
+    #AppService needs cache to be mocked first
 
     #def test_app_knownpools(self):
     #    app = ApplicationService(component='test')

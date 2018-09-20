@@ -107,6 +107,8 @@ class PoolService(BaseService):
         return None
 
     def knownpools(self):
+        if not self.cache:
+            return None
         dknownpools = self.cache.gethashset(CacheKeys.knownpools)
         if dknownpools:
             return utils.deserializelist_withschema(AvailablePoolSchema(), list(dknownpools.values()))
@@ -114,6 +116,8 @@ class PoolService(BaseService):
 
     def getpool(self, miner: Miner):
         '''get pool from cache'''
+        if not self.cache:
+            return None
         valu = self.cache.trygetvaluefromcache(miner.name + '.pool')
         if valu is None:
             return None
