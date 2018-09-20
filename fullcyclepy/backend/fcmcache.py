@@ -72,7 +72,7 @@ class Cache:
         try:
             if self.__redis is not None:
                 self.put(key, value)
-        except redis.exceptions.ConnectionError as ex:
+        except redis.exceptions.ConnectionError: # as ex:
             #self.logexception(ex)
             #todo: reenable
             pass

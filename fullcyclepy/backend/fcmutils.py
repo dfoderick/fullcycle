@@ -1,5 +1,4 @@
 #import time
-import json
 
 def safestring(thestring):
     '''safely convert anything into string'''

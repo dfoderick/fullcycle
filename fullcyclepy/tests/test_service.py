@@ -9,15 +9,15 @@ class TestService(unittest.TestCase):
         return config
 
     def getcache(self):
-        c = cache.Cache(service.InfrastructureService('', '', '', 80, '', ''))
-        return c
+        csh = cache.Cache(service.InfrastructureService('', '', '', 80, '', ''))
+        return csh
 
     def test_pool_service(self):
         svc = service.PoolService(None, None)
         miner = mining.Miner('test')
         dto = svc.serialize(miner)
         self.assertTrue(dto)
-        pool = mining.Pool('','','','',1)
+        pool = mining.Pool('', '', '', '', 1)
         dto = svc.serialize(pool)
         self.assertTrue(dto)
         self.assertFalse(svc.serialize('x'))
@@ -61,13 +61,13 @@ class TestService(unittest.TestCase):
         self.assertFalse(config.get('x'))
 
     def test_configuration_isenabled(self):
-        config = service.Configuration({'true.enabled':'true','false.enabled':'false'})
+        config = service.Configuration({'true.enabled':'true', 'false.enabled':'false'})
         self.assertTrue(config.is_enabled('true'))
         self.assertFalse(config.is_enabled('false'))
         self.assertFalse(config.is_enabled('x'))
 
     def test_telegram(self):
-        config = service.Configuration({'true.enabled':'true','false.enabled':'false'})
+        config = service.Configuration({'true.enabled':'true', 'false.enabled':'false'})
         tele = service.Telegram(config, None)
         self.assertTrue(tele)
         tele.sendmessage('x')

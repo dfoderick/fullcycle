@@ -31,7 +31,7 @@ class SensorService(backend.fcmservice.BaseService):
             if sensor_humid is not None:
                 humidity_reading = SensorValue('fullcyclehumid', sensor_humid, 'humidity')
                 humidity_reading.sensor = self.sensor
-        except BaseException as ex:
+        except BaseException: # as ex:
             #self.logexception(ex)
             #todo: reenable
             pass

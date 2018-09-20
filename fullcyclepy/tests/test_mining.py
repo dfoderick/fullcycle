@@ -37,17 +37,17 @@ class TestMiner(unittest.TestCase):
         miner = Miner("test")
         self.assertTrue(miner.key() == 'test')
 
-    def test_miner_formattime_now(self):
+    def test_miner_format_time_now(self):
         miner = Miner('test')
         miner.lastmonitor = datetime.datetime.utcnow()
         self.assertTrue(miner.formattime(miner.lastmonitor))
 
-    def test_miner_formattime_string(self):
+    def test_miner_format_time_string(self):
         miner = Miner('test')
         miner.lastmonitor = '2018-04-11T01:28:45+00:00'
         self.assertTrue(miner.formattime(miner.lastmonitor))
 
-    def test_miner_formattime_with_fraction(self):
+    def test_miner_format_time_with_fraction(self):
         miner = Miner('test')
         miner.lastmonitor = '2018-04-11T01:28:45.3821739+00:00'
         self.assertTrue(miner.formattime(miner.lastmonitor))
@@ -147,12 +147,12 @@ class TestMiner(unittest.TestCase):
 
     def test_miner_update(self):
         miner = Miner('test')
-        miner.minerid='test'
+        miner.minerid = 'test'
         miner.ipaddress = 'ip1'
         miner.location = 'location1'
         miner.in_service_date = datetime.datetime.now().replace(second=0, microsecond=0)
         minerupdate = Miner('test1')
-        minerupdate.minerid='test1'
+        minerupdate.minerid = 'test1'
         minerupdate.ipaddress = 'ip2'
         minerupdate.location = 'location2'
         minerupdate.in_service_date = datetime.datetime.now()
@@ -204,7 +204,7 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.ipaddress == "123.123.123.123")
         self.assertTrue(miner.port == "987")
         self.assertTrue(miner.location == "rack")
-        self.assertTrue(miner.in_service_date.date() == datetime.date(2018,1, 1) )
+        self.assertTrue(miner.in_service_date.date() == datetime.date(2018, 1, 1))
 
     def test_miner_key_original(self):
         miner = Miner('test')
@@ -219,7 +219,7 @@ class TestMiner(unittest.TestCase):
     def test_miner_currentpoolname(self):
         miner = Miner('test')
         self.assertTrue(miner.currentpoolname() == '?')
-        miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={}, poolname = 'unit test')
+        miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={}, poolname='unit test')
         self.assertTrue(miner.currentpoolname() == 'unit test')
         self.assertFalse(miner.minerpool.findpoolnumberforpool('test pool', 'test worker'))
 
@@ -228,39 +228,38 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.pools_available is None)
         miner.minerpool = MinerCurrentPool(miner, 'test pool', 'test worker', allpools={})
         self.assertTrue(len(miner.pools_available) == 0)
-        miner.minerpool.allpools = {
-      "POOLS": [
+        miner.minerpool.allpools = {"POOLS": [
         {
-          "Pool Stale%": 0,
-          "Accepted": 421743,
-          "Difficulty Stale": 0,
-          "Stratum URL": "test",
-          "Rejected": 85,
-          "Difficulty Accepted": 6587318272,
-          "Best Share": 4019408192,
-          "User": "test",
-          "Stratum Active": True,
-          "Difficulty Rejected": 1343488,
-          "Diff": "16.4K",
-          "Remote Failures": 3,
-          "Discarded": 1094132,
-          "Long Poll": "N",
-          "Proxy": "",
-          "Priority": 0,
-          "Has GBT": False,
-          "Pool Rejected%": 0.0204,
-          "Stale": 63,
-          "Last Share Difficulty": 16384,
-          "Diff1 Shares": 0,
-          "Has Stratum": True,
-          "Status": "Alive",
-          "URL": "test",
-          "Quota": 1,
-          "Last Share Time": "0:00:05",
-          "Getworks": 70163,
-          "Get Failures": 3,
-          "POOL": 3,
-          "Proxy Type": ""
+            "Pool Stale%": 0,
+            "Accepted": 421743,
+            "Difficulty Stale": 0,
+            "Stratum URL": "test",
+            "Rejected": 85,
+            "Difficulty Accepted": 6587318272,
+            "Best Share": 4019408192,
+            "User": "test",
+            "Stratum Active": True,
+            "Difficulty Rejected": 1343488,
+            "Diff": "16.4K",
+            "Remote Failures": 3,
+            "Discarded": 1094132,
+            "Long Poll": "N",
+            "Proxy": "",
+            "Priority": 0,
+            "Has GBT": False,
+            "Pool Rejected%": 0.0204,
+            "Stale": 63,
+            "Last Share Difficulty": 16384,
+            "Diff1 Shares": 0,
+            "Has Stratum": True,
+            "Status": "Alive",
+            "URL": "test",
+            "Quota": 1,
+            "Last Share Time": "0:00:05",
+            "Getworks": 70163,
+            "Get Failures": 3,
+            "POOL": 3,
+            "Proxy Type": ""
         }]}
         self.assertTrue(len(miner.pools_available) > 0)
         self.assertTrue(miner.minerpool.findpoolnumberforpool('test', 'test'))
@@ -275,10 +274,10 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.summary() is not None)
         miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
         self.assertTrue(miner.summary() is not None)
- 
+
     def test_miner_todate(self):
-        dt = Miner.to_date(datetime.datetime.now())
-        self.assertTrue(isinstance(dt, datetime.datetime))
+        dttm = Miner.to_date(datetime.datetime.now())
+        self.assertTrue(isinstance(dttm, datetime.datetime))
 
     def test_miner_uptime(self):
         miner = Miner("test", '', '', '', '', '', '', '', '')
@@ -303,7 +302,7 @@ class TestMiner(unittest.TestCase):
         self.assertTrue(miner.should_monitor())
         miner.monitored(domain.minerstatistics.MinerStatistics(miner), None, None, None)
         self.assertFalse(miner.should_monitor())
-        miner.name="test"
+        miner.name = "test"
         self.assertTrue(miner.should_monitor())
         miner.status = MinerStatus.Disabled
         self.assertTrue(miner.should_monitor())

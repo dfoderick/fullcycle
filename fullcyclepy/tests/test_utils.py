@@ -13,15 +13,15 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertTrue(astring)
 
     def test_formattime(self):
-        s = utils.formattime(datetime.datetime.now())
-        self.assertTrue(s)
+        dtnow = utils.formattime(datetime.datetime.now())
+        self.assertTrue(dtnow)
 
     def test_deserializelist(self):
         thelist = ['{"miner_type":"test", "minerid":"test"}']
-        s = utils.deserializelist_withschema(schema.MinerInfoSchema(), thelist)
-        self.assertTrue(len(s) > 0)
+        los = utils.deserializelist_withschema(schema.MinerInfoSchema(), thelist)
+        self.assertTrue(len(los) > 0)
 
     def test_deserializelist_string(self):
         thelist = ['{"miner_type":"test", "minerid":"test"}']
-        s = utils.deserializelistofstrings(thelist, schema.MinerInfoSchema())
-        self.assertTrue(len(s) > 0)
+        los = utils.deserializelistofstrings(thelist, schema.MinerInfoSchema())
+        self.assertTrue(len(los) > 0)

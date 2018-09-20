@@ -19,13 +19,14 @@ import backend.fcmutils as utils
 
 class TestSerialization(unittest.TestCase):
     def test_sensors(self):
-        msg = messaging.sensormessages.SensorValueMessage('','','')
+        msg = messaging.sensormessages.SensorValueMessage('', '', '')
         self.assertTrue(msg)
-        msg = messaging.sensormessages.SensorMessage('','','')
+        msg = messaging.sensormessages.SensorMessage('', '', '')
         self.assertTrue(msg)
 
     def test_messages(self):
         msg = messaging.messages.MinerCommandMessage()
+        self.assertTrue(msg)
 
     def test_minercommand(self):
         sch = messaging.schema.MinerCommandSchema()
@@ -46,7 +47,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_pool(self):
         sch = messaging.schema.PoolSchema()
-        entity = Pool('','','','',1,'')
+        entity = Pool('', '', '', '', 1, '')
         j = sch.dumps(entity).data
         reentity = sch.loads(j).data
         self.assertTrue(isinstance(reentity, Pool))
@@ -90,8 +91,8 @@ class TestSerialization(unittest.TestCase):
     def test_miner_deserialize(self):
         miner = Miner("unittest", None, "", "unitip", "unitport", "", "")
         jminer = utils.serialize(miner, messaging.messages.MinerSchema())
-        reminer = utils.deserialize(messaging.messages.MinerSchema(),jminer) #().loads(jminer).data
-        self.assertTrue(isinstance(reminer, Miner),"object from MinerSchema should be a miner")
+        reminer = utils.deserialize(messaging.messages.MinerSchema(), jminer) #().loads(jminer).data
+        self.assertTrue(isinstance(reminer, Miner), "object from MinerSchema should be a miner")
 
     def test_sensorvalue_serialization(self):
         '''on windows the deserialization seems to lose the fractions of seconds
