@@ -1,4 +1,4 @@
-'''checks for web update'''
+'''checks to see if docker repository image is updated'''
 import json
 import docker
 from helpers.queuehelper import QueueName

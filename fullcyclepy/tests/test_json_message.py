@@ -38,7 +38,7 @@ class TestSerialization(unittest.TestCase):
     def test_minermessage(self):
         sch = messaging.messages.MinerMessageSchema()
         entity = messaging.messages.MinerMessage(Miner('test'))
-        entity.command = MinerCommand('test','test')
+        entity.command = MinerCommand('test', 'test')
         entity.minerpool = MinerCurrentPool(entity.miner, 'test pool', 'test worker', allpools={})
         entity.minerstats = domain.minerstatistics.MinerStatistics(entity.miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
         j = sch.dumps(entity).data

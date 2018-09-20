@@ -101,12 +101,12 @@ def process_stats(entries, savedminer, mineroriginalstatus, minerstats, minerpoo
     check_miner_should_provision(entries, savedminer, minerpool)
 
     print(Fore.CYAN+str(APPMONITOR.app.now()), savedminer.name, savedminer.status,
-            'h='+str(minerstats.currenthash), str(minerstats.minercount),
-            '{0}/{1}/{2}'.format(str(minerstats.tempboard1),
-                                str(minerstats.tempboard2),
-                                str(minerstats.tempboard3)),
-            savedminer.uptime(minerstats.elapsed),
-            '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
+          'h='+str(minerstats.currenthash), str(minerstats.minercount),
+          '{0}/{1}/{2}'.format(str(minerstats.tempboard1),
+                               str(minerstats.tempboard2),
+                               str(minerstats.tempboard3)),
+          savedminer.uptime(minerstats.elapsed),
+          '{0:d}ms'.format(int(savedminer.monitorresponsetime() * 1000)))
     msg = APPMONITOR.app.createmessagestats(savedminer, minerstats, minerpool)
     entries.addbroadcast(QueueName.Q_STATISTICSUPDATED, msg)
 

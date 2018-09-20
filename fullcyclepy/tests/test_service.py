@@ -5,7 +5,7 @@ import domain.mining as mining
 
 class TestService(unittest.TestCase):
     def getconfig(self):
-        config = service.Configuration({'true.enabled':'true','false.enabled':'false'})
+        config = service.Configuration({'true.enabled':'true', 'false.enabled':'false'})
         return config
 
     def getcache(self):

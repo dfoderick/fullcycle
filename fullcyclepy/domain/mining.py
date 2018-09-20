@@ -106,13 +106,13 @@ class Miner(object):
         return miner
 
     @classmethod
-    def to_date(cls, dt):
-        if dt is None:
-            return dt
-        if isinstance(dt, datetime):
-            return dt
+    def to_date(cls, dat):
+        if dat is None:
+            return dat
+        if isinstance(dat, datetime):
+            return dat
         #ISO8601 from javascript
-        parsedtime = datetime.strptime(dt, '%Y-%m-%dT%H:%M:%S.%fZ')
+        parsedtime = datetime.strptime(dat, '%Y-%m-%dT%H:%M:%S.%fZ')
         return Miner.utc_to_local(parsedtime)
 
     @property

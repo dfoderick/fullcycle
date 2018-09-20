@@ -19,16 +19,16 @@ class TestQueuenames(unittest.TestCase):
         self.assertTrue(QueueType.publish == 'publish')
 
     def test_queue_entry(self):
-        q = QueueEntry('', '', '')
-        self.assertTrue(q)
+        que = QueueEntry('', '', '')
+        self.assertTrue(que)
 
     def test_queue_entries(self):
-        q = QueueEntries()
-        self.assertTrue(q)
-        q.add('test', 'test')
-        q.addbroadcast('qbroad', 'test')
-        q.addalert('msg')
-        self.assertTrue(q.hasentries())
+        que = QueueEntries()
+        self.assertTrue(que)
+        que.add('test', 'test')
+        que.addbroadcast('qbroad', 'test')
+        que.addalert('msg')
+        self.assertTrue(que.hasentries())
 
 if __name__ == '__main__':
     unittest.main()

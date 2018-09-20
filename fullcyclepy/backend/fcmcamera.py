@@ -1,11 +1,11 @@
 import os
 import base64
-import backend.fcmservice
-#from backend.fcmservice import BaseService
 from helpers.camerahelper import take_picture
 from messaging.sensormessages import SensorValueSchema
 from domain.sensors import SensorValue
+#from backend.fcmservice import BaseService
 from backend.fcmcache import CacheKeys
+import backend.fcmservice
 
 class CameraService(backend.fcmservice.BaseService):
     #def __init__(self, config, cache):
