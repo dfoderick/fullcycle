@@ -18,6 +18,12 @@ from backend.fcmapp import ApplicationService
 import backend.fcmutils as utils
 
 class TestSerialization(unittest.TestCase):
+
+    def make_miner(self) -> Miner:
+        miner = Miner("unittest", None, "", "unitip", "unitport", "", "")
+        miner.customerid = 1
+        return miner
+
     def test_sensors(self):
         msg = messaging.sensormessages.SensorValueMessage('', '', '')
         self.assertTrue(msg)
@@ -37,7 +43,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_minermessage(self):
         sch = messaging.messages.MinerMessageSchema()
-        entity = messaging.messages.MinerMessage(Miner('test'))
+        entity = messaging.messages.MinerMessage(self.make_miner())
         entity.command = MinerCommand('test', 'test')
         entity.minerpool = MinerCurrentPool(entity.miner, 'test pool', 'test worker', allpools={})
         entity.minerstats = domain.minerstatistics.MinerStatistics(entity.miner, datetime.datetime.utcnow(), 0, 1, 0, 99, 98, 97, 123, '', '', '')
@@ -61,7 +67,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_minerserialization(self):
         sch = messaging.messages.MinerSchema()
-        miner = Miner('test')
+        miner = self.make_miner()
         miner.status = MinerStatus.Offline
         miner.status = MinerStatus.Online
         miner.minerinfo = MinerInfo('Antminer S9', '123')
@@ -77,6 +83,7 @@ class TestSerialization(unittest.TestCase):
 
         #rehydrate miner
         reminer = messaging.messages.MinerSchema().loads(jminer).data
+        self.assertTrue(reminer.customerid == miner.customerid)
         self.assertTrue(isinstance(reminer.minerinfo, MinerInfo))
         self.assertTrue(isinstance(reminer.minerpool, MinerCurrentPool))
         self.assertTrue(reminer.minerpool.poolname == 'unittest')
@@ -89,7 +96,7 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(reminer.in_service_date == miner.in_service_date)
 
     def test_miner_deserialize(self):
-        miner = Miner("unittest", None, "", "unitip", "unitport", "", "")
+        miner = self.make_miner()
         jminer = utils.serialize(miner, messaging.messages.MinerSchema())
         reminer = utils.deserialize(messaging.messages.MinerSchema(), jminer) #().loads(jminer).data
         self.assertTrue(isinstance(reminer, Miner), "object from MinerSchema should be a miner")

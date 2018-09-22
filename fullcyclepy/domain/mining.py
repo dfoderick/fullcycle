@@ -41,9 +41,10 @@ class Miner(object):
                  port='', ftpport='', username='', password='', clientid='', networkid='',
                  minerid='', lastmonitor=None, offlinecount=0, defaultpool='', minerinfo=None,
                  minerpool=None, minerstats=None, laststatuschanged=None,
-                 in_service_date=None, location=None):
+                 in_service_date=None, location=None, customerid=0):
         #friendly name for your miner
         self.name = name
+        self.customerid = customerid
         self._status = status
         #saved or derived from monitoring? type of miner. Antminer S9, Antminer D3, etc.
         self.miner_type = miner_type

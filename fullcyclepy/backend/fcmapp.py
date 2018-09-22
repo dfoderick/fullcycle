@@ -225,7 +225,10 @@ class ApplicationService(BaseService):
     #todo: move to configurations section
     def miners(self):
         '''configured miners'''
+        customerid = self.configuration.get('customerid')
         miners = MinerRepository().readminers(self.getconfigfilename('config/miners.conf'))
+        for miner in miners:
+            miner.customerid = customerid
         return miners
 
     def knownminers(self):

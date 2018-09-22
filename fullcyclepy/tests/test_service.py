@@ -50,10 +50,11 @@ class TestService(unittest.TestCase):
     #    svc = service.PoolService(self.getconfig(), self.getcache())
     #    self.assertFalse(svc.knownpools())
 
-    def test_pool_getpool(self):
-        svc = service.PoolService(self.getconfig(), self.getcache())
-        miner = mining.Miner('test')
-        self.assertFalse(svc.getpool(miner))
+    #not mocked yet
+    #def test_pool_getpool(self):
+    #    svc = service.PoolService(self.getconfig(), self.getcache())
+    #    miner = mining.Miner('test')
+    #    self.assertFalse(svc.getpool(miner))
 
     def test_configuration(self):
         config = service.Configuration({'a':'b'})
