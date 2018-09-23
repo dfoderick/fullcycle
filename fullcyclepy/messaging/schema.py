@@ -45,6 +45,8 @@ class MinerStatsSchema(Schema):
     fan2 = fields.Str()
     fan3 = fields.Str()
     frequency = fields.Str(allow_none=True)
+    hash_avg = fields.Int()
+    hardware_errors = fields.Int()
     rawstats = fields.Dict(allow_none=True)
 
     @post_load

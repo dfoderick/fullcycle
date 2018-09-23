@@ -113,6 +113,26 @@ class TestMiner(unittest.TestCase):
         miner.minerstats = domain.minerstatistics.MinerStatistics(miner)
         self.assertTrue(miner.minerstats.format_elapsed() == "0:0:0:0")
 
+    def test_miner_statistics_seconds(self):
+        miner = Miner('test')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner,hardware_errors=100,elapsed=10)
+        self.assertTrue(miner.minerstats.hardware_errors_per_second == 10)
+
+    def test_miner_statistics_minutes(self):
+        miner = Miner('test')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner,hardware_errors=60,elapsed=60)
+        self.assertTrue(miner.minerstats.hardware_errors_per_minute == 60, str(miner.minerstats.hardware_errors_per_minute))
+
+    def test_miner_statistics_hours(self):
+        miner = Miner('test')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner,hardware_errors=60,elapsed=60*60)
+        self.assertTrue(miner.minerstats.hardware_errors_per_hour == 60, str(miner.minerstats.hardware_errors_per_hour))
+
+    def test_miner_statistics_days(self):
+        miner = Miner('test')
+        miner.minerstats = domain.minerstatistics.MinerStatistics(miner,hardware_errors=60,elapsed=60*60*24)
+        self.assertTrue(miner.minerstats.hardware_errors_per_day == 60)
+
     def test_miner_stats_summary(self):
         miner = Miner('test')
         miner.minerstats = domain.minerstatistics.MinerStatistics(miner)

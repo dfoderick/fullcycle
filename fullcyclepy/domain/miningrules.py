@@ -4,13 +4,17 @@ from domain.mining import Miner
 
 class RuleParameters(object):
     '''configurable parameters for rules'''
-    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, maxtempreset=None):
+    def __init__(self, minertype, hashlimit, controllertemplimit, boardtemplimit, restartaftersec, 
+                 maxtempreset=None, hardware_errors_limit=None, hardware_errors_limit_time=None):
         self.minertype = minertype
         self.hashlimit = hashlimit
         self.controllertemplimit = controllertemplimit
         self.boardtemplimit = boardtemplimit
         self.restartaftersec = restartaftersec
         self.maxtempreset = maxtempreset
+        self.hardware_errors_limit = hardware_errors_limit
+        #hours (24h), minutes (60m), seconds (10s)
+        self.hardware_errors_limit_time = hardware_errors_limit_time
 
 class BrokenRule(object):
     '''broken rules'''
@@ -73,8 +77,15 @@ class MinerStatisticsRule(object):
         self.check_hash()
         self.check_temp_controller()
         self.check_temp_boards()
+        self.check_hardware_errors()
 
         return len(self.brokenrules) > 0
+
+    def check_hardware_errors(self):
+        if MinerStatisticsRule.hasreading_num(self.statistics.hardware_errors):
+            #TODO:for now compare absolute values instead of time normalized
+            if self.statistics.hardware_errors >= self.ruleparameters.hardware_errors_limit:
+                self.addbrokenrule(BrokenRule(self.miner, 'alert', 'on {} high error rate {}'.format(self.miner.name, self.statistics.hardware_errors)))
 
     def check_hash(self):
         if MinerStatisticsRule.hasreading_num(self.statistics.currenthash):

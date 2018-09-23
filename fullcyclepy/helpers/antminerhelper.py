@@ -69,6 +69,8 @@ def parse_statistics(entity, jsonstats, status):
     entity.minercount = int(jsonstats['miner_count'])
     entity.elapsed = int(jsonstats['Elapsed'])
     entity.currenthash = int(float(jsonstats['GHS 5s']))
+    entity.hash_avg = int(float(jsonstats['GHS av']))
+    entity.hardware_errors = int(float(jsonstats['Hardware Errors']))
     entity.frequency = jsonstats['frequency']
 
     frequencies = {k:v for (k, v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}

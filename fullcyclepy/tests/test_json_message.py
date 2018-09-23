@@ -77,6 +77,8 @@ class TestSerialization(unittest.TestCase):
         miner.minerstats.boardstatus1 = 'o'
         miner.minerstats.boardstatus2 = 'oo'
         miner.minerstats.boardstatus3 = 'ooo'
+        miner.minerstats.hardware_errors = 123
+        miner.minerstats.hash_avg = 13000
         miner.location = 'unittest'
         miner.in_service_date = datetime.datetime.today().replace(microsecond=0)
         jminer = sch.dumps(miner).data
@@ -92,6 +94,8 @@ class TestSerialization(unittest.TestCase):
         self.assertTrue(reminer.minerstats.boardstatus1 == 'o')
         self.assertTrue(reminer.minerstats.boardstatus2 == 'oo')
         self.assertTrue(reminer.minerstats.boardstatus3 == 'ooo')
+        self.assertTrue(reminer.minerstats.hardware_errors == 123)
+        self.assertTrue(reminer.minerstats.hash_avg == 13000)
         self.assertTrue(reminer.location == miner.location)
         self.assertTrue(reminer.in_service_date == miner.in_service_date)
 

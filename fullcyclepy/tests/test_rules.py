@@ -102,5 +102,15 @@ class TestRules(unittest.TestCase):
         self.assertTrue(len(rules.brokenrules) == 1)
         self.assertTrue(rules.brokenrules[0].parameter == 'reboot')
 
+    def test_hardware_errors_alert(self):
+        '''test when hardware errors exceeced'''
+        self.minerstats.hardware_errors = 100
+        params = RuleParameters(self.miner.minerinfo.miner_type, 13500, 40, 55, 60*10, None, 99, '10s')
+        rules = MinerStatisticsRule(self.miner, self.minerstats, params)
+        isbroken = rules.isbroken()
+        self.assertTrue(isbroken)
+        self.assertTrue(len(rules.brokenrules) > 0)
+
+
 if __name__ == '__main__':
     unittest.main()

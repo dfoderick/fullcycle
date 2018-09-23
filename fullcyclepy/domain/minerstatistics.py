@@ -40,7 +40,7 @@ class MinerStatistics(object):
                  elapsed=0,
                  fan1='', fan2='', fan3='',
                  boardstatus1='', boardstatus2='', boardstatus3='',
-                 frequency='', rawstats=None):
+                 frequency='', hardware_errors=0, hash_avg=0, rawstats=None):
         self.miner = miner
         self.when = when
         self.minercount = minercount
@@ -49,6 +49,7 @@ class MinerStatistics(object):
         self.tempboard1 = tempboard1
         self.tempboard2 = tempboard2
         self.tempboard3 = tempboard3
+        #elapsed time in seconds
         self.elapsed = elapsed
         self.fan1 = fan1
         self.fan2 = fan2
@@ -57,7 +58,45 @@ class MinerStatistics(object):
         self.boardstatus2 = boardstatus2
         self.boardstatus3 = boardstatus3
         self.frequency = frequency
+        self.hardware_errors = hardware_errors
+        self.hash_avg = hash_avg
         self.rawstats = rawstats
+
+    @property
+    def hardware_errors_per_second(self):
+        if self.elapsed == 0:
+            return None
+        return self.hardware_errors/self.elapsed
+
+    @property
+    def hardware_errors_per_minute(self):
+        if self.elapsed == 0:
+            return None
+        seconds_per_minute = 60
+        if self.elapsed < seconds_per_minute:
+            return None
+        minutes = self.elapsed / seconds_per_minute
+        return self.hardware_errors/minutes
+
+    @property
+    def hardware_errors_per_hour(self):
+        if self.elapsed == 0:
+            return None
+        seconds_per_hour = 60 * 60
+        if self.elapsed < seconds_per_hour:
+            return None
+        hours = self.elapsed / seconds_per_hour
+        return self.hardware_errors/hours
+
+    @property
+    def hardware_errors_per_day(self):
+        if self.elapsed == 0:
+            return None
+        seconds_per_day = 60 * 60 * 24
+        if self.elapsed < seconds_per_day:
+            return None
+        day = self.elapsed / seconds_per_day
+        return self.hardware_errors/day
 
     def tempboardmax(self):
         return max(self.tempboard1, self.tempboard2, self.tempboard3)
