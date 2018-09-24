@@ -1,7 +1,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/150a3245676c4ac7ac742dd08310cb9f)](https://app.codacy.com/app/dfoderick/fullcycle?utm_source=github.com&utm_medium=referral&utm_content=dfoderick/fullcycle&utm_campaign=Badge_Grade_Dashboard)
 [![Join the chat at https://gitter.im/fullcyclemining/Lobby](https://badges.gitter.im/fullcyclemining/Lobby.svg)](https://gitter.im/fullcyclemining/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
 [![Build Status](https://travis-ci.org/dfoderick/fullcycle.svg?branch=master)](https://travis-ci.org/dfoderick/fullcycle) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dfoderick/fullcycle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dfoderick/fullcycle/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/dfoderick/fullcycle/badge.svg?branch=master)](https://coveralls.io/github/dfoderick/fullcycle?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/dfoderick/fullcycle/badge.svg?branch=master)](https://coveralls.io/github/dfoderick/fullcycle?branch=master)  
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BMHSEUYDP9XWW)
 
 # Full Cycle Bitcoin Mining Controller
 Monitoring and active management for your Bitcoin mining operation.
