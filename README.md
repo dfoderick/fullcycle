@@ -198,7 +198,7 @@ If successful you will get a telegram message ('Full Cycle Mining Test ...')
 with a picture from your mining controller
 (assuming you have a camera on your Raspberry Pi).
 ```
-python3 ~/fullcycle/fullcyclepy/tests/test_telegram.py
+python3 ~/fullcycle/fullcyclepy/tests/func_telegram.py
 ```
 If you get any errors running the test - don't worry. Either you do not have a
 camera installed on your Pi or else you are missing an installation step.
