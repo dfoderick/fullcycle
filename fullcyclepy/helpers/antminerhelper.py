@@ -70,7 +70,8 @@ def parse_statistics(entity, jsonstats, status):
     entity.elapsed = int(jsonstats['Elapsed'])
     entity.currenthash = int(float(jsonstats['GHS 5s']))
     entity.hash_avg = int(float(jsonstats['GHS av']))
-    entity.hardware_errors = int(float(jsonstats['Hardware Errors']))
+    if 'Hardware Errors' in jsonstats:
+        entity.hardware_errors = int(float(jsonstats['Hardware Errors']))
     entity.frequency = jsonstats['frequency']
 
     frequencies = {k:v for (k, v) in jsonstats.items() if k.startswith('freq_avg') and v != 0}
