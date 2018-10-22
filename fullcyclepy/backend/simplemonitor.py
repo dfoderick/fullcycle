@@ -9,8 +9,8 @@ from helpers import antminerhelper
 print('Starting...')
 APP = ApplicationService(component='fullcycle')
 APP.print('started app. getting known miners')
-WORKER_THREADS = 10
-MINER_MULTIPLIER = 10
+WORKER_THREADS = 1
+MINER_MULTIPLIER = 1
 
 #async def getstats_async(miner):
 #    minerstats, minerinfo, statspolling, minerpool = await antminerhelper.stats(miner)
