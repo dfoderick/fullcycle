@@ -49,21 +49,57 @@ def stats(miner: Miner):
             if not miner.is_disabled():
                 raise MinerMonitorException(jstatus[0]['description'])
         else:
-            status = jstats['STATS'][0]
-            jsonstats = jstats['STATS'][1]
-            #details = jstats['STATS'][1]
+            miner_software = parse_miner_software(jstats)
+            if miner_software.startswith('sgminer'):
+                jstats = stats_and_pools['STATS']
+                jsonstats = jstats
+                status = jstats[0]
+                jstatus = stats_and_pools['STATUS']
+                minerinfo = helpers.antminerhelper.parse_statistics_inno(entity, jsonstats, status)
 
-            minerinfo = parse_minerinfo(status)
+            else:
+                status = jstats['STATS'][0]
+                jsonstats = jstats['STATS'][1]
 
-            #build MinerStatistics from stats
-            parse_statistics(entity, jsonstats, status)
-            minerpool = parse_minerpool(miner, stats_and_pools['pools'][0])
+                minerinfo = parse_minerinfo(status)
+
+                #build MinerStatistics from stats
+                parse_statistics(entity, jsonstats, status)
+                minerpool = parse_minerpool(miner, stats_and_pools['pools'][0])
 
             return entity, minerinfo, thecall, minerpool
     except BaseException as ex:
         print('Failed to call miner stats api: ' + str(ex))
         raise MinerMonitorException(ex)
     return None, None, None, None
+
+def parse_miner_software(jsonstats):
+    if 'STATUS' in jsonstats:
+        status = jsonstats['STATUS']
+        if len(status) > 0 and  'Description' in status[0]:
+            return status[0]['Description']
+    return 'unknown'
+
+def parse_statistics_inno(entity, jsonstats, status):
+    miner_stats = [x for x in jsonstats if 'ID' in x and x['ID'].startswith('HLT')]
+
+    entity.minercount = len(miner_stats)
+    elapsed =[x['Elapsed'] for x in miner_stats]
+    entity.elapsed = max(elapsed)
+    entity.currenthash = sum([int(float(x['MHS av'])) for x in miner_stats])
+    entity.hash_avg = sum([int(float(x['MHS av'])) for x in miner_stats])
+    entity.hardware_errors = sum([sum({v for (k, v) in y.items() if k.endswith('HW errors')}) for y in miner_stats])
+
+    #entity.frequency = jsonstats['frequency']
+    #entity.frequency = str(int(sum(frequencies.values()) / len(frequencies)))
+
+    controllertemps = [int(float(x['Temp'])) for x in miner_stats]
+    entity.controllertemp = max(controllertemps)
+    dict_temps = {'Temp_'+x['ID']: x['Temp'] for x in miner_stats}
+    parse_board_temps(entity, dict_temps, 'Temp')
+    #some stats are not ready to parse yet
+    #parse_fans(entity, jsonstats)
+    #parse_board_status(entity, jsonstats)
 
 def parse_statistics(entity, jsonstats, status):
     entity.minercount = int(jsonstats['miner_count'])
@@ -103,9 +139,9 @@ def parse_fans(entity, jsonstats):
     if len(fans) > 2:
         entity.fan3 = fans[fankeys[2]]
 
-def parse_board_temps(entity, jsonstats):
+def parse_board_temps(entity, jsonstats, key = 'temp2_'):
     #should be 3
-    boardtemps = {k:v for (k, v) in jsonstats.items() if k.startswith('temp2_') and v != 0}
+    boardtemps = {k:v for (k, v) in jsonstats.items() if k.startswith(key) and v != 0}
     boardtempkeys = list(boardtemps.keys())
     if len(boardtemps) > 0:
         entity.tempboard1 = boardtemps[boardtempkeys[0]]

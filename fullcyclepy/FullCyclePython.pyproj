@@ -259,6 +259,9 @@
     <Compile Include="tests\test_service.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_innosilicon.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_taskscheduler.py">
       <SubType>Code</SubType>
     </Compile>
